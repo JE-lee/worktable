@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/lodash-es": "^4.17.6",
     "async-validator": "^4.2.5",
+    "lodash-es": "^4.17.21",
     "mobx": "^6.7.0"
   }
 }

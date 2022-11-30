@@ -11,9 +11,22 @@ export interface CellPosition {
   field: string // colomn field
 }
 
+export type Row = {
+  data: Record<string, Cell>
+  initialData?: Record<string, any>
+  rid: number // row id
+  children: Row[]
+  rIndex: number
+  parent?: Row
+}
+
+export type Rows = Row[]
+
 export type RowRaw = {
   [field: string]: CellValue
 } & { children?: RowRaw[] }
+
+export type RowRaws = Array<RowRaw>
 
 export type AutoRunContext = { value: CellValue; row: RowRaw }
 
@@ -27,7 +40,6 @@ export interface Cell {
   validating: boolean
   errors: string[]
   position: CellPosition
-  firstValidated: boolean
 }
 
 type ColumnComponent = any
