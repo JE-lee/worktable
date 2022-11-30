@@ -28,6 +28,10 @@ export class Worktable extends Validator {
     this.addRows(this.getRaws())
   }
 
+  getData() {
+    return this.getRaws()
+  }
+
   addRow(raw?: Record<string, any>) {
     const row = this.generateRow(raw)
     this.trackValidateHandle(row)

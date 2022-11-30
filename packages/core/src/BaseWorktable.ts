@@ -14,7 +14,7 @@ export class BaseWorktable {
   protected getRaw(row: Row) {
     const raw: Record<string, any> = {}
     for (const k in row.data) {
-      row[k] = row.data[k].value
+      raw[k] = row.data[k].value
     }
     Object.assign(omit(row.initialData || {}, 'children'), raw)
     if (row.children.length > 0) {
