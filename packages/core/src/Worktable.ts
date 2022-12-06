@@ -11,19 +11,18 @@ export class Worktable extends Validator {
     let initialData: WorktypeConstructorOpt['initialData']
     if (Array.isArray(opt)) {
       columns = opt
-    }
-    if (isObject(opt)) {
+    } else if (isObject(opt)) {
       columns = (opt as WorktypeConstructorOpt).columns
       initialData = (opt as WorktypeConstructorOpt).initialData
     }
-    this.setColumns(columns)
+    this._setColumns(columns)
     if (initialData) {
       this.addRows(initialData)
     }
   }
 
   setColumns(columns: Column[]) {
-    this.columns = cloneDeep(columns)
+    this._setColumns(columns)
     // re-generate row data
     this.addRows(this.getRaws())
   }
@@ -57,4 +56,11 @@ export class Worktable extends Validator {
     }
     return false
   }
+
+  private _setColumns(columns: Column[]) {
+    this.columns = cloneDeep(columns)
+  }
 }
+
+const columns = [{ field: 'code' }]
+const worktable1 = new Worktable({ columns, initialData: [{ code: 'c1' }] })

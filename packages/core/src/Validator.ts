@@ -1,4 +1,5 @@
-import ValidateSchema, { RuleItem } from 'async-validator'
+import { RuleItem } from 'async-validator'
+import ValidateSchema from 'async-validator'
 import { isBoolean, isFunction, omit } from 'lodash-es'
 import { BaseWorktable } from './BaseWorktable'
 import { flatten } from './share'
@@ -28,7 +29,6 @@ export class Validator extends BaseWorktable {
   private validateRow(row: Row) {
     const descriptor = this.makeRowValidateDescriptor(row)
     const rawRow = this.getRaw(row)
-
     const validator = new ValidateSchema(descriptor)
     return validator
       .validate(rawRow)
