@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "@core-build",
+			"type": "shell",
+			"group": "none",
+			"command": "node scripts/debug.build.mjs ${file}",
+			"options": {
+        "cwd": "${workspaceFolder}/packages/core"
+      }
+		}
+	]
+}

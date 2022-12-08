@@ -1,0 +1,21 @@
+{
+  // Use IntelliSense to learn about possible Node.js debug attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "2.0.0",
+  "configurations": [
+    // debug specified file in packages/core
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug @core's file",
+      "program": "debug/${fileBasenameNoExtension}.js",
+      "cwd": "${workspaceRoot}/packages/core",
+      "sourceMaps": true,
+      "smartStep": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "preLaunchTask": "@core-build",
+    },
+  ]
+}

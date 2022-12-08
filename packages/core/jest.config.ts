@@ -176,6 +176,7 @@ export default {
   // transform: undefined,
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
+  // lodash-es 需要编译转换为 cjs
   transformIgnorePatterns: ['<rootDir>/node_modules/(?!lodash-es)'],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them

@@ -6,5 +6,8 @@ module.exports = {
   rules: {
     "prettier/prettier": "error",
     "no-debugger": "warn"
+  },
+  globals: {
+      process: "readonly"
   }
 };

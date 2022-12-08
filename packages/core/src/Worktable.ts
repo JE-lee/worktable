@@ -16,6 +16,7 @@ export class Worktable extends Validator {
       initialData = (opt as WorktypeConstructorOpt).initialData
     }
     this._setColumns(columns)
+    debugger
     if (initialData) {
       this.addRows(initialData)
     }
