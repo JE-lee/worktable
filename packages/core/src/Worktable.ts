@@ -1,22 +1,22 @@
-import { Column, CellValue, WorktypeConstructorOpt, CellPosition, RowRaws } from './types'
+import { Column, CellValue, WorktableConstructorOpt, CellPosition, RowRaws } from './types'
 import { cloneDeep, isObject } from 'lodash-es'
 import { Validator } from './Validator'
+import { runInAction } from 'mobx'
 
 export class Worktable extends Validator {
-  constructor(opt: WorktypeConstructorOpt)
+  constructor(opt: WorktableConstructorOpt)
   constructor(columns: Column[])
   constructor(opt: any) {
     super()
     let columns: Column[] = []
-    let initialData: WorktypeConstructorOpt['initialData']
+    let initialData: WorktableConstructorOpt['initialData']
     if (Array.isArray(opt)) {
       columns = opt
     } else if (isObject(opt)) {
-      columns = (opt as WorktypeConstructorOpt).columns
-      initialData = (opt as WorktypeConstructorOpt).initialData
+      columns = (opt as WorktableConstructorOpt).columns
+      initialData = (opt as WorktableConstructorOpt).initialData
     }
     this._setColumns(columns)
-    debugger
     if (initialData) {
       this.addRows(initialData)
     }
@@ -36,11 +36,12 @@ export class Worktable extends Validator {
     const row = this.generateRow(raw)
     this.trackValidateHandle(row)
     this.rows.push(row)
+    return row
   }
 
   addRows(raws: RowRaws) {
     const rows = this.generateRows(raws)
-    rows.forEach((row) => this.trackValidateHandle(row))
+    // rows.forEach((row) => this.trackValidateHandle(row))
     this.rows.push(...rows)
   }
 
@@ -53,7 +54,10 @@ export class Worktable extends Validator {
     const { rid, field } = position
     const row = this.getRowByRid(rid)
     if (row) {
-      row.data[field].value = value
+      runInAction(() => {
+        row.data[field].value = value
+      })
+      return true
     }
     return false
   }
@@ -62,6 +66,3 @@ export class Worktable extends Validator {
     this.columns = cloneDeep(columns)
   }
 }
-
-const columns = [{ field: 'code' }]
-const worktable1 = new Worktable({ columns, initialData: [{ code: 'c1' }] })

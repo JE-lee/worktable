@@ -1,3 +1,6 @@
+export function noop() {
+  // empty
+}
 export function flatten<T extends { children?: T[] }>(array: T[]) {
   const arr: T[] = []
   array.forEach((node) => {
@@ -20,4 +23,10 @@ export function walk<T extends { children?: T[] }>(
       walk(item.children, action)
     }
   })
+}
+
+export function noThrow<T>(fn: (...args: any[]) => Promise<T>) {
+  return (...args: any[]) => {
+    return fn(...args).catch(noop)
+  }
 }

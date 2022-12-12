@@ -46,7 +46,10 @@ export class BaseWorktable {
       rIndex: -1,
     }
     this.columns.forEach((col) => {
-      const cell = this.generateBaseCell(rid, this.getDefaultValue(col.default))
+      const cell = this.generateBaseCell(
+        rid,
+        (raw?.[col.field] as CellValue) || this.getDefaultValue(col.default)
+      )
       cell.position.field = col.field
       row.data[col.field] = observable(cell)
     })

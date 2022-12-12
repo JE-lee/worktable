@@ -16,14 +16,15 @@ export type Row = {
   initialData?: Record<string, any>
   rid: number // row id
   children: Row[]
-  rIndex: number
+  rIndex: number // index under parent row, encounted from 0
   parent?: Row
 }
 
 export type Rows = Row[]
 
+// TODO: recursive type
 export type RowRaw = {
-  [field: string]: CellValue
+  [field: string]: CellValue | RowRaw[]
 } & { children?: RowRaw[] }
 
 export type RowRaws = Array<RowRaw>
@@ -47,7 +48,7 @@ type ColumnComponent = any
 type ColumnComponentProps = Record<string, any> | ((context: AutoRunContext) => Record<string, any>)
 
 export type Rule = Omit<RuleItem, 'transform' | 'asyncValidator' | 'validator'> & {
-  validator?: (context: AsyncValidatorContext) => Promise<any>
+  validator?: (context: AsyncValidatorContext) => Promise<any> | any
 }
 
 export interface Column {
