@@ -4,19 +4,20 @@ import { Cell, CellValue, Column, Row, RowRaw, RowRaws, Rows } from './types'
 
 export class BaseWorktable {
   static rid = 1
-  columns: Column[] = []
-  rows: Rows = []
+  protected columns: Column[] = []
+  protected rows: Rows = []
 
   protected getRaws() {
     return this.rows.map((row) => this.getRaw(row))
   }
 
   protected getRaw(row: Row) {
-    const raw: Record<string, any> = {}
+    let raw: Record<string, any> = {}
     for (const k in row.data) {
       raw[k] = row.data[k].value
     }
-    Object.assign(omit(row.initialData || {}, 'children'), raw)
+
+    raw = Object.assign(omit(row.initialData || {}, 'children'), raw)
     if (row.children.length > 0) {
       raw.children = row.children.map((child) => this.getRaw(child))
     }

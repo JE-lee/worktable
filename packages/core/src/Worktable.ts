@@ -23,9 +23,12 @@ export class Worktable extends Validator {
   }
 
   setColumns(columns: Column[]) {
+    const raws = this.getRaws()
+
+    this.clearAll()
     this._setColumns(columns)
     // re-generate row data
-    this.addRows(this.getRaws())
+    this.addRows(raws)
   }
 
   getData() {
@@ -41,7 +44,7 @@ export class Worktable extends Validator {
 
   addRows(raws: RowRaws) {
     const rows = this.generateRows(raws)
-    // rows.forEach((row) => this.trackValidateHandle(row))
+    rows.forEach((row) => this.trackValidateHandle(row))
     this.rows.push(...rows)
   }
 
