@@ -1,15 +1,17 @@
 import { RuleItem } from 'async-validator'
 import ValidateSchema from 'async-validator'
 import { isBoolean, isFunction, omit, mapValues } from 'lodash-es'
-import { BaseWorktable } from './BaseWorktable'
 import { flatten, noThrow } from './share'
-import { Column, Row, RowRaw, Rule } from './types'
+import { Column, RowRaw, Rule } from './types'
 import { autorun } from 'mobx'
-export class Validator extends BaseWorktable {
-  isTracking = false
-  disposers: Array<ReturnType<typeof autorun>> = []
+import { Row } from './Row'
+export class Validator {
+  protected rows: Row[] = []
 
-  async validate() {
+  private isTracking = false
+  private disposers: Array<ReturnType<typeof autorun>> = []
+
+  async validateAll() {
     const flatRows = flatten(this.rows)
     let isValid = true
     await Promise.all(
@@ -20,7 +22,7 @@ export class Validator extends BaseWorktable {
       )
     )
     if (isValid) {
-      return this.getRaws()
+      return Promise.resolve(true)
     } else {
       throw new Error('validate failed')
     }
@@ -41,9 +43,9 @@ export class Validator extends BaseWorktable {
     this.isTracking = false
   }
 
-  private validateRow(row: Row) {
+  protected validateRow(row: Row) {
     const descriptor = this.makeRowValidateDescriptor(row)
-    const rawRow = this.getRaw(row)
+    const rawRow = row.getRaw()
     const validator = new ValidateSchema(descriptor)
     this.setRowValidating(row, true)
     return validator
@@ -76,8 +78,9 @@ export class Validator extends BaseWorktable {
   private makeRowValidateDescriptor(row: Row) {
     const descriptor: Record<string, RuleItem> = {}
     // TODO: row proxy
-    const rawRow = this.getRaw(row)
-    this.columns.forEach((colDef) => {
+    const rawRow = row.getRaw()
+    const columns = row.columns
+    columns.forEach((colDef) => {
       if (colDef.rule) {
         descriptor[colDef.field] = this.getRule(colDef.rule)
         // validator

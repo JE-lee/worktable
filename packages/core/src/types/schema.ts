@@ -11,17 +11,6 @@ export interface CellPosition {
   field: string // colomn field
 }
 
-export type Row = {
-  data: Record<string, Cell>
-  initialData?: Record<string, any>
-  rid: number // row id
-  children: Row[]
-  rIndex: number // index under parent row, encounted from 0
-  parent?: Row
-}
-
-export type Rows = Row[]
-
 // TODO: recursive type
 export type RowRaw = {
   [field: string]: CellValue | RowRaw[]

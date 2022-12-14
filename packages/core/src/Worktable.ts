@@ -1,9 +1,10 @@
 import { Column, CellValue, WorktableConstructorOpt, CellPosition, RowRaws } from './types'
 import { cloneDeep, isObject } from 'lodash-es'
-import { Validator } from './Validator'
+import { BaseWorktable } from './BaseWorktable'
 import { runInAction } from 'mobx'
+import { Row } from './Row'
 
-export class Worktable extends Validator {
+export class Worktable extends BaseWorktable {
   constructor(opt: WorktableConstructorOpt)
   constructor(columns: Column[])
   constructor(opt: any) {
@@ -35,16 +36,21 @@ export class Worktable extends Validator {
     return this.getRaws()
   }
 
-  addRow(raw?: Record<string, any>) {
-    const row = this.generateRow(raw)
+  addRow(raw: Record<string, any> = {}) {
+    const row = new Row(this.columns, raw, undefined, this.rows.length)
     this.trackValidateHandle(row)
     this.rows.push(row)
     return row
   }
 
   addRows(raws: RowRaws) {
-    const rows = this.generateRows(raws)
-    rows.forEach((row) => this.trackValidateHandle(row))
+    const rows = Row.generateRows(this.columns, raws)
+    const last = this.rows.length
+    // fix: rIndex
+    rows.forEach((row, index) => {
+      row.rIndex = last + index
+      this.trackValidateHandle(row)
+    })
     this.rows.push(...rows)
   }
 
