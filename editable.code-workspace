@@ -1,0 +1,30 @@
+{
+	"folders": [
+		{
+      // Source code
+      "name": "root",
+      "path": "./"
+    },
+		{
+      // Source code
+      "name": "core",
+      "path": "./packages/core"
+    },
+		{
+      // Source code
+      "name": "element-ui",
+      "path": "./packages/element-ui"
+    },
+		{
+      // Source code
+      "name": "vue",
+      "path": "./packages/vue"
+    },
+	],
+	"settings": {
+		"jest.disabledWorkspaceFolders": [
+			"vue",
+			"root"
+		]
+	}
+}
