@@ -1,5 +1,5 @@
 import { isFunction, isUndefined, omit } from 'lodash-es'
-import { observable } from 'mobx'
+import { observable, makeObservable, runInAction, action } from 'mobx'
 import { Column, RowRaw, Cell, CellValue, RowRaws } from './types'
 
 export class Row {
@@ -20,7 +20,13 @@ export class Row {
     })
   }
 
-  constructor(columns: Column[], raw: RowRaw, parent?: Row, rIndex?: number) {
+  constructor(columns: Column[], raw: RowRaw = {}, parent?: Row, rIndex?: number) {
+    makeObservable(this, {
+      children: observable.shallow,
+      addRow: action,
+      addRows: action,
+    })
+
     this.rid = Row.rid++
     this.columns = columns
     this.parent = parent
@@ -42,6 +48,15 @@ export class Row {
     return raw
   }
 
+  addRow(raw?: RowRaw) {
+    const row = new Row(this.columns, raw, this)
+    this.children.push(row)
+  }
+
+  addRows(raws: RowRaw[] = []) {
+    raws.forEach((raw) => this.addRow(raw))
+  }
+
   private generate(raw: RowRaw) {
     this.columns.forEach((col) => {
       const cell = this.generateBaseCell(
@@ -52,7 +67,9 @@ export class Row {
       this.data[col.field] = observable(cell)
     })
     if (Array.isArray(raw?.children)) {
-      this.children = Row.generateRows(this.columns, raw!.children, this)
+      runInAction(() => {
+        this.children = Row.generateRows(this.columns, raw!.children!, this)
+      })
     }
   }
 

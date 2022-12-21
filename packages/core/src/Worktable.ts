@@ -1,7 +1,7 @@
 import { Column, CellValue, WorktableConstructorOpt, CellPosition, RowRaws } from './types'
 import { cloneDeep, isObject } from 'lodash-es'
 import { BaseWorktable } from './BaseWorktable'
-import { runInAction } from 'mobx'
+import { runInAction, makeObservable, observable, action } from 'mobx'
 import { Row } from './Row'
 
 export class Worktable extends BaseWorktable {
@@ -9,6 +9,8 @@ export class Worktable extends BaseWorktable {
   constructor(columns: Column[])
   constructor(opt: any) {
     super()
+    this.makeObservable()
+
     let columns: Column[] = []
     let initialData: WorktableConstructorOpt['initialData']
     if (Array.isArray(opt)) {
@@ -72,6 +74,17 @@ export class Worktable extends BaseWorktable {
   }
 
   private _setColumns(columns: Column[]) {
-    this.columns = cloneDeep(columns)
+    runInAction(() => (this.columns = cloneDeep(columns)))
+  }
+
+  private makeObservable() {
+    makeObservable(this, {
+      columns: observable.shallow,
+      rows: observable,
+      setColumns: action,
+      addRow: action,
+      addRows: action,
+      clearAll: action,
+    })
   }
 }

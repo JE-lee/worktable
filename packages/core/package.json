@@ -2,10 +2,14 @@
   "name": "@worktable/core",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "esm/index.js",
+  "module": "esm",
+  "types": "esm/index.d.ts",
   "scripts": {
     "test": "jest",
-    "debug-build": "tsc --pretty"
+    "build": "npm run clean && npm run ts-build",
+    "clean": "rimraf esm",
+    "ts-build": "tsc --project tsconfig.build.json --module es2015 --outDir esm"
   },
   "author": "",
   "license": "ISC",

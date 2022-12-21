@@ -4,8 +4,8 @@ import { Validator } from './Validator'
 import type { Row } from './Row'
 export class BaseWorktable extends Validator {
   static rid = 1
-  protected columns: Column[] = []
-  protected Rows: Row[] = []
+  columns: Column[] = []
+  rows: Row[] = []
 
   protected getRaws() {
     return this.rows.map((row) => row.getRaw())

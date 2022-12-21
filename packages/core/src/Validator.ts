@@ -6,7 +6,7 @@ import { Column, RowRaw, Rule } from './types'
 import { autorun } from 'mobx'
 import { Row } from './Row'
 export class Validator {
-  protected rows: Row[] = []
+  rows: Row[] = []
 
   private isTracking = false
   private disposers: Array<ReturnType<typeof autorun>> = []
