@@ -56,7 +56,7 @@ export class Validator {
           for (const k in row.data) {
             // 性能优化
             if (row.data[k].errors.length > 0) {
-              row.data[k].errors = []
+              row.data[k].setState('errors', [])
             }
           }
         }
@@ -67,7 +67,7 @@ export class Validator {
           const errors = err.errors || []
           errors.forEach((item: any) => {
             const cell = row.data[item.field]
-            cell.errors = [item.message]
+            cell.setState('errors', [item.message])
           })
         }
         throw err

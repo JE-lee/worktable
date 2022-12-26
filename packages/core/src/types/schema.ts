@@ -24,14 +24,6 @@ export type EventContext = AutoRunContext
 
 export type AsyncValidatorContext = AutoRunContext
 
-export interface Cell {
-  value: CellValue
-  previewing: boolean
-  validating: boolean
-  errors: string[]
-  position: CellPosition
-}
-
 type ColumnComponent = any
 
 type ColumnComponentProps = Record<string, any> | ((context: AutoRunContext) => Record<string, any>)
@@ -44,7 +36,7 @@ export interface Column {
   title?: string
   field: string
   type?: ValueType
-  // width?: number
+  width?: number
   component?: ColumnComponent
   preview?: ColumnComponent
   componentProps?: ColumnComponentProps

@@ -3,7 +3,7 @@ import { cloneDeep, isObject } from 'lodash-es'
 import { BaseWorktable } from './BaseWorktable'
 import { runInAction, makeObservable, observable, action } from 'mobx'
 import { Row } from './Row'
-
+import { flatten } from './share'
 export class Worktable extends BaseWorktable {
   constructor(opt: WorktableConstructorOpt)
   constructor(columns: Column[])
@@ -62,15 +62,16 @@ export class Worktable extends BaseWorktable {
   }
 
   inputValue(position: CellPosition, value: CellValue) {
-    const { rid, field } = position
-    const row = this.getRowByRid(rid)
-    if (row) {
-      runInAction(() => {
-        row.data[field].value = value
-      })
+    const cell = this.getCell(position)
+    if (cell) {
+      cell.setState('value', value)
       return true
     }
     return false
+  }
+
+  getCell(pos: CellPosition) {
+    return flatten(this.rows).find((r) => r.rid === pos.rid)?.data[pos.field]
   }
 
   private _setColumns(columns: Column[]) {
@@ -80,7 +81,7 @@ export class Worktable extends BaseWorktable {
   private makeObservable() {
     makeObservable(this, {
       columns: observable.shallow,
-      rows: observable,
+      rows: observable.shallow,
       setColumns: action,
       addRow: action,
       addRows: action,

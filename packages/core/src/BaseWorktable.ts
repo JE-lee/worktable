@@ -10,7 +10,8 @@ export class BaseWorktable extends Validator {
   protected getRaws() {
     return this.rows.map((row) => row.getRaw())
   }
-  protected getRowByRid(rid: string | number) {
+
+  public getRowByRid(rid: string | number) {
     return flatten(this.rows).find((row) => row.rid == rid)
   }
 

@@ -1,6 +1,7 @@
-import { isFunction, isUndefined, omit } from 'lodash-es'
+import { isFunction, omit } from 'lodash-es'
 import { observable, makeObservable, runInAction, action } from 'mobx'
-import { Column, RowRaw, Cell, CellValue, RowRaws } from './types'
+import { Column, RowRaw, CellValue, RowRaws } from './types'
+import { Cell } from './Cell'
 
 export class Row {
   static rid = 1
@@ -59,8 +60,9 @@ export class Row {
 
   private generate(raw: RowRaw) {
     this.columns.forEach((col) => {
-      const cell = this.generateBaseCell(
-        col.field,
+      const cell = Cell.generateBaseCell(
+        this.rid,
+        col,
         (raw?.[col.field] as CellValue) || this.getDefaultValue(col.default)
       )
       cell.position.field = col.field
@@ -70,19 +72,6 @@ export class Row {
       runInAction(() => {
         this.children = Row.generateRows(this.columns, raw!.children!, this)
       })
-    }
-  }
-
-  private generateBaseCell(field: string, value?: CellValue): Cell {
-    return {
-      value: isUndefined(value) ? '' : value, // TODO: infer default value from it's type
-      previewing: true,
-      validating: false,
-      errors: [],
-      position: {
-        rid: this.rid,
-        field,
-      },
     }
   }
   private getDefaultValue<T>(_default: T | (() => T)) {
