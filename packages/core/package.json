@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "esm/index.js",
-  "module": "esm",
-  "types": "esm/index.d.ts",
+  "module": "esm/index.js",
+  "types": "esm/types/index.d.ts",
   "scripts": {
     "test": "jest",
-    "build": "npm run clean && npm run ts-build",
+    "build": "npm run clean && npm run rollup-build",
     "clean": "rimraf esm",
-    "ts-build": "tsc --project tsconfig.build.json --module es2015 --outDir esm"
+    "ts-build": "tsc --project tsconfig.build.json --module es2015 --outDir esm",
+    "rollup-build": "rollup -c"
   },
   "author": "",
   "license": "ISC",

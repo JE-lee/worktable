@@ -4,11 +4,16 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'
 const config = {
   input: 'src/index.ts',
   output: {
-    dir: 'output',
+    dir: 'esm',
     format: 'es',
     sourcemap: true,
   },
-  plugins: [typescript(), nodeResolve()],
+  plugins: [
+    typescript({
+      tsconfig: './tsconfig.rollup.build.json',
+    }),
+    nodeResolve(),
+  ],
 }
 
 export default config
