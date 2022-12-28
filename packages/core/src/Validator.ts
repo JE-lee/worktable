@@ -1,7 +1,7 @@
 import { RuleItem } from 'async-validator'
 import ValidateSchema from 'async-validator'
 import { isBoolean, isFunction, omit, mapValues } from 'lodash-es'
-import { flatten, noThrow } from './share'
+import { flatten, noThrow, makeRowProxy } from './share'
 import { Column, RowRaw, Rule } from './types'
 import { autorun } from 'mobx'
 import { Row } from './Row'
@@ -38,6 +38,7 @@ export class Validator {
 
   protected trackValidateHandle(row: Row) {
     this.isTracking = true
+    // TODO: track cell validator
     const disposer = autorun(noThrow(() => this.validateRow(row)))
     this.disposers.push(disposer)
     this.isTracking = false
@@ -48,8 +49,8 @@ export class Validator {
     const rawRow = row.getRaw()
     const validator = new ValidateSchema(descriptor)
     this.setRowValidating(row, true)
-    return validator
-      .validate(rawRow)
+    const validateResult = validator.validate(rawRow)
+    return validateResult
       .then((res) => {
         if (!this.isTracking) {
           // clear all row errors
@@ -77,8 +78,7 @@ export class Validator {
 
   private makeRowValidateDescriptor(row: Row) {
     const descriptor: Record<string, RuleItem> = {}
-    // TODO: row proxy
-    const rawRow = row.getRaw()
+    const rawRow = makeRowProxy(row)
     const columns = row.columns
     columns.forEach((colDef) => {
       if (colDef.rule) {

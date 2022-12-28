@@ -74,6 +74,16 @@ export class Worktable extends BaseWorktable {
     return flatten(this.rows).find((r) => r.rid === pos.rid)?.data[pos.field]
   }
 
+  setCellEditable(pos: CellPosition) {
+    const flatRows = flatten(this.rows)
+    flatRows.forEach((row) => {
+      for (const field in row.data) {
+        row.data[field].setState('previewing', true)
+      }
+    })
+    this.getCell(pos)?.setState('previewing', false)
+  }
+
   private _setColumns(columns: Column[]) {
     runInAction(() => (this.columns = cloneDeep(columns)))
   }

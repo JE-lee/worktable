@@ -1,5 +1,7 @@
 import { RuleItem } from 'async-validator'
 
+export type Options = Array<{ label: string; value: any }>
+
 export type ValueType = 'boolean' | 'string' | 'number' | 'object' | 'array'
 
 type BaseCellValue = string | number | boolean
@@ -41,7 +43,7 @@ export interface Column {
   preview?: ColumnComponent
   componentProps?: ColumnComponentProps
   default?: CellValue | (() => CellValue)
-  // enum?: Options
+  enum?: Options
   rule?: Rule
   hidden?: boolean
   virtual?: boolean

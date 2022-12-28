@@ -3,9 +3,10 @@ import { CellState, CellValue, Column } from './types'
 import { isUndefined } from 'lodash-es'
 import { makeAutoObservable, runInAction } from 'mobx'
 
+// TODO: getter of previweing and validating
 export class Cell {
   value: CellValue
-  previewing = false
+  previewing = true
   validating = false
   errors: string[] = []
   position: CellPosition

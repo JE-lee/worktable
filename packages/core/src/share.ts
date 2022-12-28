@@ -1,3 +1,7 @@
+import { isObject } from 'lodash-es'
+import { RowRaw } from './types'
+import { Row } from './Row'
+
 export function noop() {
   // empty
 }
@@ -29,4 +33,30 @@ export function noThrow<T>(fn: (...args: any[]) => Promise<T>) {
   return (...args: any[]) => {
     return fn(...args).catch(noop)
   }
+}
+
+// TODO: extract this function to a shared module
+export function makeRowProxy(row: Row): RowRaw {
+  return new Proxy(row, {
+    get(target: Row, prop: string) {
+      if (typeof prop === 'string') {
+        if (prop === 'parent') {
+          return row.parent ? makeRowProxy(row.parent) : null
+        } else {
+          const cell = target.data[prop]
+          return isObject(cell) ? cell.value : cell
+        }
+      } else {
+        return Reflect.get(target, prop)
+      }
+    },
+    set(target: Row, prop: string, newValue: any) {
+      if (typeof prop === 'string') {
+        const cell = target.data[prop]
+        return isObject(cell) ? Reflect.set(cell, 'value', newValue) : false
+      } else {
+        return false
+      }
+    },
+  }) as unknown as RowRaw
 }
