@@ -1,71 +1,42 @@
-import { defineComponent, inject, computed, h } from 'vue-demi'
+import { defineComponent, inject, h, provide } from 'vue-demi'
 import { Table as ElTable, TableColumn as ElTableColumn } from 'element-ui'
 import { VNodeData } from 'vue'
-import { getWorktableInjectKey } from './shared'
+import { getWorktableInjectKey, innerDefaultKey } from '@/shared'
 import { Worktable, Row } from '@worktable/core'
-import { TableCell } from './component'
-import isFunction from 'lodash/isFunction'
+import { TableCell } from '@/components/TableCell'
+import { mergePosKey, splitPosKey } from '@/shared/pos-key'
+import { computed as mobxComputed } from 'mobx'
+import { observer } from 'mobx-vue'
 
 const ROWID = '_rowid'
-const sperator = '$'
-const mergePosKey = (index: number, field: string) => `${index}${sperator}${field}`
-const splitPosKey = (key: string) => {
-  const [index, field] = key.split(sperator)
-  return [+index, field] as [number, string]
-}
 
-export default defineComponent({
-  name: 'EditTable',
+const InnerWorktable = defineComponent({
+  name: 'Worktable',
   props: {
     name: String, // injected key
   },
   setup(props, { attrs, listeners }) {
-    const context = inject(getWorktableInjectKey(props.name)) as Worktable
-    // dynamic columns
-    // const columns = computed(() =>
-    //   context.columns.filter((colDef) => !colDef.hidden /* && !colDef.virtual */)
-    // )
-    // const {
-    //   rows,
-    //   pagination: { paginationAttrs, paginationListeners, total },
-    //   selectRows,
-    //   getCell,
-    // } = context
-    const { getColumns } = context
-    const columns = getColumns()
+    const key = getWorktableInjectKey(props.name)
+    const worktable = inject(key) as Worktable
+    provide(innerDefaultKey, worktable)
 
-    function generatePosData(rows: Row[]) {
-      return rows.map((row) => {
-        const rowPos: Record<string, string> & {
-          children?: Array<Record<string, string>>
-        } = {}
-        for (const field in row.data) {
-          const { rid } = row.data[field].position
-          rowPos[field] = mergePosKey(rid, field)
-        }
-        rowPos[ROWID] = `${row.rid}`
-        // 树形数据
-        if (row.children) {
-          rowPos['children'] = generatePosData(row.children)
-        }
-        return rowPos
-      })
-    }
-
-    // const positions = computed(() => generatePosData(rows.value))
-    const positions = generatePosData()
+    const positions = mobxComputed(() => generatePosData(worktable.rows))
 
     // render columns
     function renderColumns() {
-      const _columns = columns.value.map((col) => {
+      const _columns = worktable.columns.map((col) => {
         const scopedSlots: VNodeData['scopedSlots'] = {}
 
-        // 在 table-row 渲染函数上执行
+        // 在 table-row 渲染函数上执行, 当 cell 的 value 改变时，整行重新渲染
         scopedSlots.default = (scope) => {
           const row = scope.row as Record<string, string>
           const [rid, field] = splitPosKey(row[col.field])
           const pos = { rid, field }
-          const cell = getCell(pos)
+          const cell = worktable.getCell(pos)
+          console.log('cell scope render', field)
+          if (!cell && process.env.NODE_ENV === 'development') {
+            console.warn(`not a validable cell in postion ${pos}`)
+          }
 
           return h(TableCell, {
             attrs: { cell, colDef: col },
@@ -113,11 +84,10 @@ export default defineComponent({
       return h(
         ElTable,
         {
-          attrs,
-          props: {
-            data: positions.value,
+          attrs: Object.assign({}, attrs, {
+            data: positions.get(),
             'row-key': ROWID,
-          },
+          }),
           // on: Object.assign({}, listeners, {
           //   'selection-change': onTableSelectionChange,
           // }) as any,
@@ -131,3 +101,24 @@ export default defineComponent({
     }
   },
 })
+
+function generatePosData(rows: Row[]) {
+  return rows.map((row) => {
+    const rowPos: Record<string, string> & {
+      children?: Array<Record<string, string>>
+    } = {}
+
+    for (const field in row.data) {
+      const { rid } = row.data[field].position
+      rowPos[field] = mergePosKey(rid, field)
+    }
+    rowPos[ROWID] = `${row.rid}`
+    // 树形数据
+    if (row.children) {
+      rowPos['children'] = generatePosData(row.children)
+    }
+    return rowPos
+  })
+}
+
+export default observer(InnerWorktable as any)
