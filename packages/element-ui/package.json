@@ -2,10 +2,13 @@
   "name": "@worktable/element-ui",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "esm/index.js",
+  "module": "esm/index.js",
+  "types": "esm/types/index.d.ts",
   "scripts": {
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs",
+    "build": "npm run ts-build",
     "test": "jest",
     "ts-build": "rimraf esm && tsc --project tsconfig.build.json --module es2015 --outDir esm"
   },
