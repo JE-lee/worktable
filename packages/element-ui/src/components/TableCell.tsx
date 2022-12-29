@@ -24,16 +24,14 @@ export const TableCell = observer(
     },
     setup(props) {
       const { worktable } = inject(innerDefaultKey) as Context
-
+      const colDef = props.colDef as Column
+      const cell = props.cell as Cell
+      const row = worktable.getRowByRid(cell.position.rid)
+      if (!row && process.env.NODE_ENV === 'development') {
+        console.warn(`not a validable row with rid ${cell.position.rid}`)
+      }
       return () => {
-        const colDef = props.colDef as Column
-        const cell = props.cell as Cell
-        const row = worktable.getRowByRid(cell.position.rid)
-        if (!row && process.env.NODE_ENV === 'development') {
-          console.warn(`not a validable row with rid ${cell.position.rid}`)
-        }
         const rowProxy = makeRowProxy(row!)
-
         function runWithContext<T extends (...args: any[]) => any>(run: T) {
           return run({
             row: rowProxy,

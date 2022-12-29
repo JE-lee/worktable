@@ -11,5 +11,6 @@ export function useWorktable(opt: useWorkTableOpt) {
 
   return {
     validate: worktable.validate.bind(worktable),
+    remove: worktable.remove.bind(worktable),
   }
 }
