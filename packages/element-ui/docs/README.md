@@ -1,4 +1,7 @@
 ## worktable element-ui
 
-<i class="el-icon-platform-eleme"></i>
 <basic-worktable></basic-worktable>
+
+<tree-worktable></tree-worktable>
+
+<size-worktable></size-worktable>
