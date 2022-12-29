@@ -137,4 +137,27 @@ describe('Worktable', () => {
     rid = row.rid
     expect(worktable.getRowByRid(rid)).toBe(row)
   })
+
+  test('remove row', async () => {
+    const mockValidator = jest.fn(({ value }) => !!value)
+    const columns: Column[] = [{ field: 'code', rule: { validator: mockValidator } }]
+    const wt = new Worktable(columns)
+    const row1 = wt.addRow({ code: 9 })
+    wt.remove(row1.rid)
+    expect(wt.rows.length).toBe(0)
+
+    wt.addRow({ id: 1, code: 9 })
+    wt.addRow({ id: 2, code: 9 })
+    wt.addRow({ id: 3, code: 9 })
+    wt.remove((row) => row.id < 3)
+    expect(wt.rows.length).toBe(1)
+
+    wt.removeAll()
+
+    const times = mockValidator.mock.calls.length
+    const row2 = wt.addRow({ code: 9 })
+    wt.remove(row2.rid)
+    row2.data['code'].value = 10
+    expect(mockValidator.mock.calls.length).toBe(times + 1)
+  })
 })

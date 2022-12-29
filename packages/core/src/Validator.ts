@@ -41,6 +41,7 @@ export class Validator {
     // TODO: track cell validator
     const disposer = autorun(noThrow(() => this.validateRow(row)))
     this.disposers.push(disposer)
+    row.disposers = [disposer]
     // don't need to wait for validation finish
     this.isTracking = false
   }

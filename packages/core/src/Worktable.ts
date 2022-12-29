@@ -1,9 +1,9 @@
-import { Column, CellValue, WorktableConstructorOpt, CellPosition, RowRaws } from './types'
-import { cloneDeep, isObject } from 'lodash-es'
+import { Column, CellValue, WorktableConstructorOpt, CellPosition, RowRaws, Filter } from './types'
+import { cloneDeep, isObject, isFunction } from 'lodash-es'
 import { BaseWorktable } from './BaseWorktable'
 import { runInAction, makeObservable, observable, action } from 'mobx'
 import { Row } from './Row'
-import { flatten } from './share'
+import { flatten, walk } from './share'
 export class Worktable extends BaseWorktable {
   constructor(opt: WorktableConstructorOpt)
   constructor(columns: Column[])
@@ -28,7 +28,7 @@ export class Worktable extends BaseWorktable {
   setColumns(columns: Column[]) {
     const raws = this.getRaws()
 
-    this.clearAll()
+    this.removeAll()
     this._setColumns(columns)
     // re-generate row data
     this.addRows(raws)
@@ -58,7 +58,7 @@ export class Worktable extends BaseWorktable {
     this.rows.push(...rows)
   }
 
-  clearAll() {
+  removeAll() {
     this.rows = []
     this.stopWatchValidation()
   }
@@ -70,6 +70,16 @@ export class Worktable extends BaseWorktable {
       return true
     }
     return false
+  }
+
+  findAll(filter: Filter) {
+    const rows: Row[] = []
+    walk(this.rows, (row) => {
+      if (filter(row.getRaw())) {
+        rows.push(row)
+      }
+    })
+    return rows
   }
 
   getCell(pos: CellPosition) {
@@ -86,6 +96,35 @@ export class Worktable extends BaseWorktable {
     this.getCell(pos)?.setState('previewing', false)
   }
 
+  remove(rid: number): void
+  remove(filter: Filter): void
+  remove(filter: any): void {
+    const rows: Row[] = []
+    if (isFunction(filter)) {
+      rows.push(...this.findAll(filter as Filter))
+    } else {
+      const row = this.getRowByRid(filter)
+      row && rows.push(row)
+    }
+    rows.forEach((row) => this.removeRow(row))
+  }
+
+  removeRow(row: Row) {
+    let workRows = this.rows
+    if (row.parent) {
+      workRows = row.parent.children
+    }
+
+    const index = workRows.findIndex((r) => r === row)
+    if (index > -1) {
+      const [removed] = workRows.splice(index, 1)
+      removed.stopWatchValidation()
+      row.disposers = []
+      // reset row.rIndex
+      workRows.forEach((row, index) => (row.rIndex = index))
+    }
+  }
+
   private _setColumns(columns: Column[]) {
     runInAction(() => (this.columns = cloneDeep(columns)))
   }
@@ -97,7 +136,8 @@ export class Worktable extends BaseWorktable {
       setColumns: action,
       addRow: action,
       addRows: action,
-      clearAll: action,
+      removeAll: action,
+      removeRow: action,
     })
   }
 }

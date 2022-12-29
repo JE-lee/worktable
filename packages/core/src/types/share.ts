@@ -1,4 +1,4 @@
-import { Column, RowRaws } from './schema'
+import { Column, RowRaw, RowRaws } from './schema'
 
 export interface WorktableConstructorOpt {
   columns: Column[]
@@ -6,3 +6,5 @@ export interface WorktableConstructorOpt {
 }
 
 export type CellState = 'value' | 'previewing' | 'validating' | 'errors'
+
+export type Filter = (row: RowRaw) => boolean

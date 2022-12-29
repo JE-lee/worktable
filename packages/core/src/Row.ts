@@ -1,5 +1,5 @@
 import { isFunction, omit } from 'lodash-es'
-import { observable, makeObservable, runInAction, action } from 'mobx'
+import { observable, makeObservable, runInAction, action, autorun } from 'mobx'
 import { Column, RowRaw, CellValue, RowRaws } from './types'
 import { Cell } from './Cell'
 
@@ -11,6 +11,7 @@ export class Row {
   parent?: Row
   rIndex?: number
   columns: Column[]
+  disposers: Array<ReturnType<typeof autorun>> = []
 
   private initialData: Record<string, any> = {}
 
@@ -37,16 +38,16 @@ export class Row {
   }
 
   getShallowRaw() {
-    const raw: Record<string, any> = {}
+    let raw: Record<string, any> = {}
     for (const k in this.data) {
       raw[k] = this.data[k].value
     }
+    raw = Object.assign(omit(this.initialData || {}, 'children'), raw)
     return raw
   }
 
   getRaw() {
-    let raw = this.getShallowRaw()
-    raw = Object.assign(omit(this.initialData || {}, 'children'), raw)
+    const raw = this.getShallowRaw()
     if (this.children.length > 0) {
       raw.children = this.children.map((child) => child.getRaw())
     }
@@ -60,6 +61,10 @@ export class Row {
 
   addRows(raws: RowRaw[] = []) {
     raws.forEach((raw) => this.addRow(raw))
+  }
+
+  stopWatchValidation() {
+    this.disposers.forEach((disposer) => disposer())
   }
 
   private generate(raw: RowRaw) {
