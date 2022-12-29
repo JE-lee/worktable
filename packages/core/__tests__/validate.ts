@@ -77,7 +77,7 @@ describe('validate', () => {
     expect(errors[1]).toEqual({ code: [message] })
   })
 
-  test('shoule re-validate automatically', async () => {
+  test('should re-validate automatically', async () => {
     const message = 'must be greater than 10'
     const mockValidator = jest.fn(({ value }) => value > 10)
     const columns: Column[] = [
@@ -101,6 +101,32 @@ describe('validate', () => {
     expect(mockValidator.mock.calls.length).toBe(3)
     const errors = worktable.getValidateErrors()
     expect(errors[0]).toEqual({ code: [message] })
+  })
+
+  test('child row should re-validate automatically', async () => {
+    const message = 'must be greater than 10'
+    const mockValidator = jest.fn(({ value }) => value > 10)
+    const columns: Column[] = [
+      {
+        field: 'code',
+        rule: {
+          message,
+          validator: mockValidator,
+        },
+      },
+    ]
+    const worktable = new Worktable(columns)
+    const parent = worktable.addRow({ code: 12, children: [{ code: 13 }] }) // 2
+    const row = parent.children[0]
+    expect(mockValidator.mock.calls.length).toBe(2)
+    await worktable.validate() // 4 times
+
+    worktable.inputValue({ rid: row.rid, field: 'code' }, 9) // 5 times
+    // wait for worktable asynchronous validate process finished
+    // TODO:
+    await delay(20)
+    expect(mockValidator.mock.calls.length).toBe(5)
+    expect(row.data['code'].errors[0]).toEqual(message)
   })
 
   test('stop watching validation', async () => {

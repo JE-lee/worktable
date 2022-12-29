@@ -126,4 +126,15 @@ describe('Worktable', () => {
     expect(consumer.mock.calls.length).toBe(2)
     expect(consumer.mock.results[1].value).toBe('B')
   })
+
+  test('getRowByRid', () => {
+    const worktable = generateWorktable()
+    let row = worktable.rows[0]
+    let rid = row.rid
+    expect(worktable.getRowByRid(rid)).toBe(row)
+
+    row = row.children[0]
+    rid = row.rid
+    expect(worktable.getRowByRid(rid)).toBe(row)
+  })
 })

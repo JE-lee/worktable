@@ -36,12 +36,16 @@ export class Row {
     this.generate(raw)
   }
 
-  getRaw() {
-    let raw: Record<string, any> = {}
+  getShallowRaw() {
+    const raw: Record<string, any> = {}
     for (const k in this.data) {
       raw[k] = this.data[k].value
     }
+    return raw
+  }
 
+  getRaw() {
+    let raw = this.getShallowRaw()
     raw = Object.assign(omit(this.initialData || {}, 'children'), raw)
     if (this.children.length > 0) {
       raw.children = this.children.map((child) => child.getRaw())

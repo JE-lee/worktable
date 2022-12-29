@@ -1,4 +1,4 @@
-import { flatten } from 'lodash-es'
+import { flatten } from './share'
 import { Column } from './types'
 import { Validator } from './Validator'
 import type { Row } from './Row'

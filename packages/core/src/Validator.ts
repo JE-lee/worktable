@@ -36,7 +36,7 @@ export class Validator {
     return flatten(this.rows).map((row) => mapValues(row.data, (cell) => [...cell.errors]))
   }
 
-  protected trackValidateHandle(row: Row) {
+  protected trackRowValidateHandle(row: Row) {
     this.isTracking = true
     // TODO: track cell validator
     const disposer = autorun(noThrow(() => this.validateRow(row)))
@@ -47,7 +47,7 @@ export class Validator {
 
   protected validateRow(row: Row) {
     const descriptor = this.makeRowValidateDescriptor(row)
-    const rawRow = row.getRaw()
+    const rawRow = row.getShallowRaw()
     const validator = new ValidateSchema(descriptor)
     this.setRowValidating(row, true)
 
