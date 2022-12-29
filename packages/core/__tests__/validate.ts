@@ -127,4 +127,21 @@ describe('validate', () => {
     await delay(20)
     expect(mockValidator.mock.calls.length).toBe(2)
   })
+
+  test('should pass cell validation', async () => {
+    const columns: Column[] = [
+      { field: 'code', type: 'string', rule: { required: true } },
+      { field: 'name', type: 'string', rule: { required: true } },
+    ]
+    const worktable = new Worktable(columns)
+    const row = worktable.addRow()
+    await worktable.validate().catch(() => ({}))
+    expect(row.data['code'].errors.length).toBeGreaterThan(0)
+    expect(row.data['name'].errors.length).toBeGreaterThan(0)
+
+    worktable.inputValue({ rid: row.rid, field: 'code' }, 'c1')
+    await delay(10)
+    expect(row.data['code'].errors.length).toBe(0)
+    expect(row.data['name'].errors.length).toBeGreaterThan(0)
+  })
 })

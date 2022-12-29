@@ -41,6 +41,7 @@ export class Validator {
     // TODO: track cell validator
     const disposer = autorun(noThrow(() => this.validateRow(row)))
     this.disposers.push(disposer)
+    // don't need to wait for validation finish
     this.isTracking = false
   }
 
@@ -49,22 +50,27 @@ export class Validator {
     const rawRow = row.getRaw()
     const validator = new ValidateSchema(descriptor)
     this.setRowValidating(row, true)
+
+    const clearCellsError = () => {
+      // clear all row errors
+      for (const k in row.data) {
+        // 性能优化
+        if (row.data[k].errors.length > 0) {
+          row.data[k].setState('errors', [])
+        }
+      }
+    }
     const validateResult = validator.validate(rawRow)
     return validateResult
       .then((res) => {
         if (!this.isTracking) {
-          // clear all row errors
-          for (const k in row.data) {
-            // 性能优化
-            if (row.data[k].errors.length > 0) {
-              row.data[k].setState('errors', [])
-            }
-          }
+          clearCellsError()
         }
         return res
       })
       .catch((err) => {
         if (!this.isTracking) {
+          clearCellsError()
           const errors = err.errors || []
           errors.forEach((item: any) => {
             const cell = row.data[item.field]
