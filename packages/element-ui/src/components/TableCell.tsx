@@ -1,8 +1,8 @@
 import { defineComponent, inject, h, getCurrentInstance, nextTick } from 'vue-demi'
 import { VNodeData, VNode } from 'vue'
 import { innerDefaultKey, makeRowProxy } from '@/shared'
-import { Worktable, Column, Cell, CellValue } from '@worktable/core'
-import { VueComponent, FocusAble, Options } from '@/types'
+import { Column, Cell, CellValue } from '@worktable/core'
+import { VueComponent, FocusAble, Options, Context } from '@/types'
 import { isString, isFunction } from 'lodash-es'
 import { getInnerComponent, InnerText } from './InnerComponent'
 import { getInnerPreview } from './InnerPreview'
@@ -23,12 +23,15 @@ export const TableCell = observer(
       },
     },
     setup(props) {
-      const worktable = inject(innerDefaultKey) as Worktable
+      const { worktable } = inject(innerDefaultKey) as Context
 
       return () => {
         const colDef = props.colDef as Column
         const cell = props.cell as Cell
         const row = worktable.getRowByRid(cell.position.rid)
+        if (!row && process.env.NODE_ENV === 'development') {
+          console.warn(`not a validable row with rid ${cell.position.rid}`)
+        }
         const rowProxy = makeRowProxy(row!)
 
         function runWithContext<T extends (...args: any[]) => any>(run: T) {
@@ -69,7 +72,6 @@ export const TableCell = observer(
         }
 
         const componentListener: VNodeData['on'] = {}
-        console.log('cell render: ', colDef.field)
         if (component) {
           bindValueUpdateListener(componentListener, (val: CellValue) => {
             worktable.inputValue(cell.position, val)
@@ -137,15 +139,15 @@ export function mergePreview(Preview: VueComponent, component: VueComponent) {
       },
       setup(props, { attrs, listeners }) {
         const FORM_INPUT = 'formInput'
-        const worktable = inject(innerDefaultKey) as Worktable
+        const { worktable, layout } = inject(innerDefaultKey) as Context
         const vm = getCurrentInstance()
 
         return () => {
           const cell = props.cell as Cell
           const colDef = props.colDef as Column
-          console.log('merge preview render: ', colDef.field)
           function renderFormItemInner(): VNode {
             const value = cell.value
+            const mergeAttrs = Object.assign({ size: layout.size }, attrs)
             if (cell.previewing) {
               const onDomClick = () => {
                 worktable.setCellEditable(cell.position)
@@ -158,14 +160,14 @@ export function mergePreview(Preview: VueComponent, component: VueComponent) {
               }
               const showText = getTextFromOptions(colDef.enum || [], value) || value
               return h(Preview, {
-                attrs,
+                attrs: mergeAttrs,
                 props: { value: showText },
                 nativeOn: { click: onDomClick },
               })
             } else {
               return h(component, {
                 ref: FORM_INPUT,
-                attrs: attrs,
+                attrs: mergeAttrs,
                 props: { value },
                 on: Object.assign({}, listeners as any),
               })

@@ -2,11 +2,12 @@ import { defineComponent, inject, h, provide } from 'vue-demi'
 import { Table as ElTable, TableColumn as ElTableColumn } from 'element-ui'
 import { VNodeData } from 'vue'
 import { getWorktableInjectKey, innerDefaultKey } from '@/shared'
-import { Worktable, Row } from '@worktable/core'
+import { Row } from '@worktable/core'
 import { TableCell } from '@/components/TableCell'
 import { mergePosKey, splitPosKey } from '@/shared/pos-key'
 import { computed as mobxComputed } from 'mobx'
 import { observer } from 'mobx-vue'
+import { Context } from './types'
 
 const ROWID = '_rowid'
 
@@ -17,8 +18,9 @@ const InnerWorktable = defineComponent({
   },
   setup(props, { attrs, listeners }) {
     const key = getWorktableInjectKey(props.name)
-    const worktable = inject(key) as Worktable
-    provide(innerDefaultKey, worktable)
+    const ctx = inject(key) as Context
+    const worktable = ctx.worktable
+    provide(innerDefaultKey, ctx)
 
     const positions = mobxComputed(() => generatePosData(worktable.rows))
 
@@ -33,7 +35,6 @@ const InnerWorktable = defineComponent({
           const [rid, field] = splitPosKey(row[col.field])
           const pos = { rid, field }
           const cell = worktable.getCell(pos)
-          console.log('cell scope render', field)
           if (!cell && process.env.NODE_ENV === 'development') {
             console.warn(`not a validable cell in postion ${pos}`)
           }

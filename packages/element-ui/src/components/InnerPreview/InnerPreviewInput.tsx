@@ -3,13 +3,17 @@ export const InnerPreviewInput = defineComponent({
   name: 'InnerPreview',
   props: {
     value: [String, Number],
+    size: {
+      type: String,
+      default: 'default',
+    },
   },
   setup(props, { attrs }) {
     return () =>
       h(
         'div',
         {
-          staticClass: 'el-input el-input--medium',
+          staticClass: `el-input el-input--${props.size}`,
           class: attrs.disabled ? 'is-disabled' : '',
         },
         [

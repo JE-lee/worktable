@@ -4,10 +4,14 @@ export const InnerPreviewSelect = defineComponent({
   name: 'InnerPreviewSelect',
   props: {
     value: [String, Number],
+    size: {
+      type: String,
+      default: 'default',
+    },
   },
   setup(props, { attrs }) {
     return () => {
-      let staticClass = 'el-input el-input--medium el-select el-select--medium el-input--suffix'
+      let staticClass = `el-input el-input--${props.size} el-select el-select--${props.size} el-input--suffix`
       if (attrs.disabled) {
         staticClass += ' is-disabled'
       }

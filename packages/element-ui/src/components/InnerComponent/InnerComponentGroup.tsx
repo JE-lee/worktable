@@ -1,7 +1,7 @@
 import { defineComponent, h, inject } from 'vue-demi'
 import { innerDefaultKey } from '@/shared'
 import { Worktable, Cell } from '@worktable/core'
-import { BaseComponent } from '@/types'
+import { BaseComponent, Context } from '@/types'
 import { observer } from 'mobx-vue'
 
 export const InnerComponentGroup = observer(
@@ -18,11 +18,10 @@ export const InnerComponentGroup = observer(
       },
     },
     setup(props, { attrs }) {
-      const context = inject(innerDefaultKey) as Worktable
-      const { getRowByRid, addRow } = context
+      const { worktable } = inject(innerDefaultKey) as Context
       return () => {
         const cell = props.cell as Cell
-        const row = getRowByRid(cell.position.rid)
+        const row = worktable.getRowByRid(cell.position.rid)
         // const rowProxy = makeRawProxy(row!) as unknown as RowRaw
         const components = props.components as BaseComponent[]
         return h(

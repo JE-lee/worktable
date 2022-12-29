@@ -7,6 +7,8 @@ export function makeRowProxy(row: Row): RowRaw {
       if (typeof prop === 'string') {
         if (prop === 'parent') {
           return row.parent ? makeRowProxy(row.parent) : null
+        } else if (prop === 'rIndex') {
+          return row['rIndex']
         } else {
           const cell = target.data[prop]
           return isObject(cell) ? cell.value : cell

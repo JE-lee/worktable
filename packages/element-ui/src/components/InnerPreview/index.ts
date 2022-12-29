@@ -9,7 +9,9 @@ const innerPreviewMap = {
 }
 
 export function getInnerPreview(key: string) {
-  return innerPreviewMap[key.toLowerCase() as Exclude<InnerComponent, 'checkbox' | 'group'>]
+  return innerPreviewMap[
+    key.toLowerCase() as Extract<InnerComponent, 'input' | 'select' | 'datepicker'>
+  ]
 }
 
 export { InnerPreviewInput }
