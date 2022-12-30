@@ -30,6 +30,8 @@ type ColumnComponent = any
 
 type ColumnComponentProps = Record<string, any> | ((context: AutoRunContext) => Record<string, any>)
 
+type ColumnConponentListeners = Record<string, (...args: any[]) => void>
+
 export type Rule = Omit<RuleItem, 'transform' | 'asyncValidator' | 'validator'> & {
   validator?: (context: AsyncValidatorContext) => Promise<any> | any
 }
@@ -42,6 +44,7 @@ export interface Column {
   component?: ColumnComponent
   preview?: ColumnComponent
   componentProps?: ColumnComponentProps
+  componentListeners?: ColumnConponentListeners
   default?: CellValue | (() => CellValue)
   enum?: Options
   rule?: Rule

@@ -1,7 +1,7 @@
 import { CellPosition } from './types/schema'
 import { CellState, CellValue, Column } from './types'
 import { isUndefined } from 'lodash-es'
-import { makeAutoObservable, runInAction } from 'mobx'
+import { makeObservable, observable, runInAction } from 'mobx'
 
 // TODO: getter of previweing and validating
 export class Cell {
@@ -19,7 +19,13 @@ export class Cell {
   private constructor(position: CellPosition, value: CellValue) {
     this.position = position
     this.value = value
-    makeAutoObservable(this)
+    makeObservable(this, {
+      value: observable.ref,
+      previewing: observable.ref,
+      validating: observable.ref,
+      errors: observable,
+      position: observable,
+    })
   }
 
   setState(state: CellState, val: any) {

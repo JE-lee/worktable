@@ -75,7 +75,7 @@ export class Row {
         (raw?.[col.field] as CellValue) || this.getDefaultValue(col.default)
       )
       cell.position.field = col.field
-      this.data[col.field] = observable(cell)
+      this.data[col.field] = cell
     })
     if (Array.isArray(raw?.children)) {
       runInAction(() => {
