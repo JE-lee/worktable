@@ -1,7 +1,8 @@
 import { isFunction, omit } from 'lodash-es'
-import { observable, makeObservable, runInAction, action, autorun } from 'mobx'
+import { observable, makeObservable, runInAction, action } from 'mobx'
 import { Column, RowRaw, CellValue, RowRaws } from './types'
 import { Cell } from './Cell'
+import { Worktable } from './Worktable'
 
 export class Row {
   static rid = 1
@@ -11,24 +12,25 @@ export class Row {
   parent?: Row
   rIndex?: number
   columns: Column[]
-  disposers: Array<ReturnType<typeof autorun>> = []
+  disposers: Array<() => void> = []
+  initialData: Record<string, any> = {}
+  private wt: Worktable
 
-  private initialData: Record<string, any> = {}
-
-  static generateRows(columns: Column[], raws: RowRaws, parent?: Row) {
+  static generateRows(columns: Column[], raws: RowRaws, wt: Worktable, parent?: Row) {
     return raws.map((raw, index) => {
-      const row = new Row(columns, raw, parent, index)
+      const row = new Row(columns, raw, wt, parent, index)
       return row
     })
   }
 
-  constructor(columns: Column[], raw: RowRaw = {}, parent?: Row, rIndex?: number) {
+  constructor(columns: Column[], raw: RowRaw = {}, wt: Worktable, parent?: Row, rIndex?: number) {
     makeObservable(this, {
       children: observable.shallow,
       addRow: action,
       addRows: action,
     })
 
+    this.wt = wt
     this.rid = Row.rid++
     this.columns = columns
     this.parent = parent
@@ -55,7 +57,7 @@ export class Row {
   }
 
   addRow(raw?: RowRaw) {
-    const row = new Row(this.columns, raw, this)
+    const row = new Row(this.columns, raw, this.wt, this)
     this.children.push(row)
   }
 
@@ -69,17 +71,18 @@ export class Row {
 
   private generate(raw: RowRaw) {
     this.columns.forEach((col) => {
-      const cell = Cell.generateBaseCell(
-        this.rid,
-        col,
-        (raw?.[col.field] as CellValue) || this.getDefaultValue(col.default)
-      )
+      const cell = Cell.generateBaseCell({
+        parent: this,
+        colDef: col,
+        value: (raw?.[col.field] as CellValue) || this.getDefaultValue(col.default),
+        evProxy: this.wt,
+      })
       cell.position.field = col.field
       this.data[col.field] = cell
     })
     if (Array.isArray(raw?.children)) {
       runInAction(() => {
-        this.children = Row.generateRows(this.columns, raw!.children!, this)
+        this.children = Row.generateRows(this.columns, raw!.children!, this.wt, this)
       })
     }
   }

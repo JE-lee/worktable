@@ -22,7 +22,7 @@ export type RowRaws = Array<RowRaw>
 
 export type AutoRunContext = { value: CellValue; row: RowRaw }
 
-export type EventContext = AutoRunContext
+export type EventContext = any[]
 
 export type AsyncValidatorContext = AutoRunContext
 
@@ -51,6 +51,6 @@ export interface Column {
   hidden?: boolean
   virtual?: boolean
   effects?: {
-    [eventName: string]: (context: EventContext) => void
+    [eventName: string]: (...args: EventContext) => void
   }
 }

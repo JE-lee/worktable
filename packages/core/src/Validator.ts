@@ -3,13 +3,14 @@ import ValidateSchema from 'async-validator'
 import { isBoolean, isFunction, omit, mapValues } from 'lodash-es'
 import { flatten, noThrow, makeRowProxy } from './share'
 import { Column, RowRaw, Rule } from './types'
-import { autorun } from 'mobx'
+import { Reaction } from 'mobx'
 import { Row } from './Row'
-export class Validator {
+import { EVENT_NAME } from './event'
+import { EventEmitter } from './EventEmitter'
+export class Validator extends EventEmitter {
   rows: Row[] = []
 
-  private isTracking = false
-  private disposers: Array<ReturnType<typeof autorun>> = []
+  private disposers: Array<() => void> = []
 
   async validateAll() {
     const flatRows = flatten(this.rows)
@@ -37,20 +38,25 @@ export class Validator {
   }
 
   protected trackRowValidateHandle(row: Row) {
-    this.isTracking = true
     // TODO: track cell validator
-    const disposer = autorun(noThrow(() => this.validateRow(row)))
+    const validator = noThrow((isFirstTrack: boolean) => this.validateRow(row, isFirstTrack))
+    const reaction: Reaction = new Reaction(`${row.rid}-validator`, () =>
+      reaction.track(() => validator(false))
+    )
+    reaction.track(() => validator(true))
+    const disposer = () => reaction.dispose()
     this.disposers.push(disposer)
     row.disposers = [disposer]
-    // don't need to wait for validation finish
-    this.isTracking = false
   }
 
-  protected validateRow(row: Row) {
+  protected validateRow(row: Row, isFirstTrack = false) {
     const descriptor = this.makeRowValidateDescriptor(row)
     const rawRow = row.getShallowRaw()
     const validator = new ValidateSchema(descriptor)
     this.setRowValidating(row, true)
+    if (!isFirstTrack) {
+      this.notifyAllCell(rawRow, EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START)
+    }
 
     const clearCellsError = () => {
       // clear all row errors
@@ -61,26 +67,59 @@ export class Validator {
         }
       }
     }
-    const validateResult = validator.validate(rawRow)
-    return validateResult
+    return validator
+      .validate(rawRow)
       .then((res) => {
-        if (!this.isTracking) {
-          clearCellsError()
+        clearCellsError()
+        if (!isFirstTrack) {
+          this.notifyAllCell(rawRow, EVENT_NAME.ON_FIELD_VALUE_VALIDATE_SUCCESS)
         }
         return res
       })
       .catch((err) => {
-        if (!this.isTracking) {
+        if (!isFirstTrack) {
           clearCellsError()
+
+          const successFields = new Set(Object.keys(row.data))
           const errors = err.errors || []
           errors.forEach((item: any) => {
             const cell = row.data[item.field]
-            cell.setState('errors', [item.message])
+            const errors = [item.message]
+            cell.setState('errors', errors)
+            this.notify(
+              item.field,
+              EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FAIL,
+              errors,
+              cell.value,
+              makeRowProxy(row)
+            )
+
+            successFields.delete(item.field)
           })
+
+          successFields.forEach((field) =>
+            this.notify(
+              field,
+              EVENT_NAME.ON_FIELD_VALUE_VALIDATE_SUCCESS,
+              row.data[field].value,
+              makeRowProxy(row)
+            )
+          )
         }
         throw err
       })
-      .finally(() => this.setRowValidating(row, false))
+      .finally(() => {
+        this.setRowValidating(row, false)
+        if (!isFirstTrack) {
+          this.notifyAllCell(rawRow, EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH)
+        }
+      })
+  }
+
+  private notifyAllCell(row: RowRaw, enventName: EVENT_NAME) {
+    for (const field in row) {
+      this.notify(field, enventName, row[field], row)
+    }
   }
 
   private makeRowValidateDescriptor(row: Row) {

@@ -3,7 +3,8 @@ import { cloneDeep, isObject, isFunction } from 'lodash-es'
 import { BaseWorktable } from './BaseWorktable'
 import { runInAction, makeObservable, observable, action } from 'mobx'
 import { Row } from './Row'
-import { flatten, walk } from './share'
+import { flatten, makeRowProxy, walk } from './share'
+import { EVENT_NAME } from './event'
 export class Worktable extends BaseWorktable {
   constructor(opt: WorktableConstructorOpt)
   constructor(columns: Column[])
@@ -39,7 +40,7 @@ export class Worktable extends BaseWorktable {
   }
 
   addRow(raw: Record<string, any> = {}) {
-    const row = new Row(this.columns, raw, undefined, this.rows.length)
+    const row = new Row(this.columns, raw, this, undefined, this.rows.length)
     // collect validate track
     flatten([row]).forEach((row) => this.trackRowValidateHandle(row))
     this.rows.push(row)
@@ -47,7 +48,7 @@ export class Worktable extends BaseWorktable {
   }
 
   addRows(raws: RowRaws) {
-    const rows = Row.generateRows(this.columns, raws)
+    const rows = Row.generateRows(this.columns, raws, this)
     const last = this.rows.length
     // fix: rIndex
     rows.forEach((row, index) => {
@@ -64,9 +65,16 @@ export class Worktable extends BaseWorktable {
   }
 
   inputValue(position: CellPosition, value: CellValue) {
-    const cell = this.getCell(position)
+    const row = this.getRowByRid(position.rid)
+    const cell = row?.data[position.field]
     if (cell) {
       cell.setState('value', value)
+      this.notify(
+        cell.colDef.field,
+        EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE,
+        value,
+        makeRowProxy(row)
+      )
       return true
     }
     return false
@@ -126,7 +134,19 @@ export class Worktable extends BaseWorktable {
   }
 
   private _setColumns(columns: Column[]) {
-    runInAction(() => (this.columns = cloneDeep(columns)))
+    const cols = cloneDeep(columns)
+    // remove all event listeners
+    this.offAll()
+    runInAction(() => (this.columns = cols))
+
+    // init event listener of every field
+    cols.forEach((colDef) => {
+      if (isObject(colDef.effects)) {
+        Object.entries(colDef.effects).forEach(([eventName, listener]) =>
+          this.on(colDef.field, eventName, listener)
+        )
+      }
+    })
   }
 
   private makeObservable() {

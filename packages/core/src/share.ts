@@ -53,7 +53,9 @@ export function makeRowProxy(row: Row): RowRaw {
     set(target: Row, prop: string, newValue: any) {
       if (typeof prop === 'string') {
         const cell = target.data[prop]
-        return isObject(cell) ? Reflect.set(cell, 'value', newValue) : false
+        return isObject(cell)
+          ? Reflect.set(cell, 'value', newValue)
+          : Reflect.set(target.initialData, prop, newValue)
       } else {
         return false
       }
