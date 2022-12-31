@@ -143,10 +143,7 @@ export class Validator extends EventEmitter {
   private makeCellAsyncVaidator(colDef: Column, rawRow: RowRaw) {
     return async (rule: any, value: any) => {
       if (isFunction(colDef?.rule?.validator)) {
-        const success = await colDef?.rule?.validator({
-          row: rawRow,
-          value,
-        })
+        const success = await colDef?.rule?.validator(value, rawRow)
         if (isBoolean(success) && !success) {
           return Promise.reject(colDef?.rule?.message || 'validate error')
         }

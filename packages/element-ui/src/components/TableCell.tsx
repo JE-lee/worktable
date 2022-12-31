@@ -1,9 +1,9 @@
 import { defineComponent, inject, h, getCurrentInstance, nextTick } from 'vue-demi'
 import { VNodeData, VNode } from 'vue'
-import { innerDefaultKey, makeRowProxy } from '@/shared'
-import { Column, Cell, CellValue } from '@worktable/core'
+import { innerDefaultKey } from '@/shared'
+import { Column, Cell, CellValue, makeRowProxy } from '@worktable/core'
 import { VueComponent, FocusAble, Options, Context } from '@/types'
-import { isString, isFunction } from 'lodash-es'
+import { isString, isFunction, cloneDeep } from 'lodash-es'
 import { getInnerComponent, InnerText } from './InnerComponent'
 import { getInnerPreview } from './InnerPreview'
 import { Feedback } from './Feedback'
@@ -30,13 +30,21 @@ export const TableCell = observer(
       if (!row && process.env.NODE_ENV === 'development') {
         console.warn(`not a validable row with rid ${cell.position.rid}`)
       }
-      return () => {
-        const rowProxy = makeRowProxy(row!)
-        function runWithContext<T extends (...args: any[]) => any>(run: T) {
-          return run({
-            row: rowProxy,
-          })
+      const rowProxy = makeRowProxy(row!)
+      function runWithContext<T extends (...args: any[]) => any>(run: T) {
+        return run({
+          row: rowProxy,
+        })
+      }
+
+      function convertListener(listeners: { [key: string]: (...args: any[]) => void }) {
+        const converted: { [key: string]: (...args: any[]) => void } = {}
+        for (const event in listeners) {
+          converted[event] = (...args: any[]) => listeners[event](...args, rowProxy)
         }
+        return converted
+      }
+      return () => {
         let colDefComponent = colDef.component
         if (isFunction(colDefComponent)) {
           colDefComponent = runWithContext(colDefComponent)
@@ -53,6 +61,8 @@ export const TableCell = observer(
           getInnerPreview
         )
 
+        component = mergePreview(component || InnerText, preview)
+
         // dynamic props
         let componentProps: Record<string, any> = {}
         if (colDef.componentProps) {
@@ -65,33 +75,18 @@ export const TableCell = observer(
 
         // enum
         const mergeProps = mergePropsFromColumn(colDef)
-        if (component && preview) {
-          component = mergePreview(preview, component)
-        }
 
-        const componentListener: VNodeData['on'] = {}
+        const componentListener: VNodeData['on'] = convertListener(colDef.componentListeners || {})
         if (component) {
+          const originInput = componentListener.input
           bindValueUpdateListener(componentListener, (val: CellValue) => {
-            worktable.inputValue(cell.position, val)
-            // 执行基本校验
-            // validateCell(cell.position)
-            // 事件响应
-            // events.notify(
-            //   colDef.field,
-            //   EVENT_NAME.ON_FIELD_VALUE_CHANGE,
-            //   {
-            //     value: cell.value,
-            //     row: getRowByRid(cell.position.rid),
-            //   },
-            //   {
-            //     setComponentProps,
-            //     setValuesIn,
-            //     setCurrentRowValue: (values: Record<string, any>) => Object.assign(rowProxy, values),
-            //   }
-            // )
+            worktable.inputValue(cell.position, cloneDeep(val))
+            if (isFunction(originInput)) {
+              originInput(val, rowProxy)
+            }
           })
         }
-        return h(component || InnerText, {
+        return h(component, {
           attrs: Object.assign(
             {},
             componentProps || {},
@@ -121,7 +116,7 @@ function mergePropsFromColumn(col: Column) {
   }
 }
 
-export function mergePreview(Preview: VueComponent, component: VueComponent) {
+export function mergePreview(component: VueComponent, Preview?: VueComponent) {
   return observer(
     defineComponent({
       name: 'MergePreview',
@@ -146,7 +141,7 @@ export function mergePreview(Preview: VueComponent, component: VueComponent) {
           function renderFormItemInner(): VNode {
             const value = cell.value
             const mergeAttrs = Object.assign({ size: layout.size }, attrs)
-            if (cell.previewing) {
+            if (cell.previewing && Preview) {
               const onDomClick = () => {
                 worktable.setCellEditable(cell.position)
                 nextTick(() => {
