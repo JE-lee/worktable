@@ -41,8 +41,6 @@ export class Worktable extends BaseWorktable {
 
   addRow(raw: Record<string, any> = {}) {
     const row = new Row(this.columns, raw, this, undefined, this.rows.length)
-    // collect validate track
-    flatten([row]).forEach((row) => this.trackRowValidateHandle(row))
     this.rows.push(row)
     return row
   }
@@ -54,8 +52,6 @@ export class Worktable extends BaseWorktable {
     rows.forEach((row, index) => {
       row.rIndex = last + index
     })
-    // collect validate track
-    flatten(rows).forEach((row) => this.trackRowValidateHandle(row))
     this.rows.push(...rows)
   }
 

@@ -49,10 +49,10 @@ describe('effects', () => {
   })
 
   test('event of validating field value', async () => {
-    const start = jest.fn()
-    const finish = jest.fn()
-    const success = jest.fn()
-    const fail = jest.fn()
+    const start = jest.fn((value, row) => [value, row.code])
+    const finish = jest.fn((value, row) => [value, row.code])
+    const success = jest.fn((value, row) => [value, row.code])
+    const fail = jest.fn((errors, value, row) => [errors, value, row.code])
     const wt = generateWorktable({
       [EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START]: start,
       [EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH]: finish,
@@ -82,17 +82,12 @@ describe('effects', () => {
     expect(success.mock.calls.length).toBe(1)
     expect(fail.mock.calls.length).toBe(1)
 
-    expect(success.mock.calls[0][0]).toBe(1) // value
-    expect(success.mock.calls[0][1].code).toBe(1) // row
+    expect(success.mock.results[0].value).toEqual([1, 1])
 
-    expect(start.mock.calls[1][0]).toBe('') // value
-    expect(start.mock.calls[1][1].code).toBe('') // row
+    expect(start.mock.results[1].value).toEqual(['', ''])
 
-    expect(finish.mock.calls[1][0]).toBe('') // value
-    expect(finish.mock.calls[1][1].code).toBe('') // row
+    expect(finish.mock.results[1].value).toEqual(['', ''])
 
-    expect(fail.mock.calls[0][0]).toEqual([message]) // value
-    expect(fail.mock.calls[0][1]).toBe('') // value
-    expect(fail.mock.calls[0][2].code).toBe('') // row
+    expect(fail.mock.results[0].value).toEqual([[message], '', ''])
   })
 })

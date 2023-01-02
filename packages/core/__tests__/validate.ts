@@ -36,7 +36,9 @@ describe('validate', () => {
         field: 'code',
         rule: {
           message: 'must be greater than 10',
-          validator: ({ value }) => value > 10,
+          validator: (value) => {
+            return value > 10
+          },
         },
       },
     ]
@@ -55,7 +57,7 @@ describe('validate', () => {
       {
         field: 'code',
         rule: {
-          validator: ({ value }) => {
+          validator: (value) => {
             return new Promise((resolve, reject) =>
               setTimeout(() => {
                 if (value > 10) resolve('')
@@ -79,7 +81,7 @@ describe('validate', () => {
 
   test('should re-validate automatically #1', async () => {
     const message = 'must be greater than 10'
-    const mockValidator = jest.fn(({ value }) => value > 10)
+    const mockValidator = jest.fn((value) => value > 10)
     const columns: Column[] = [
       {
         field: 'code',
@@ -135,7 +137,7 @@ describe('validate', () => {
 
   test('child row should re-validate automatically', async () => {
     const message = 'must be greater than 10'
-    const mockValidator = jest.fn(({ value }) => value > 10)
+    const mockValidator = jest.fn((value) => value > 10)
     const columns: Column[] = [
       {
         field: 'code',

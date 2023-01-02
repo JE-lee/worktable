@@ -1,8 +1,12 @@
-import { isFunction, omit } from 'lodash-es'
-import { observable, makeObservable, runInAction, action } from 'mobx'
-import { Column, RowRaw, CellValue, RowRaws } from './types'
+import { isBoolean, isFunction, omit } from 'lodash-es'
+import { observable, makeObservable, runInAction, action, Reaction } from 'mobx'
+import { Column, RowRaw, CellValue, RowRaws, Rule } from './types'
 import { Cell } from './Cell'
 import { Worktable } from './Worktable'
+import { flatten, makeRowProxy, noThrow } from './share'
+import { RuleItem } from 'async-validator'
+import ValidateSchema from 'async-validator'
+import { EVENT_NAME } from './event'
 
 export class Row {
   static rid = 1
@@ -37,6 +41,7 @@ export class Row {
     this.rIndex = rIndex
     this.initialData = raw
     this.generate(raw)
+    this.trackRowValidateHandle()
   }
 
   getShallowRaw() {
@@ -58,6 +63,8 @@ export class Row {
 
   addRow(raw?: RowRaw) {
     const row = new Row(this.columns, raw, this.wt, this)
+    row.rIndex = row.children.length
+    flatten([row]).forEach((row) => row.trackRowValidateHandle())
     this.children.push(row)
   }
 
@@ -67,6 +74,88 @@ export class Row {
 
   stopWatchValidation() {
     this.disposers.forEach((disposer) => disposer())
+  }
+
+  validate(isFirstTrack = false) {
+    const validators: Promise<boolean>[] = []
+    for (const field in this.data) {
+      validators.push(this.validateCell(this.data[field], isFirstTrack))
+    }
+    return Promise.all(validators)
+  }
+
+  private trackRowValidateHandle() {
+    for (const field in this.data) {
+      const disposer = this.trackCellValidateHandle(this.data[field])
+      this.disposers.push(disposer)
+    }
+  }
+
+  private trackCellValidateHandle(cell: Cell) {
+    const validator = noThrow((isFirstTrack: boolean) => this.validateCell(cell, isFirstTrack))
+    const reaction: Reaction = new Reaction(`${this.rid}-${cell.colDef.field}-validator`, () =>
+      reaction.track(() => validator(false))
+    )
+    reaction.track(() => validator(true))
+    const disposer = () => reaction.dispose()
+    return disposer
+  }
+
+  private validateCell(cell: Cell, isFirstTrack = false) {
+    const colDef = cell.colDef
+    const descriptor = this.makeCellVaidateDescriptor(colDef)
+    const target = { [colDef.field]: cell.value }
+    cell.setState('validating', true)
+    const validator = new ValidateSchema(descriptor)
+    if (!isFirstTrack) {
+      this.wt.notify(
+        colDef.field,
+        EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START,
+        cell.value,
+        makeRowProxy(this)
+      )
+    }
+    return validator
+      .validate(target)
+      .then(() => {
+        if (cell.errors.length > 0) {
+          cell.setState('errors', [])
+        }
+        if (!isFirstTrack) {
+          this.wt.notify(
+            colDef.field,
+            EVENT_NAME.ON_FIELD_VALUE_VALIDATE_SUCCESS,
+            cell.value,
+            makeRowProxy(this)
+          )
+        }
+        return true
+      })
+      .catch((err) => {
+        if (!isFirstTrack) {
+          const errors = [err.errors[0]?.message]
+          cell.setState('errors', errors)
+          this.wt.notify(
+            colDef.field,
+            EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FAIL,
+            errors,
+            cell.value,
+            makeRowProxy(this)
+          )
+        }
+        throw err
+      })
+      .finally(() => {
+        cell.setState('validating', false)
+        if (!isFirstTrack) {
+          this.wt.notify(
+            colDef.field,
+            EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH,
+            cell.value,
+            makeRowProxy(this)
+          )
+        }
+      })
   }
 
   private generate(raw: RowRaw) {
@@ -86,7 +175,38 @@ export class Row {
       })
     }
   }
+
   private getDefaultValue<T>(_default: T | (() => T)) {
     return isFunction(_default) ? _default() : _default
+  }
+
+  private makeCellVaidateDescriptor(colDef: Column) {
+    const descriptor: Record<string, RuleItem> = {}
+    const rawRow = makeRowProxy(this)
+    if (colDef.rule) {
+      descriptor[colDef.field] = this.getRule(colDef.rule)
+      // validator
+      if (isFunction(colDef.rule.validator)) {
+        Object.assign(descriptor[colDef.field], {
+          asyncValidator: this.makeCellAsyncVaidatorFn(colDef, rawRow),
+        })
+      }
+    }
+    return descriptor
+  }
+
+  private makeCellAsyncVaidatorFn(colDef: Column, rawRow: RowRaw) {
+    return async (rule: any, value: any) => {
+      if (isFunction(colDef?.rule?.validator)) {
+        const success = await colDef?.rule?.validator(value, rawRow)
+        if (isBoolean(success) && !success) {
+          return Promise.reject(colDef?.rule?.message || 'validate error')
+        }
+      }
+    }
+  }
+
+  private getRule(rule: Rule): Omit<Rule, 'transform' | 'asyncValidator' | 'validator'> {
+    return omit(rule, ['transform', 'asyncValidator', 'validator'])
   }
 }

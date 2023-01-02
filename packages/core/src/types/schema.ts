@@ -20,20 +20,16 @@ export type RowRaw = {
 
 export type RowRaws = Array<RowRaw>
 
-export type AutoRunContext = { value: CellValue; row: RowRaw }
-
 export type EventContext = any[]
-
-export type AsyncValidatorContext = AutoRunContext
 
 type ColumnComponent = any
 
-type ColumnComponentProps = Record<string, any> | ((context: AutoRunContext) => Record<string, any>)
+type ColumnComponentProps = Record<string, any> | ((row: RowRaw) => Record<string, any>)
 
 type ColumnConponentListeners = Record<string, (...args: any[]) => void>
 
 export type Rule = Omit<RuleItem, 'transform' | 'asyncValidator' | 'validator'> & {
-  validator?: (context: AsyncValidatorContext) => Promise<any> | any
+  validator?: (value: CellValue, row: RowRaw) => Promise<any> | any
 }
 
 export interface Column {
