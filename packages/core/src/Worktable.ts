@@ -1,4 +1,12 @@
-import { Column, CellValue, WorktableConstructorOpt, CellPosition, RowRaws, Filter } from './types'
+import {
+  Column,
+  CellValue,
+  WorktableConstructorOpt,
+  CellPosition,
+  RowRaws,
+  Filter,
+  RowRaw,
+} from './types'
 import { cloneDeep, isObject, isFunction } from 'lodash-es'
 import { BaseWorktable } from './BaseWorktable'
 import { runInAction, makeObservable, observable, action } from 'mobx'
@@ -39,25 +47,27 @@ export class Worktable extends BaseWorktable {
     return this.getRaws()
   }
 
-  addRow(raw: Record<string, any> = {}) {
-    const row = new Row(this.columns, raw, this, undefined, this.rows.length)
-    this.rows.push(row)
-    return row
+  add(raw: RowRaw | RowRaw[], filter?: Filter) {
+    const raws = Array.isArray(raw) ? raw : [raw]
+    if (!filter) {
+      this.addRows(raws)
+    } else {
+      const parents = this.findAll(filter)
+      parents.forEach((parent) => parent.addRows(raws))
+    }
   }
 
-  addRows(raws: RowRaws) {
-    const rows = Row.generateRows(this.columns, raws, this)
-    const last = this.rows.length
-    // fix: rIndex
-    rows.forEach((row, index) => {
-      row.rIndex = last + index
-    })
-    this.rows.push(...rows)
-  }
-
-  removeAll() {
-    this.rows = []
-    this.stopWatchValidation()
+  remove(rid: number): void
+  remove(filter: Filter): void
+  remove(filter: any): void {
+    const rows: Row[] = []
+    if (isFunction(filter)) {
+      rows.push(...this.findAll(filter as Filter))
+    } else {
+      const row = this.getRowByRid(filter)
+      row && rows.push(row)
+    }
+    rows.forEach((row) => this.removeRow(row))
   }
 
   inputValue(position: CellPosition, value: CellValue) {
@@ -76,18 +86,33 @@ export class Worktable extends BaseWorktable {
     return false
   }
 
+  getCell(pos: CellPosition) {
+    return flatten(this.rows).find((r) => r.rid === pos.rid)?.data[pos.field]
+  }
+
+  addRow(raw: RowRaw = {}) {
+    const row = new Row(this.columns, raw, undefined, this.rows.length, this)
+    this.rows.push(row)
+    return row
+  }
+
+  addRows(raws: RowRaws) {
+    raws.forEach((raw) => this.addRow(raw))
+  }
+
+  removeAll() {
+    this.rows = []
+    this.stopWatchValidation()
+  }
+
   findAll(filter: Filter) {
     const rows: Row[] = []
     walk(this.rows, (row) => {
-      if (filter(row.getRaw())) {
+      if (filter(makeRowProxy(row, true))) {
         rows.push(row)
       }
     })
     return rows
-  }
-
-  getCell(pos: CellPosition) {
-    return flatten(this.rows).find((r) => r.rid === pos.rid)?.data[pos.field]
   }
 
   setCellEditable(pos: CellPosition) {
@@ -100,19 +125,6 @@ export class Worktable extends BaseWorktable {
     this.getCell(pos)?.setState('previewing', false)
   }
 
-  remove(rid: number): void
-  remove(filter: Filter): void
-  remove(filter: any): void {
-    const rows: Row[] = []
-    if (isFunction(filter)) {
-      rows.push(...this.findAll(filter as Filter))
-    } else {
-      const row = this.getRowByRid(filter)
-      row && rows.push(row)
-    }
-    rows.forEach((row) => this.removeRow(row))
-  }
-
   removeRow(row: Row) {
     let workRows = this.rows
     if (row.parent) {
@@ -123,7 +135,6 @@ export class Worktable extends BaseWorktable {
     if (index > -1) {
       const [removed] = workRows.splice(index, 1)
       removed.stopWatchValidation()
-      row.disposers = []
       // reset row.rIndex
       workRows.forEach((row, index) => (row.rIndex = index))
     }

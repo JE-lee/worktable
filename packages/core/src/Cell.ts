@@ -16,7 +16,7 @@ export class Cell {
   errors: string[] = []
   position: CellPosition
   colDef: Column
-  evProxy: EventEmitter
+  evProxy?: EventEmitter
 
   static generateBaseCell(ctx: CellFactoryContext) {
     const { value, colDef, parent, evProxy } = ctx
@@ -24,7 +24,7 @@ export class Cell {
     return new Cell(parent, colDef, formatedValue, evProxy)
   }
 
-  private constructor(parent: Row, colDef: Column, value: CellValue, ev: EventEmitter) {
+  private constructor(parent: Row, colDef: Column, value: CellValue, ev?: EventEmitter) {
     this.parent = parent
     this.position = { rid: parent.rid, field: colDef.field }
     this.colDef = colDef
@@ -39,7 +39,7 @@ export class Cell {
       position: observable,
     })
 
-    this.evProxy.notify(
+    this.evProxy?.notify(
       this.colDef.field,
       EVENT_NAME.ON_FIELD_VALUE_CHANGE,
       this.value,
@@ -52,7 +52,7 @@ export class Cell {
       const prev = this[state]
       this[state] = val
       if (state === 'value' && !isEqual(prev, val)) {
-        this.evProxy.notify(
+        this.evProxy?.notify(
           this.colDef.field,
           EVENT_NAME.ON_FIELD_VALUE_CHANGE,
           val,

@@ -5,8 +5,6 @@ import { EventEmitter } from './EventEmitter'
 export class Validator extends EventEmitter {
   rows: Row[] = []
 
-  private disposers: Array<() => void> = []
-
   async validateAll() {
     const flatRows = flatten(this.rows)
     let isValid = true
@@ -25,7 +23,7 @@ export class Validator extends EventEmitter {
   }
 
   stopWatchValidation() {
-    this.disposers.forEach((disposer) => disposer())
+    flatten(this.rows).forEach((row) => row.stopWatchValidation())
   }
 
   getValidateErrors() {

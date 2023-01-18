@@ -35,24 +35,29 @@ export function noThrow<T>(fn: (...args: any[]) => Promise<T>) {
   }
 }
 
-// TODO: extract this function to a shared module
-export function makeRowProxy(row: Row): RowRaw {
-  return new Proxy(row, {
+export function makeRowProxy(row: Row, immutable = false): RowRaw {
+  const handler: ProxyHandler<Row> = {
     get(target: Row, prop: string) {
       if (typeof prop === 'string') {
         if (prop === 'parent') {
-          return row.parent ? makeRowProxy(row.parent) : null
+          return row.parent ? makeRowProxy(row.parent, immutable) : null
+        } else if (prop === 'children') {
+          return row.children.map((r) => makeRowProxy(r, immutable))
         } else if (prop === 'index') {
           return target.rIndex
+        } else if (prop === 'rid') {
+          return target.rid
         } else {
           const cell = target.data[prop]
-          return isObject(cell) ? cell.value : cell
+          return isObject(cell) ? cell.value : target.initialData[prop]
         }
       } else {
         return Reflect.get(target, prop)
       }
     },
-    set(target: Row, prop: string, newValue: any) {
+  }
+  if (!immutable) {
+    handler.set = function (target: Row, prop: string, newValue: any) {
       if (typeof prop === 'string') {
         const cell = target.data[prop]
         return isObject(cell)
@@ -61,6 +66,7 @@ export function makeRowProxy(row: Row): RowRaw {
       } else {
         return false
       }
-    },
-  }) as unknown as RowRaw
+    }
+  }
+  return new Proxy(row, handler) as unknown as RowRaw
 }

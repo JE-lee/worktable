@@ -14,6 +14,6 @@ export type Filter = (row: RowRaw) => boolean
 export type CellFactoryContext = {
   parent: Row
   colDef: Column
-  evProxy: EventEmitter
+  evProxy?: EventEmitter
   value?: CellValue
 }
