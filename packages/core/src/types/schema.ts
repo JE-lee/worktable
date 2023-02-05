@@ -32,6 +32,8 @@ export type Rule = Omit<RuleItem, 'transform' | 'asyncValidator' | 'validator'> 
   validator?: (value: CellValue, row: RowRaw) => Promise<any> | any
 }
 
+export type EffectListener = (...args: EventContext) => void
+
 export interface Column {
   title?: string
   field: string
@@ -47,6 +49,6 @@ export interface Column {
   hidden?: boolean
   virtual?: boolean
   effects?: {
-    [eventName: string]: (...args: EventContext) => void
+    [eventName: string]: EffectListener
   }
 }

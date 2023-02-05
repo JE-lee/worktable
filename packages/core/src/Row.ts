@@ -3,10 +3,10 @@ import { observable, makeObservable, runInAction, action, Reaction } from 'mobx'
 import { Column, RowRaw, CellValue, RowRaws, Rule, Filter } from './types'
 import { Cell } from './Cell'
 import { Worktable } from './Worktable'
-import { flatten, makeRowProxy, noThrow, walk } from './share'
+import { flatten, makeRowProxy, makeRowAction, noThrow, walk } from './share'
 import { RuleItem } from 'async-validator'
 import ValidateSchema from 'async-validator'
-import { EVENT_NAME } from './event'
+import { FIELD_EVENT_NAME } from './event'
 
 export class Row {
   static rid = 1
@@ -93,6 +93,14 @@ export class Row {
     }
   }
 
+  removeAll() {
+    this.remove(() => true)
+  }
+
+  removeSelf() {
+    this.wt?.remove(this.rid)
+  }
+
   stopWatchValidation() {
     this.disposers.forEach((disposer) => disposer())
     this.disposers = []
@@ -142,9 +150,10 @@ export class Row {
     if (!isFirstTrack) {
       this.wt?.notify(
         colDef.field,
-        EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START,
+        FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START,
         cell.value,
-        makeRowProxy(this)
+        makeRowProxy(this),
+        makeRowAction(this)
       )
     }
     return validator
@@ -156,9 +165,10 @@ export class Row {
         if (!isFirstTrack) {
           this.wt?.notify(
             colDef.field,
-            EVENT_NAME.ON_FIELD_VALUE_VALIDATE_SUCCESS,
+            FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_SUCCESS,
             cell.value,
-            makeRowProxy(this)
+            makeRowProxy(this),
+            makeRowAction(this)
           )
         }
         return true
@@ -169,10 +179,11 @@ export class Row {
           cell.setState('errors', errors)
           this.wt?.notify(
             colDef.field,
-            EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FAIL,
+            FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FAIL,
             errors,
             cell.value,
-            makeRowProxy(this)
+            makeRowProxy(this),
+            makeRowAction(this)
           )
         }
         throw err
@@ -182,9 +193,10 @@ export class Row {
         if (!isFirstTrack) {
           this.wt?.notify(
             colDef.field,
-            EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH,
+            FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH,
             cell.value,
-            makeRowProxy(this)
+            makeRowProxy(this),
+            makeRowAction(this)
           )
         }
       })

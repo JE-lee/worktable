@@ -1,4 +1,4 @@
-import { Worktable, Column, EVENT_NAME } from '../src'
+import { Worktable, Column, FIELD_EVENT_NAME } from '../src'
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -27,8 +27,8 @@ describe('effects', () => {
     const onFieldValueChange = jest.fn()
     const onFieldInputValueChange = jest.fn()
     const wt = generateWorktable({
-      [EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE]: onFieldInputValueChange,
-      [EVENT_NAME.ON_FIELD_VALUE_CHANGE]: onFieldValueChange,
+      [FIELD_EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE]: onFieldInputValueChange,
+      [FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE]: onFieldValueChange,
     })
 
     // onFieldValueChange
@@ -54,10 +54,10 @@ describe('effects', () => {
     const success = jest.fn((value, row) => [value, row.code])
     const fail = jest.fn((errors, value, row) => [errors, value, row.code])
     const wt = generateWorktable({
-      [EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START]: start,
-      [EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH]: finish,
-      [EVENT_NAME.ON_FIELD_VALUE_VALIDATE_SUCCESS]: success,
-      [EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FAIL]: fail,
+      [FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START]: start,
+      [FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH]: finish,
+      [FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_SUCCESS]: success,
+      [FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FAIL]: fail,
     })
 
     expect(start.mock.calls.length).toBe(0)

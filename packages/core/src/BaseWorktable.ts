@@ -2,6 +2,7 @@ import { flatten } from './share'
 import { Column } from './types'
 import { Validator } from './Validator'
 import type { Row } from './Row'
+import { TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME } from './event'
 export class BaseWorktable extends Validator {
   static rid = 1
   columns: Column[] = []
@@ -16,6 +17,21 @@ export class BaseWorktable extends Validator {
   }
 
   validate() {
-    return this.validateAll().then(() => this.getRaws())
+    this.notify(TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME.ON_VALIDATE_START)
+    return this.validateAll()
+      .then(() => {
+        this.notify(TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME.ON_VALIDATE_SUCCESS)
+        return this.getRaws()
+      })
+      .catch(() => {
+        this.notify(
+          TABLE_EFFECT_NAMESPACE,
+          TABLE_EVENT_NAME.ON_VALIDATE_FAIL,
+          this.getValidateErrors()
+        )
+      })
+      .finally(() => {
+        this.notify(TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME.ON_VALIDATE_FINISH)
+      })
   }
 }

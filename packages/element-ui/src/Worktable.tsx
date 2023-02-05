@@ -1,57 +1,84 @@
-import { defineComponent, inject, h, provide } from 'vue-demi'
+import {
+  defineComponent,
+  inject,
+  h,
+  provide,
+  computed,
+  watchEffect,
+  VNodeData,
+  onMounted,
+  getCurrentInstance,
+} from 'vue-demi'
 import { Table as ElTable, TableColumn as ElTableColumn } from 'element-ui'
-import { VNodeData } from 'vue'
-import { getWorktableInjectKey, innerDefaultKey } from '@/shared'
-import { Row } from '@worktable/core'
+import { getWorktableInjectKey, innerDefaultKey, ROWID, useFlashingValue } from '@/shared'
+import { TABLE_EVENT_NAME } from '@worktable/core'
 import { TableCell } from '@/components/TableCell'
-import { mergePosKey, splitPosKey } from '@/shared/pos-key'
-import { computed as mobxComputed } from 'mobx'
+import { splitPosKey } from '@/shared/pos-key'
 import { observer } from 'mobx-vue'
 import { Context } from './types'
-
-const ROWID = '_rowid'
 
 const InnerWorktable = defineComponent({
   name: 'Worktable',
   props: {
     name: String, // injected key
+    summaryMethod: null,
+    showSummary: Boolean,
   },
   setup(props, { attrs, listeners }) {
     const key = getWorktableInjectKey(props.name)
     const ctx = inject(key) as Context
     const worktable = ctx.worktable
+    const vm = getCurrentInstance()
     provide(innerDefaultKey, ctx)
 
-    const positions = mobxComputed(() => generatePosData(worktable.rows))
+    // HACK: re-render summary-line when every field changes of value
+    // FIXME: layout shift of summary-line
+    const [isTwinking, flash] = useFlashingValue()
+    const summaryMethod = computed(() => {
+      return isTwinking.value ? () => [''] : props.summaryMethod // the space is crucial
+    })
+    watchEffect(() => {
+      if (props.showSummary) {
+        worktable.addEffect(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE, flash)
+      } else {
+        worktable.removeEffect(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
+      }
+    })
+
+    onMounted(() => {
+      ctx.tableRef.value = vm?.proxy.$refs['tableRef']
+    })
 
     // render columns
     function renderColumns() {
-      const _columns = worktable.columns.map((col) => {
-        const scopedSlots: VNodeData['scopedSlots'] = {}
+      const _columns = worktable.columns
+        .filter((col) => !col.hidden)
+        .map((col) => {
+          const scopedSlots: VNodeData['scopedSlots'] = {}
 
-        // 在 table-row 渲染函数上执行, 当 cell 的 value 改变时，整行重新渲染
-        scopedSlots.default = (scope) => {
-          const row = scope.row as Record<string, string>
-          const [rid, field] = splitPosKey(row[col.field])
-          const pos = { rid, field }
-          const cell = worktable.getCell(pos)
-          if (!cell && process.env.NODE_ENV === 'development') {
-            console.warn(`not a validable cell in postion ${pos}`)
+          // 在 table-row 渲染函数上执行, 当 cell 的 value 改变时，整行重新渲染
+          scopedSlots.default = (scope) => {
+            const row = scope.row as Record<string, string>
+            const [rid, field] = splitPosKey(row[col.field])
+            const pos = { rid, field }
+            const cell = worktable.getCell(pos)
+            if (!cell && process.env.NODE_ENV === 'development') {
+              console.warn(`not a validable cell in postion ${pos}`)
+            }
+
+            return h(TableCell, {
+              attrs: { cell, colDef: col },
+            })
           }
-
-          return h(TableCell, {
-            attrs: { cell, colDef: col },
+          return h(ElTableColumn, {
+            props: {
+              prop: col.field,
+              label: col.title,
+              width: col.width,
+            },
+            scopedSlots,
           })
-        }
-        return h(ElTableColumn, {
-          props: {
-            prop: col.field,
-            label: col.title,
-            width: col.width,
-          },
-          scopedSlots,
         })
-      })
       // 可多选
       // if (context.selectable) {
       //   _columns.unshift(
@@ -85,9 +112,12 @@ const InnerWorktable = defineComponent({
       return h(
         ElTable,
         {
+          ref: 'tableRef',
           attrs: Object.assign({}, attrs, {
-            data: positions.get(),
+            data: ctx.rowDatas.get(),
             'row-key': ROWID,
+            showSummary: props.showSummary,
+            summaryMethod: summaryMethod.value,
           }),
           // on: Object.assign({}, listeners, {
           //   'selection-change': onTableSelectionChange,
@@ -102,24 +132,5 @@ const InnerWorktable = defineComponent({
     }
   },
 })
-
-function generatePosData(rows: Row[]) {
-  return rows.map((row) => {
-    const rowPos: Record<string, string> & {
-      children?: Array<Record<string, string>>
-    } = {}
-
-    for (const field in row.data) {
-      const { rid } = row.data[field].position
-      rowPos[field] = mergePosKey(rid, field)
-    }
-    rowPos[ROWID] = `${row.rid}`
-    // 树形数据
-    if (row.children) {
-      rowPos['children'] = generatePosData(row.children)
-    }
-    return rowPos
-  })
-}
 
 export default observer(InnerWorktable as any)

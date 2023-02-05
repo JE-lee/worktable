@@ -1,4 +1,4 @@
-import { defineComponent, h } from 'vue-demi'
+import { computed, defineComponent, h } from 'vue-demi'
 
 export const InnerPreviewSelect = defineComponent({
   name: 'InnerPreviewSelect',
@@ -8,8 +8,24 @@ export const InnerPreviewSelect = defineComponent({
       type: String,
       default: 'default',
     },
+    options: {
+      type: Array,
+      default: () => [],
+    },
+    labelProp: {
+      type: String,
+      default: 'label',
+    },
+    valueProp: {
+      type: String,
+      default: 'value',
+    },
   },
   setup(props, { attrs }) {
+    const text = computed(() => {
+      const option: any = props.options.find((item: any) => item[props.valueProp] === props.value)
+      return option ? option[props.labelProp] : props.value || ''
+    })
     return () => {
       let staticClass = `el-input el-input--${props.size} el-select el-select--${props.size} el-input--suffix`
       if (attrs.disabled) {
@@ -26,7 +42,7 @@ export const InnerPreviewSelect = defineComponent({
               verticalAlign: 'middle',
             },
           },
-          props.value as string
+          text.value
         ),
         // suffix 倒三角
         h('span', { staticClass: 'el-input__suffix' }, [

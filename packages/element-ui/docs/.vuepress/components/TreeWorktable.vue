@@ -3,6 +3,7 @@
     <h4>{{ title }}</h4>
     <div style="padding: 10px 0">
       <el-button type="primary" size="mini" @click="validate">校验</el-button>
+      <el-button type="danger" size="mini" @click="removeOne">删除一条</el-button>
     </div>
     <worktable></worktable>
   </div>
@@ -70,18 +71,32 @@ export default defineComponent({
       },
 
     ]
-    const { validate } = useWorktable({
+    const { validate, remove } = useWorktable({
       columns, initialData: [{
-        name: '李斯', age: 32,
+        name: '李斯',
+        age: 32,
+        id: 'i1',
         children: [{
-          name: '李子航', age: 6,
-          children: [{ name: '李佳', age: 1 }]
+          id: 'i2',
+          name: '李子航',
+          age: 6,
+          children: [{ id: 'i3', name: '李佳', age: 1 }]
         }]
       }]
     })
+
+    const ids = ['i1', 'i2', 'i3']
+    const removeOne = () => {
+      const id = ids.pop()
+      remove(row => {
+        console.log('id', id, row)
+        return row.id === id
+      })
+    }
     return {
       title: '树形结构',
-      validate
+      validate,
+      removeOne
     }
   }
 

@@ -6,13 +6,14 @@ import {
   RowRaws,
   Filter,
   RowRaw,
+  EffectListener,
 } from './types'
 import { cloneDeep, isObject, isFunction } from 'lodash-es'
 import { BaseWorktable } from './BaseWorktable'
 import { runInAction, makeObservable, observable, action } from 'mobx'
 import { Row } from './Row'
-import { flatten, makeRowProxy, walk } from './share'
-import { EVENT_NAME } from './event'
+import { flatten, makeRowProxy, makeRowAction, walk } from './share'
+import { FIELD_EVENT_NAME, TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME } from './event'
 export class Worktable extends BaseWorktable {
   constructor(opt: WorktableConstructorOpt)
   constructor(columns: Column[])
@@ -41,6 +42,18 @@ export class Worktable extends BaseWorktable {
     this._setColumns(columns)
     // re-generate row data
     this.addRows(raws)
+  }
+
+  updateColumn(field: string, newCol: Column | ((oldCol: Column) => Column)) {
+    const colIndex = this.columns.findIndex((col) => col.field === field)
+
+    if (colIndex > -1) {
+      if (isFunction(newCol)) {
+        newCol = newCol(this.columns[colIndex])
+      }
+      const columns = [...this.columns]
+      columns.splice(colIndex, 1, newCol)
+    }
   }
 
   getData() {
@@ -75,11 +88,16 @@ export class Worktable extends BaseWorktable {
     const cell = row?.data[position.field]
     if (cell) {
       cell.setState('value', value)
+      const field = cell.colDef.field
+      const rowProxy = makeRowProxy(row)
+      const rowAction = makeRowAction(row)
+      this.notify(field, FIELD_EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE, value, rowProxy, rowAction)
       this.notify(
-        cell.colDef.field,
-        EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE,
+        TABLE_EFFECT_NAMESPACE,
+        TABLE_EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE,
         value,
-        makeRowProxy(row)
+        rowProxy,
+        rowAction
       )
       return true
     }
@@ -140,19 +158,33 @@ export class Worktable extends BaseWorktable {
     }
   }
 
+  addEffect(eventName: TABLE_EVENT_NAME, listener: EffectListener) {
+    return this.on(TABLE_EFFECT_NAMESPACE, eventName, listener)
+  }
+
+  removeEffect(eventName: TABLE_EVENT_NAME, listener?: EffectListener) {
+    return this.off(TABLE_EFFECT_NAMESPACE, eventName, listener)
+  }
+
   private _setColumns(columns: Column[]) {
     const cols = cloneDeep(columns)
-    // remove all event listeners
-    this.offAll()
+    // remove all effect event listeners of field
+    this.removeAllFieldEffects()
     runInAction(() => (this.columns = cols))
 
-    // init event listener of every field
+    // init effect event listener of every field
     cols.forEach((colDef) => {
       if (isObject(colDef.effects)) {
         Object.entries(colDef.effects).forEach(([eventName, listener]) =>
           this.on(colDef.field, eventName, listener)
         )
       }
+    })
+  }
+
+  private removeAllFieldEffects() {
+    this.columns.forEach((col) => {
+      this.offNamespace(col.field)
     })
   }
 
@@ -165,6 +197,7 @@ export class Worktable extends BaseWorktable {
       addRows: action,
       removeAll: action,
       removeRow: action,
+      updateColumn: action,
     })
   }
 }

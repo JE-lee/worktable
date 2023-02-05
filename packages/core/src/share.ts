@@ -1,5 +1,5 @@
 import { isObject } from 'lodash-es'
-import { RowRaw } from './types'
+import { Filter, RowRaw } from './types'
 import { Row } from './Row'
 
 export function noop() {
@@ -69,4 +69,20 @@ export function makeRowProxy(row: Row, immutable = false): RowRaw {
     }
   }
   return new Proxy(row, handler) as unknown as RowRaw
+}
+
+export function makeRowAction(row: Row) {
+  const addRow = row.addRow.bind(row)
+  const addRows = row.addRows.bind(row)
+  const removeRow = row.remove.bind(row)
+  const removeSelf = row.removeSelf.bind(row)
+  const removeAllRow = row.removeAll.bind(row)
+
+  return {
+    addRow,
+    addRows,
+    removeRow,
+    removeSelf,
+    removeAllRow,
+  }
 }

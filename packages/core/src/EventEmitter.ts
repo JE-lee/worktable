@@ -1,10 +1,11 @@
-export type EventCb = (...args: any[]) => void
-type EventMap = Record<string, EventCb[]>
+import { EffectListener } from './types'
+
+type EventMap = Record<string, EffectListener[]>
 type Events = Record<string, EventMap>
 export class EventEmitter {
   constructor(private events: Events = {}) {}
 
-  on(namespace: string, eventName: string, cb: EventCb) {
+  on(namespace: string, eventName: string, cb: EffectListener) {
     this.events[namespace] = this.events[namespace] || {}
     this.events[namespace][eventName] = this.events[namespace][eventName] || []
     this.events[namespace][eventName].push(cb)
@@ -16,9 +17,16 @@ export class EventEmitter {
     }
   }
 
-  off(namespace: string, eventName: string) {
+  off(namespace: string, eventName: string, listener?: EffectListener) {
     if (this.events[namespace] && this.events[namespace][eventName]) {
-      this.events[namespace][eventName] = []
+      if (!listener) {
+        this.events[namespace][eventName] = []
+      } else {
+        const cbIndex = this.events[namespace][eventName].findIndex((cb) => cb === listener)
+        if (cbIndex > -1) {
+          this.events[namespace][eventName].splice(cbIndex, 1)
+        }
+      }
     }
   }
 

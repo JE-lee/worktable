@@ -9,9 +9,10 @@ const innerPreviewMap = {
 }
 
 export function getInnerPreview(key: string) {
-  return innerPreviewMap[
-    key.toLowerCase() as Extract<InnerComponent, 'input' | 'select' | 'datepicker'>
-  ]
+  // FIXME: keep Both Form component and Preview component of ui behaves consistently
+  // return innerPreviewMap[
+  //   key.toLowerCase() as Extract<InnerComponent, 'input' | 'select' | 'datepicker'>
+  // ]
 }
 
 export { InnerPreviewInput }

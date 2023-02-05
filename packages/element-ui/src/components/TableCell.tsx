@@ -32,9 +32,7 @@ export const TableCell = observer(
       }
       const rowProxy = makeRowProxy(row!)
       function runWithContext<T extends (...args: any[]) => any>(run: T) {
-        return run({
-          row: rowProxy,
-        })
+        return run(rowProxy)
       }
 
       function convertListener(listeners: { [key: string]: (...args: any[]) => void }) {
@@ -46,31 +44,29 @@ export const TableCell = observer(
       }
       return () => {
         let colDefComponent = colDef.component
-        if (isFunction(colDefComponent)) {
+        if (isFnComponent(colDefComponent)) {
           colDefComponent = runWithContext(colDefComponent)
         }
         // 表单组件
         let component = getComponent(colDefComponent, getInnerComponent)
         // 预览态组件
-        let preview = colDef.preview as any
-        if (isFunction(preview)) {
-          preview = runWithContext(preview)
-        }
-        preview = getComponent(
-          isString(colDefComponent) ? colDefComponent : preview, // inner preview
-          getInnerPreview
-        )
+        // let preview = colDef.preview as any
+        // if (isFnComponent(preview)) {
+        //   preview = runWithContext(preview)
+        // }
+        // preview = getComponent(
+        //   isString(colDefComponent) ? colDefComponent : preview, // inner preview
+        //   getInnerPreview
+        // )
 
-        component = mergePreview(component || InnerText, preview)
+        component = mergePreview(component || InnerText /* preview */)
 
         // dynamic props
         let componentProps: Record<string, any> = {}
-        if (colDef.componentProps) {
-          if (isFunction(colDef.componentProps)) {
-            componentProps = runWithContext(colDef.componentProps)
-          } else {
-            componentProps = colDef.componentProps
-          }
+        if (isFunction(colDef.componentProps)) {
+          componentProps = runWithContext(colDef.componentProps)
+        } else {
+          componentProps = colDef.componentProps || {}
         }
 
         // enum
@@ -89,9 +85,9 @@ export const TableCell = observer(
         return h(component, {
           attrs: Object.assign(
             {},
+            mergeProps,
             componentProps || {},
-            props,
-            mergeProps
+            props
             // (
             //   colDef as Column & {
             //     advanceComponentProps: Ref<Record<string, any>>
@@ -140,7 +136,7 @@ export function mergePreview(component: VueComponent, Preview?: VueComponent) {
           const colDef = props.colDef as Column
           function renderFormItemInner(): VNode {
             const value = cell.value
-            const mergeAttrs = Object.assign({ size: layout.size }, attrs)
+            const mergeAttrs = Object.assign({ size: layout.size }, attrs, props)
             if (cell.previewing && Preview) {
               const onDomClick = () => {
                 worktable.setCellEditable(cell.position)
@@ -153,23 +149,21 @@ export function mergePreview(component: VueComponent, Preview?: VueComponent) {
               }
               const showText = getTextFromOptions(colDef.enum || [], value) || value
               return h(Preview, {
-                attrs: mergeAttrs,
-                props: { value: showText },
+                attrs: Object.assign(mergeAttrs, { value: showText }),
                 nativeOn: { click: onDomClick },
               })
             } else {
               return h(component, {
                 ref: FORM_INPUT,
-                attrs: mergeAttrs,
-                props: { value },
+                attrs: Object.assign(mergeAttrs, { value }),
                 on: Object.assign({}, listeners as any),
               })
             }
           }
           const errors = cell.errors
           const isError = errors.length > 0
-          // 防止编辑的时候校验引起元素抖动
-          if (isError || !cell.previewing) {
+          // FIXME: lose focus when input validation state changes
+          if (isError) {
             return h(Feedback, { props: { feedback: errors.join(','), isError: isError } }, [
               renderFormItemInner(),
             ])
@@ -191,4 +185,8 @@ function bindValueUpdateListener(on: VNodeData['on'], fn: (...args: any[]) => vo
 function getTextFromOptions(options: Options, val: any) {
   const option = options.find((item) => item.value === val)
   return option ? option.label : ''
+}
+
+function isFnComponent(fn: any) {
+  return isFunction(fn) && !(fn as any).cid
 }
