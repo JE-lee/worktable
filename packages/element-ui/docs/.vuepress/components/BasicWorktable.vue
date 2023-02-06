@@ -82,10 +82,10 @@ export default defineComponent({
         },
         effects: {
           onFieldValueChange(val, row) {
-            console.log('onFieldValueChange', val)
+            // console.log('onFieldValueChange', val)
           },
           onFieldInputValueChange(val, row) {
-            console.log('onFieldInputValueChange', val)
+            // console.log('onFieldInputValueChange', val)
           }
         }
       },
@@ -160,7 +160,7 @@ export default defineComponent({
         effects: {
           // TODO: keep the action parameter types consistent with 'render' component  
           onFieldValueChange(value, row, action) {
-            console.log('action', action)
+            // console.log('action', action)
             if (value === 'married') {
               action.addRow()
             } else {
@@ -320,7 +320,7 @@ export default defineComponent({
       title: '基本用法',
       validate,
       save,
-      add,
+      add: () => add(),
       getSummaries,
       toggleAll
     }

@@ -11,3 +11,14 @@ export function walk<T extends { children?: T[] }>(
     }
   })
 }
+
+export function flatten<T extends { children?: T[] }>(array: T[]) {
+  const arr: T[] = []
+  array.forEach((node) => {
+    arr.push(node)
+    if (node.children && node.children.length > 0) {
+      arr.push(...flatten(node.children))
+    }
+  })
+  return arr
+}

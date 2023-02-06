@@ -1,29 +1,21 @@
-import { reactive, ref, computed } from 'vue-demi'
+import { observable, computed, makeObservable, runInAction } from 'mobx'
 import { isFunction, debounce } from 'lodash-es'
 
-export function usePagination(
-  reaction: (pagination: { size: number; current: number }) => void,
-  externalAttrs = {},
-  immediate = true
-) {
-  const attr = reactive(
-    Object.assign(
-      {
-        pageSize: 10,
-        pageSizes: [10, 20, 50, 100],
-        layout: 'total, sizes, prev, pager, next, jumper',
-        currentPage: 1,
-      },
-      externalAttrs
-    )
-  )
+export function usePagination(reaction?: (pagination: { size: number; current: number }) => void) {
+  const attr = observable({
+    pageSize: 10,
+    pageSizes: [10, 20, 50, 100],
+    layout: 'total, sizes, prev, pager, next',
+    currentPage: 1,
+  })
+
   const pagination = computed(() => {
     return {
       current: attr.currentPage,
       size: attr.pageSize,
     }
   })
-  const loading = ref(false)
+  const loading = makeObservable({ value: false }, { value: observable.ref })
 
   attr.pageSize = attr.pageSizes[0]
 
@@ -41,13 +33,17 @@ export function usePagination(
   const query = debounce(_query, 20) // 20 is crucial
 
   const onSizeChange = (val: number) => {
-    attr.pageSize = val
-    query()
+    runInAction(() => {
+      attr.pageSize = val
+      query()
+    })
   }
 
   const onCurrentChange = (val: number) => {
-    attr.currentPage = val
-    query()
+    runInAction(() => {
+      attr.currentPage = val
+      query()
+    })
   }
 
   const refresh = (current?: number) => {
@@ -57,7 +53,7 @@ export function usePagination(
     query()
   }
 
-  immediate && query()
+  query()
 
   return {
     loading,

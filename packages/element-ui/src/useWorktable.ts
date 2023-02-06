@@ -1,5 +1,5 @@
 import { Context, RowData, UIColumn, useWorkTableOpt } from '@/types'
-import { computed as mobxComputed } from 'mobx'
+import { computed as mcomputed } from 'mobx'
 import { makeRowProxy, Row, RowRaw, Worktable } from '@worktable/core'
 import { provide, shallowRef } from 'vue-demi'
 import { getWorktableInjectKey, mergePosKey, ROWID, walk } from '@/shared'
@@ -10,7 +10,7 @@ export function useWorktable(opt: useWorkTableOpt) {
   _opt.columns = formatColumns(_opt.columns)
   const worktable = new Worktable(_opt)
   const injectKey = getWorktableInjectKey(opt.key)
-  const rowDatas = mobxComputed(() => generatePosData(worktable.rows))
+  const rowDatas = mcomputed(() => generatePosData(worktable.rows))
   const tableRef = shallowRef(null as any)
   const toggleRowExpansion = (filter: (row: RowRaw) => boolean, expanded: boolean) => {
     const targets: RowData[] = []
