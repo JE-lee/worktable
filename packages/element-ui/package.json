@@ -6,8 +6,8 @@
   "module": "esm/index.js",
   "types": "esm/types/index.d.ts",
   "scripts": {
-    "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs",
+    "docs:dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress dev docs",
+    "docs:build": "cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress build docs",
     "build": "npm run ts-build",
     "test": "jest",
     "ts-build": "rimraf esm && tsc --project tsconfig.build.json --module es2015 --outDir esm"
