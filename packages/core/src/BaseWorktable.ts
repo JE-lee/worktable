@@ -23,12 +23,13 @@ export class BaseWorktable extends Validator {
         this.notify(TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME.ON_VALIDATE_SUCCESS)
         return this.getRaws()
       })
-      .catch(() => {
+      .catch((err) => {
         this.notify(
           TABLE_EFFECT_NAMESPACE,
           TABLE_EVENT_NAME.ON_VALIDATE_FAIL,
           this.getValidateErrors()
         )
+        throw err
       })
       .finally(() => {
         this.notify(TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME.ON_VALIDATE_FINISH)

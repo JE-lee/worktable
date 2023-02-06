@@ -7,7 +7,7 @@ function delay(ms: number) {
 }
 
 describe('validate', () => {
-  test('should respect async-validator', async () => {
+  test('should respect "async-validator" lib', async () => {
     const requiredMessage = 'code is required'
     const columns: Column[] = [
       {
