@@ -51,13 +51,13 @@ export const InnerPagination = observer(
       return () => {
         const errorMap = errors.get()
         const hasError = Object.keys(errorMap).some((k) => errorMap[k])
-        console.log('errors render', hasError)
         const jumper = h(
           Select,
           {
             style: {
               width: '80px',
-              borderColor: hasError ? 'red' : 'inhreit',
+              // FIXME: follow theme color
+              borderColor: hasError ? '#F56C6C' : 'none',
             },
             props: {
               value: props.currentPage,

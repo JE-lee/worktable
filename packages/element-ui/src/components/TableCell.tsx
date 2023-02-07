@@ -162,14 +162,13 @@ export function mergePreview(component: VueComponent, Preview?: VueComponent) {
           }
           const errors = cell.errors
           const isError = errors.length > 0
-          // FIXME: lose focus when input validation state changes
-          if (isError) {
-            return h(Feedback, { props: { feedback: errors.join(','), isError: isError } }, [
-              renderFormItemInner(),
-            ])
-          } else {
-            return renderFormItemInner()
-          }
+          // if (isError) {
+          return h(Feedback, { props: { feedback: errors.join(','), isError: isError } }, [
+            renderFormItemInner(),
+          ])
+          // } else {
+          //   return renderFormItemInner()
+          // }
         }
       },
     }) as any

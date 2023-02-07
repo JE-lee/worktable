@@ -9,14 +9,20 @@ export const Feedback = defineComponent({
     const isPopover = layout.feedback === 'popover'
     return () => {
       if (!isPopover) {
-        return h('div', { staticClass: props.isError ? 'el-form-item is-error' : '' }, [
-          h('div', { staticClass: props.isError ? 'el-form-item__content' : '' }, [
-            slots.default?.(),
-            h('div', { staticClass: props.isError ? 'el-form-item__error' : '' }, [
-              props.feedback as string,
+        return h(
+          'div',
+          {
+            staticClass: props.isError ? 'el-form-item is-error' : '',
+          },
+          [
+            h('div', { staticClass: props.isError ? 'el-form-item__content' : '' }, [
+              slots.default?.(),
+              h('div', { staticClass: props.isError ? 'el-form-item__error' : '' }, [
+                props.feedback as string,
+              ]),
             ]),
-          ]),
-        ])
+          ]
+        )
       } else {
         return
       }
