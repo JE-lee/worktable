@@ -1,24 +1,28 @@
 {
-  "name": "@worktable/element-ui",
-  "version": "1.0.0",
+  "name": "@edsheet/element-ui",
+  "version": "1.0.4",
   "description": "",
-  "main": "esm/index.js",
-  "module": "esm/index.js",
+  "main": "esm",
+  "module": "esm",
   "types": "esm/types/index.d.ts",
   "scripts": {
     "docs:dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress dev docs",
     "docs:build": "cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress build docs",
-    "build": "npm run ts-build",
+    "build": "npm run clean && npm run rollup-build",
+    "clean": "rimraf esm",
     "test": "jest",
-    "ts-build": "rimraf esm && tsc --project tsconfig.build.json --module es2015 --outDir esm"
+    "ts-build": "tsc --project tsconfig.build.json --module es2015 --outDir esm",
+    "rollup-build": "rollup -c",
+    "pub": "npm publish --access=public"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@worktable/core": "workspace:^1.0.0",
+    "@edsheet/core": "^1.0.1",
+    "dayjs": "^1.11.7",
     "lodash-es": "^4.17.21",
-    "mobx-vue": "^2.2.0",
-    "vue-demi": "^0.13.11"
+    "mobx": "^6.7.0",
+    "mobx-vue": "^2.2.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
@@ -30,19 +34,17 @@
     "core-js": "2",
     "cross-env": "^7.0.3",
     "dayjs": "^1.11.7",
-    "element-ui": "^2.15.12",
     "jest-environment-jsdom": "^29.3.1",
     "mobx": "^6.7.0",
     "ts-loader": "~8.2.0",
     "vue": "^2.7.14",
+    "vue-demi": "^0.13.11",
     "vue-template-compiler": "^2.7.14",
     "vuepress": "^1.9.7"
   },
   "peerDependencies": {
-    "dayjs": "^1.11.7",
     "element-ui": "^2.15.12",
-    "mobx": "^6.7.0",
     "vue": "^2.7.14",
-    "vue-template-compiler": "^2.7.14"
+    "vue-demi": "^0.13.11"
   }
 }
