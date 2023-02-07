@@ -110,6 +110,7 @@ export class Worktable extends BaseWorktable {
 
   addRow(raw: RowRaw = {}) {
     const row = new Row(this.columns, raw, undefined, this.rows.length, this)
+    console.log('row created')
     this.rows.push(row)
     return row
   }
@@ -195,6 +196,7 @@ export class Worktable extends BaseWorktable {
       setColumns: action,
       addRow: action,
       addRows: action,
+      add: action,
       removeAll: action,
       removeRow: action,
       updateColumn: action,

@@ -64,7 +64,6 @@ export class Row {
   addRow(raw?: RowRaw) {
     const row = new Row(this.columns, raw, this, 0, this.wt)
     row.rIndex = this.children.length
-    flatten([row]).forEach((row) => row.trackRowValidateHandle())
     this.children.push(row)
   }
 
@@ -214,9 +213,7 @@ export class Row {
       this.data[col.field] = cell
     })
     if (Array.isArray(raw?.children)) {
-      runInAction(() => {
-        this.children = Row.generateRows(this.columns, raw!.children!, this, this.wt)
-      })
+      this.children = Row.generateRows(this.columns, raw!.children!, this, this.wt)
     }
   }
 

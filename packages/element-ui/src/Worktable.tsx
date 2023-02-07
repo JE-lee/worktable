@@ -10,14 +10,14 @@ import {
   getCurrentInstance,
 } from 'vue-demi'
 import { Table as ElTable, TableColumn as ElTableColumn } from 'element-ui'
-import { flatten, getWorktableInjectKey, innerDefaultKey, ROWID, useFlashingValue } from '@/shared'
+import { getWorktableInjectKey, innerDefaultKey, ROWID, useFlashingValue } from '@/shared'
 import { TABLE_EVENT_NAME } from '@worktable/core'
 import { TableCell } from '@/components/TableCell'
 import { splitPosKey } from '@/shared/pos-key'
 import { computed as mcomputed } from 'mobx'
 import { observer } from 'mobx-vue'
 import { Context } from './types'
-import { usePagination, InnerPagination } from '@/components/BetterPagination'
+import { usePagination, InnerPagination } from '@/components/InnerPagination'
 
 const InnerWorktable = defineComponent({
   name: 'Worktable',
@@ -34,36 +34,15 @@ const InnerWorktable = defineComponent({
     provide(innerDefaultKey, ctx)
 
     const datas = ctx.rowDatas
-    const total = mcomputed(() => datas.get().length)
     const { attr: paginationAttrs, on: paginationListeners, pagination } = usePagination()
     const visibleDatas = mcomputed(() => {
       const { current, size } = pagination.get()
       return datas.get().slice((current - 1) * size, current * size)
     })
 
-    const errors = mcomputed(() => {
-      console.log('get errors')
-      const rows = worktable.rows
-      const errors: Record<string, boolean> = {}
-      const { size } = pagination.get()
-      const maxPages = Math.ceil(total.get() / size)
-      for (let i = 0; i < maxPages; i++) {
-        let isError = false
-        flatten(rows.slice(i * size, (i + 1) * size)).some((row) => {
-          for (const k in row.data) {
-            if (row.data[k].errors.length > 0) {
-              isError = true
-              break
-            }
-          }
-        })
-        errors[i + 1] = isError
-      }
-      return errors
-    })
-
     // HACK: re-render summary-line when every field changes of value
     // FIXME: layout shift of summary-line
+    // FIXME: avoid re-rendering the entire table when field values change
     const [isTwinking, flash] = useFlashingValue()
     const summaryMethod = computed<() => any>(() => {
       return isTwinking.value ? () => [''] : props.summaryMethod // the space is crucial
@@ -129,7 +108,7 @@ const InnerWorktable = defineComponent({
     function renderPagination() {
       return h(InnerPagination, {
         style: { marginTop: '10px' },
-        attrs: Object.assign({}, paginationAttrs, { total: total.get(), errors: errors.get() }),
+        attrs: Object.assign({}, paginationAttrs),
         on: paginationListeners,
       })
     }
@@ -141,6 +120,7 @@ const InnerWorktable = defineComponent({
     // }
 
     function renderTable() {
+      console.log('render table')
       return h(
         ElTable,
         {

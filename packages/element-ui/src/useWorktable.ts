@@ -1,6 +1,6 @@
 import { Context, RowData, UIColumn, useWorkTableOpt } from '@/types'
 import { computed as mcomputed } from 'mobx'
-import { makeRowProxy, Row, RowRaw, Worktable } from '@worktable/core'
+import { Column, makeRowProxy, Row, RowRaw, Worktable } from '@worktable/core'
 import { provide, shallowRef } from 'vue-demi'
 import { getWorktableInjectKey, mergePosKey, ROWID, walk } from '@/shared'
 import { InnerRender } from '@/components/InnerComponent'
@@ -10,7 +10,7 @@ export function useWorktable(opt: useWorkTableOpt) {
   _opt.columns = formatColumns(_opt.columns)
   const worktable = new Worktable(_opt)
   const injectKey = getWorktableInjectKey(opt.key)
-  const rowDatas = mcomputed(() => generatePosData(worktable.rows))
+  const rowDatas = mcomputed(() => generatePosData(worktable.rows, worktable.columns))
   const tableRef = shallowRef(null as any)
   const toggleRowExpansion = (filter: (row: RowRaw) => boolean, expanded: boolean) => {
     const targets: RowData[] = []
@@ -55,10 +55,9 @@ function formatColumns(columns: UIColumn[]) {
   })
 }
 
-function generatePosData(rows: Row[]) {
+function generatePosData(rows: Row[], columns: Column[]) {
   return rows.map((row) => {
     const rowData: RowData = {}
-
     for (const field in row.data) {
       const { rid } = row.data[field].position
       rowData[field] = mergePosKey(rid, field)
@@ -67,7 +66,7 @@ function generatePosData(rows: Row[]) {
     rowData['_row'] = row
     // 树形数据
     if (row.children) {
-      rowData['children'] = generatePosData(row.children)
+      rowData['children'] = generatePosData(row.children, columns)
     }
     return rowData
   })

@@ -1,6 +1,9 @@
-import { defineComponent, h, computed } from 'vue-demi'
+import { defineComponent, h, computed, inject } from 'vue-demi'
 import { observer } from 'mobx-vue'
+import { computed as mcomputed } from 'mobx'
 import { Pagination, Select, Option } from 'element-ui'
+import { flatten, innerDefaultKey } from '@/shared'
+import { Context } from '@/types'
 
 function makePages(max: number) {
   const pages: number[] = []
@@ -14,21 +17,40 @@ export const InnerPagination = observer(
   defineComponent({
     name: 'InnerPagination',
     props: {
-      errors: {
-        type: Object, // Record<string, boolean>
-        required: true,
-      },
-      total: Number,
       currentPage: Number,
       pageSize: Number,
     },
     setup(props, { attrs, listeners: on }) {
+      const { worktable, rowDatas } = inject(innerDefaultKey) as Context
+      const total = mcomputed(() => rowDatas.get().length)
+      const errors = mcomputed<Record<string, boolean>>(() => {
+        if (!props.pageSize) return {}
+        const rows = worktable.rows
+        const errors: Record<string, boolean> = {}
+        const size = props.pageSize
+        const maxPages = Math.ceil(total.get() / size)
+        for (let i = 0; i < maxPages; i++) {
+          let isError = false
+          flatten(rows.slice(i * size, (i + 1) * size)).some((row) => {
+            for (const k in row.data) {
+              if (row.data[k].errors.length > 0) {
+                isError = true
+                break
+              }
+            }
+          })
+          errors[i + 1] = isError
+        }
+        return errors
+      })
+
       // FIXME: computed type declaration
       const pages = computed<number[]>(() =>
-        makePages(Math.ceil((props.total || 0) / (props.pageSize || 0)))
+        makePages(Math.ceil(total.get() / (props.pageSize || 0)))
       )
       return () => {
-        const hasError = Object.keys(props.errors).some((k) => props.errors[k])
+        const errorMap = errors.get()
+        const hasError = Object.keys(errorMap).some((k) => errorMap[k])
         console.log('errors render', hasError)
         const jumper = h(
           Select,
@@ -60,7 +82,7 @@ export const InnerPagination = observer(
                   'span',
                   {
                     style: {
-                      color: `${props.errors[pageNum] ? 'red' : 'black'}`,
+                      color: `${errorMap[pageNum] ? 'red' : 'black'}`,
                     },
                   },
                   [`${pageNum}`]
