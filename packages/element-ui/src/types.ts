@@ -1,11 +1,12 @@
-import { Column, makeRowAction, Row, RowRaw, RowRaws, Worktable } from '@worktable/core'
-import { Component, Ref, ShallowRef } from 'vue-demi'
+import { Column, makeRowAction, Row, RowRaw, RowRaws, Worktable } from '@edsheet/core'
+import { Component, ShallowRef } from 'vue-demi'
 import { IComputedValue } from 'Mobx'
 
 export type Feedbacklayout = 'terse' | 'popover'
 export interface TableLayout {
-  size: string
-  feedback: Feedbacklayout
+  pagination?: boolean
+  size?: string
+  feedback?: Feedbacklayout
 }
 export type useWorkTableOpt = {
   key?: string

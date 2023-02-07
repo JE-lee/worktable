@@ -1,7 +1,7 @@
 import { defineComponent, inject, h, getCurrentInstance, nextTick } from 'vue-demi'
 import { VNodeData, VNode } from 'vue'
 import { innerDefaultKey } from '@/shared'
-import { Column, Cell, CellValue, makeRowProxy } from '@worktable/core'
+import { Column, Cell, CellValue, makeRowProxy } from '@edsheet/core'
 import { VueComponent, FocusAble, Options, Context } from '@/types'
 import { isString, isFunction, cloneDeep } from 'lodash-es'
 import { getInnerComponent, InnerText } from './InnerComponent'
@@ -83,6 +83,7 @@ export const TableCell = observer(
           })
         }
         return h(component, {
+          style: { display: 'inline-block' },
           attrs: Object.assign(
             {},
             mergeProps,

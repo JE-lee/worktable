@@ -9,7 +9,7 @@
 </template>
 
 <script >
-import { useWorktable, Worktable } from '@worktable/element-ui'
+import { useWorktable, Worktable } from '@edsheet/element-ui'
 import { defineComponent } from 'vue-demi'
 export default defineComponent({
   name: 'BasicWorktable',

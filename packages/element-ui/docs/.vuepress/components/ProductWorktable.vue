@@ -9,7 +9,7 @@
 </template>
 
 <script lang="jsx">
-import { useWorktable, Worktable } from '@worktable/element-ui'
+import { useWorktable, Worktable } from '@edsheet/element-ui'
 import { defineComponent, h } from 'vue-demi'
 import UserPicker from './UserPicker'
 export default defineComponent({

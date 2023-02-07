@@ -1,6 +1,6 @@
 import { defineComponent, inject, nextTick } from 'vue-demi'
 import { innerDefaultKey } from '@/shared'
-import { Cell, makeRowProxy, makeRowAction } from '@worktable/core'
+import { Cell, makeRowProxy, makeRowAction } from '@edsheet/core'
 import { Context, RowAction } from '@/types'
 import { observer } from 'mobx-vue'
 import { isFunction } from 'lodash-es'

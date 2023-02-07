@@ -1,4 +1,4 @@
-import { defineComponent, h, computed, inject } from 'vue-demi'
+import { defineComponent, h, inject } from 'vue-demi'
 import { observer } from 'mobx-vue'
 import { computed as mcomputed } from 'mobx'
 import { Pagination, Select, Option } from 'element-ui'
@@ -45,7 +45,7 @@ export const InnerPagination = observer(
       })
 
       // FIXME: computed type declaration
-      const pages = computed<number[]>(() =>
+      const pages = mcomputed<number[]>(() =>
         makePages(Math.ceil(total.get() / (props.pageSize || 0)))
       )
       return () => {
@@ -67,7 +67,7 @@ export const InnerPagination = observer(
               input: on['current-change'],
             },
           },
-          pages.value.map((pageNum, index) =>
+          pages.get().map((pageNum, index) =>
             h(
               Option,
               {
@@ -101,7 +101,7 @@ export const InnerPagination = observer(
           },
           [
             h(Pagination, {
-              attrs: Object.assign({}, attrs, props),
+              attrs: Object.assign({}, attrs, props, { total: total.get() }),
               on,
             }),
             h('span', { staticClass: hasError ? 'el-form-item is-error' : '' }, [jumper]),

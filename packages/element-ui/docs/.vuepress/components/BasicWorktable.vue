@@ -12,7 +12,7 @@
 </template>
 
 <script lang="jsx">
-import { useWorktable, Worktable } from '@worktable/element-ui'
+import { useWorktable, Worktable } from '@edsheet/element-ui'
 import { defineComponent, h, nextTick } from 'vue-demi'
 import UserPicker from './UserPicker'
 
@@ -261,7 +261,7 @@ export default defineComponent({
         title: '操作',
         field: 'action',
         width: 200,
-        render: (row, { addRow, toggleExpansion }) => {
+        render: (row, { addRow, toggleExpansion, removeSelf }) => {
           // TODO: use jsx
           return h('div', [
             h('el-button', {
@@ -282,7 +282,7 @@ export default defineComponent({
                 size: 'mini'
               },
               on: {
-                click: () => row.removeSelf()
+                click: () => removeSelf()
               }
             }, '删除')])
         }
@@ -293,7 +293,8 @@ export default defineComponent({
       columns,
       initialData: [{ name: '李思', age: 32 }],
       layout: {
-        size: 'mini'
+        pagination: true,
+        feedback: 'popover'
       }
     })
 

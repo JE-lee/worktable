@@ -11,7 +11,7 @@ import {
 } from 'vue-demi'
 import { Table as ElTable, TableColumn as ElTableColumn } from 'element-ui'
 import { getWorktableInjectKey, innerDefaultKey, ROWID, useFlashingValue } from '@/shared'
-import { TABLE_EVENT_NAME } from '@worktable/core'
+import { TABLE_EVENT_NAME } from '@edsheet/core'
 import { TableCell } from '@/components/TableCell'
 import { splitPosKey } from '@/shared/pos-key'
 import { computed as mcomputed } from 'mobx'
@@ -36,8 +36,12 @@ const InnerWorktable = defineComponent({
     const datas = ctx.rowDatas
     const { attr: paginationAttrs, on: paginationListeners, pagination } = usePagination()
     const visibleDatas = mcomputed(() => {
-      const { current, size } = pagination.get()
-      return datas.get().slice((current - 1) * size, current * size)
+      if (ctx.layout.pagination) {
+        const { current, size } = pagination.get()
+        return datas.get().slice((current - 1) * size, current * size)
+      } else {
+        return datas.get()
+      }
     })
 
     // HACK: re-render summary-line when every field changes of value
@@ -120,7 +124,6 @@ const InnerWorktable = defineComponent({
     // }
 
     function renderTable() {
-      console.log('render table')
       return h(
         ElTable,
         {
@@ -140,7 +143,7 @@ const InnerWorktable = defineComponent({
       )
     }
     return () => {
-      return h('div', [renderTable(), renderPagination()])
+      return h('div', [renderTable(), ctx.layout.pagination && renderPagination()])
     }
   },
 })

@@ -1,6 +1,6 @@
 import { Context, RowData, UIColumn, useWorkTableOpt } from '@/types'
 import { computed as mcomputed } from 'mobx'
-import { Column, makeRowProxy, Row, RowRaw, Worktable } from '@worktable/core'
+import { Column, makeRowProxy, Row, RowRaw, Worktable } from '@edsheet/core'
 import { provide, shallowRef } from 'vue-demi'
 import { getWorktableInjectKey, mergePosKey, ROWID, walk } from '@/shared'
 import { InnerRender } from '@/components/InnerComponent'
@@ -26,7 +26,7 @@ export function useWorktable(opt: useWorkTableOpt) {
 
   const ctx: Context = {
     worktable,
-    layout: opt.layout || {},
+    layout: Object.assign({ pagination: false, size: 'mini', feedback: 'terse' }, opt.layout),
     rowDatas,
     tableRef,
     toggleRowExpansion,
