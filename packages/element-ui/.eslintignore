@@ -1,0 +1,9 @@
+**/.eslintrc.js
+**/prettier.config.js
+**/babel.config.js
+**/*.config.js
+**/lib
+**/dist
+**/coverage
+**/debug
+**/esm
