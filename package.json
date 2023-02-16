@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "editable table component, supported react and vue",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "build": "nx run-many --target=build",
     "clean": "pnpm --stream -r clean",
