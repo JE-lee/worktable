@@ -17,3 +17,5 @@ export type CellFactoryContext = {
   evProxy?: EventEmitter
   value?: CellValue
 }
+
+export type StaticComponentProps = Record<string, any>

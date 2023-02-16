@@ -1,9 +1,18 @@
 import { isBoolean, isFunction, omit } from 'lodash-es'
-import { observable, makeObservable, runInAction, action, Reaction } from 'mobx'
-import { Column, RowRaw, CellValue, RowRaws, Rule, Filter } from './types'
+import { observable, makeObservable, action, Reaction } from 'mobx'
+import {
+  Column,
+  RowRaw,
+  CellValue,
+  RowRaws,
+  Rule,
+  Filter,
+  StaticComponentProps,
+  RowProxy,
+} from './types'
 import { Cell } from './Cell'
 import { Worktable } from './Worktable'
-import { flatten, makeRowProxy, makeRowAction, noThrow, walk } from './share'
+import { makeRowProxy, makeRowAction, noThrow, walk, getDefault } from './share'
 import { RuleItem } from 'async-validator'
 import ValidateSchema from 'async-validator'
 import { FIELD_EVENT_NAME } from './event'
@@ -32,6 +41,7 @@ export class Row {
       children: observable.shallow,
       addRow: action,
       addRows: action,
+      sort: action,
     })
 
     this.wt = wt
@@ -47,7 +57,9 @@ export class Row {
   getShallowRaw() {
     let raw: Record<string, any> = {}
     for (const k in this.data) {
-      raw[k] = this.data[k].value
+      if (!this.data[k].colDef.virtual) {
+        raw[k] = this.data[k].value
+      }
     }
     raw = Object.assign(omit(this.initialData || {}, 'children'), raw)
     return raw
@@ -59,6 +71,16 @@ export class Row {
       raw.children = this.children.map((child) => child.getRaw())
     }
     return raw
+  }
+
+  setValues(raw: Record<string, any>) {
+    Object.keys(raw).forEach((key) => {
+      if (this.data[key]) {
+        this.data[key].setState('value', raw[key])
+      } else {
+        Object.assign(this.initialData, { [key]: raw[key] })
+      }
+    })
   }
 
   addRow(raw?: RowRaw) {
@@ -100,6 +122,10 @@ export class Row {
     this.wt?.remove(this.rid)
   }
 
+  sort(comparator: (a: RowProxy, b: RowProxy) => number) {
+    this.children.sort((arow, brow) => comparator(makeRowProxy(arow), makeRowProxy(brow)))
+  }
+
   stopWatchValidation() {
     this.disposers.forEach((disposer) => disposer())
     this.disposers = []
@@ -111,6 +137,22 @@ export class Row {
       validators.push(this.validateCell(this.data[field], isFirstTrack))
     }
     return Promise.all(validators)
+  }
+
+  setComponentProps(field: string, extralProps: StaticComponentProps) {
+    return this.data[field]?.setComponentProps(extralProps)
+  }
+
+  reset(field?: string) {
+    if (field) {
+      const cell = this.data[field]
+      cell?.setState(
+        'value',
+        cell.colDef.default
+          ? this.getDefaultValue(cell.colDef.default)
+          : getDefault(cell.colDef.type)
+      )
+    }
   }
 
   private findAll(filter: Filter) {
@@ -225,6 +267,8 @@ export class Row {
     const descriptor: Record<string, RuleItem> = {}
     const rawRow = makeRowProxy(this)
     if (colDef.rule) {
+      const rule = this.getRule(colDef.rule)
+      rule.type = rule.type || colDef.type
       descriptor[colDef.field] = this.getRule(colDef.rule)
       // validator
       if (isFunction(colDef.rule.validator)) {

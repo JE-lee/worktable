@@ -71,8 +71,8 @@ export const InnerPagination = observer(
             h(
               Option,
               {
+                key: index,
                 props: {
-                  key: index,
                   label: pageNum,
                   value: pageNum,
                 },

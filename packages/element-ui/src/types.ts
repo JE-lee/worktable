@@ -35,6 +35,7 @@ export type InnerComponent =
   | 'render'
   | 'text'
   | 'async-select'
+  | 'cascader'
 
 export type Options = Array<{ label: string; value: any }>
 
@@ -50,7 +51,18 @@ export type RowAction = ReturnType<typeof makeRowAction> & {
   toggleExpansion: (expanded: boolean) => void
 }
 
-export type UIColumn = Column & { render?: (row: RowRaw, action: RowAction) => void }
+export type DynamicRender = (row: RowRaw, action: RowAction) => void
+
+export type UIColumn = Column & {
+  fixed?: string // left or right
+  render?: DynamicRender
+  renderHeader?: (ctx: {
+    field: string
+    colIndex: number
+    add: Worktable['add']
+    rows: RowRaw[]
+  }) => void
+}
 
 export type RowData = Record<string, string> & {
   children?: Array<Record<string, string>>

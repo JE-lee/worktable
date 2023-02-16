@@ -45,10 +45,10 @@ export const InnerSelect = observer(
             on: _listeners.value,
             ref: SELECT_REF,
           },
-          props.options.map((option, index) =>
+          props.options.map((option) =>
             h(ElOption, {
-              attrs: {
-                key: index,
+              key: (option as any)[props.valueProp],
+              props: {
                 label: (option as any)[props.labelProp],
                 value: (option as any)[props.valueProp],
               },

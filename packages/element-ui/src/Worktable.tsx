@@ -11,12 +11,12 @@ import {
 } from 'vue-demi'
 import { Table as ElTable, TableColumn as ElTableColumn } from 'element-ui'
 import { getWorktableInjectKey, innerDefaultKey, ROWID, useFlashingValue } from '@/shared'
-import { TABLE_EVENT_NAME } from '@edsheet/core'
+import { makeRowAction, makeRowProxy, TABLE_EVENT_NAME } from '@edsheet/core'
 import { TableCell } from '@/components/TableCell'
 import { splitPosKey } from '@/shared/pos-key'
 import { computed as mcomputed } from 'mobx'
 import { observer } from 'mobx-vue'
-import { Context } from './types'
+import { Context, UIColumn } from './types'
 import { usePagination, InnerPagination } from '@/components/InnerPagination'
 
 const InnerWorktable = defineComponent({
@@ -65,9 +65,9 @@ const InnerWorktable = defineComponent({
 
     // render columns
     function renderColumns() {
-      const _columns = worktable.columns
+      const _columns = (worktable.columns as UIColumn[])
         .filter((col) => !col.hidden)
-        .map((col) => {
+        .map((col, colIndex) => {
           const scopedSlots: VNodeData['scopedSlots'] = {}
 
           // 在 table-row 渲染函数上执行, 当 cell 的 value 改变时，整行重新渲染
@@ -84,11 +84,25 @@ const InnerWorktable = defineComponent({
               attrs: { cell, colDef: col },
             })
           }
+          // column header
+          scopedSlots.header = ({ column }) => {
+            const field = column.property
+            if (col.renderHeader) {
+              return col.renderHeader({
+                field,
+                colIndex: colIndex,
+                rows: worktable.getData(),
+                add: worktable.add.bind(worktable),
+              }) as any
+            } else {
+              return h('span', col.title)
+            }
+          }
           return h(ElTableColumn, {
             props: {
               prop: col.field,
-              label: col.title,
               width: col.width,
+              fixed: col.fixed,
             },
             scopedSlots,
           })
@@ -117,6 +131,7 @@ const InnerWorktable = defineComponent({
       })
     }
 
+    // TODO: selectable
     // const onSelectionChange = listeners['selection-change']
     // function onTableSelectionChange(rows: any[]) {
     //   selectRows(rows.map((row) => row[ROWID]))

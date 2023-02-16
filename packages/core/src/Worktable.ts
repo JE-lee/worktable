@@ -7,6 +7,8 @@ import {
   Filter,
   RowRaw,
   EffectListener,
+  StaticComponentProps,
+  RowProxy,
 } from './types'
 import { cloneDeep, isObject, isFunction } from 'lodash-es'
 import { BaseWorktable } from './BaseWorktable'
@@ -60,6 +62,19 @@ export class Worktable extends BaseWorktable {
     return this.getRaws()
   }
 
+  setValuesInEach(raw: (row: RowProxy) => Record<string, any>, filter: Filter): void
+  setValuesInEach(raw: Record<string, any>, filter: Filter): void
+  setValuesInEach(raw: any, filter: Filter): void {
+    const rows = this.findAll(filter)
+    rows.forEach((row) => {
+      if (isFunction(raw)) {
+        row.setValues(raw(makeRowProxy(row)))
+      } else {
+        row.setValues(raw)
+      }
+    })
+  }
+
   add(raw: RowRaw | RowRaw[], filter?: Filter) {
     const raws = Array.isArray(raw) ? raw : [raw]
     if (!filter) {
@@ -83,6 +98,16 @@ export class Worktable extends BaseWorktable {
     rows.forEach((row) => this.removeRow(row))
   }
 
+  sort(comparator: (a: RowProxy, b: RowProxy) => number) {
+    this.rows.sort((arow, brow) => comparator(makeRowProxy(arow, true), makeRowProxy(brow, true)))
+  }
+
+  sortChildInEach(comparator: (a: RowProxy, b: RowProxy) => number, filter: Filter) {
+    const rows = this.findAll(filter)
+    rows.forEach((row) => row.sort(comparator))
+  }
+
+  // FIXME: select optionInChangeEvent 两个 value 不一样
   inputValue(position: CellPosition, value: CellValue) {
     const row = this.getRowByRid(position.rid)
     const cell = row?.data[position.field]
@@ -91,11 +116,18 @@ export class Worktable extends BaseWorktable {
       const field = cell.colDef.field
       const rowProxy = makeRowProxy(row)
       const rowAction = makeRowAction(row)
-      this.notify(field, FIELD_EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE, value, rowProxy, rowAction)
+      const copiedVal = cloneDeep(value)
+      this.notify(
+        field,
+        FIELD_EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE,
+        copiedVal,
+        rowProxy,
+        rowAction
+      )
       this.notify(
         TABLE_EFFECT_NAMESPACE,
         TABLE_EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE,
-        value,
+        copiedVal,
         rowProxy,
         rowAction
       )
@@ -162,12 +194,29 @@ export class Worktable extends BaseWorktable {
     return this.on(TABLE_EFFECT_NAMESPACE, eventName, listener)
   }
 
+  addFieldEffect(feild: string, eventName: FIELD_EVENT_NAME, listener: EffectListener) {
+    return this.on(feild, eventName, listener)
+  }
+
   removeEffect(eventName: TABLE_EVENT_NAME, listener?: EffectListener) {
     return this.off(TABLE_EFFECT_NAMESPACE, eventName, listener)
   }
 
+  setComponentProps(field: string, externalProps: StaticComponentProps) {
+    flatten(this.rows).forEach((row) => row.setComponentProps(field, externalProps))
+    const column = this.columns.find((col) => col.field === field)
+    if (column) {
+      column.componentProps = column.componentProps || {}
+      Object.assign(column.componentProps, externalProps)
+    }
+  }
+
+  walk(processor: (row: RowProxy, action: ReturnType<typeof makeRowAction>) => void) {
+    walk(this.rows, (row) => processor(makeRowProxy(row), makeRowAction(row)))
+  }
+
   private _setColumns(columns: Column[]) {
-    const cols = cloneDeep(columns)
+    const cols = cloneDeep(columns.filter((col) => isObject(col)))
     // remove all effect event listeners of field
     this.removeAllFieldEffects()
     runInAction(() => (this.columns = cols))
@@ -199,6 +248,9 @@ export class Worktable extends BaseWorktable {
       removeAll: action,
       removeRow: action,
       updateColumn: action,
+      inputValue: action,
+      setComponentProps: action,
+      sort: action,
     })
   }
 }

@@ -34,11 +34,23 @@ export function useWorktable(opt: useWorkTableOpt) {
   provide(injectKey, ctx)
 
   return {
+    ...worktable,
+    addEffect: worktable.addEffect.bind(worktable),
+    addFieldEffect: worktable.addFieldEffect.bind(worktable),
+    removeEffect: worktable.removeEffect.bind(worktable),
+    setColumns: worktable.setColumns.bind(worktable),
+    setComponentProps: worktable.setComponentProps.bind(worktable),
     validate: worktable.validate.bind(worktable),
     remove: worktable.remove.bind(worktable),
+    removeAll: worktable.removeAll.bind(worktable),
     add: worktable.add.bind(worktable),
     getData: worktable.getData.bind(worktable),
+    getValues: worktable.getData.bind(worktable),
+    setValuesInEach: worktable.setValuesInEach.bind(worktable),
     toggleRowExpansion,
+    sort: worktable.sort.bind(worktable),
+    sortChildInEach: worktable.sortChildInEach.bind(worktable),
+    walk: worktable.walk.bind(worktable),
   }
 }
 

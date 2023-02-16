@@ -2,9 +2,9 @@ import { defineComponent, h } from 'vue-demi'
 export const InnerRawText = defineComponent({
   name: 'InnerRawText',
   props: {
-    text: String,
+    text: null,
   },
   setup(props) {
-    return () => h('span', props.text as string)
+    return () => h('span', String(props.text))
   },
 })

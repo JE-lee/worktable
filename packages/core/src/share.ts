@@ -1,6 +1,23 @@
+import { ValueType } from './types/schema'
 import { isObject } from 'lodash-es'
 import { Filter, RowRaw } from './types'
 import { Row } from './Row'
+
+export function getDefault(type: ValueType = 'string') {
+  if (type === 'boolean') {
+    return false
+  } else if (type === 'string') {
+    return ''
+  } else if (type === 'number') {
+    return ''
+  } else if (type === 'object') {
+    return {}
+  } else if (type === 'array') {
+    return []
+  } else {
+    return ''
+  }
+}
 
 export function noop() {
   // empty
@@ -35,6 +52,7 @@ export function noThrow<T>(fn: (...args: any[]) => Promise<T>) {
   }
 }
 
+// TODO: correct type delaretion
 export function makeRowProxy(row: Row, immutable = false): RowRaw {
   const handler: ProxyHandler<Row> = {
     get(target: Row, prop: string) {
@@ -60,9 +78,12 @@ export function makeRowProxy(row: Row, immutable = false): RowRaw {
     handler.set = function (target: Row, prop: string, newValue: any) {
       if (typeof prop === 'string') {
         const cell = target.data[prop]
-        return isObject(cell)
-          ? Reflect.set(cell, 'value', newValue)
-          : Reflect.set(target.initialData, prop, newValue)
+        if (isObject(cell)) {
+          cell.setState('value', newValue)
+          return true
+        } else {
+          return Reflect.set(target.initialData, prop, newValue)
+        }
       } else {
         return false
       }
@@ -77,12 +98,20 @@ export function makeRowAction(row: Row) {
   const removeRow = row.remove.bind(row)
   const removeSelf = row.removeSelf.bind(row)
   const removeAllRow = row.removeAll.bind(row)
+  const setComponentProps = row.setComponentProps.bind(row)
+  const reset = row.reset.bind(row)
+  const setValues = row.setValues.bind(row)
+  const getValue = row.getRaw.bind(row)
 
   return {
+    reset,
     addRow,
     addRows,
     removeRow,
     removeSelf,
     removeAllRow,
+    setComponentProps,
+    setValues,
+    getValue,
   }
 }

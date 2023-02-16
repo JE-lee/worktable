@@ -1,7 +1,7 @@
 import { defineComponent, inject, h, getCurrentInstance, nextTick } from 'vue-demi'
 import { VNodeData, VNode } from 'vue'
 import { innerDefaultKey } from '@/shared'
-import { Column, Cell, CellValue, makeRowProxy } from '@edsheet/core'
+import { Column, Cell, CellValue, makeRowProxy, StaticComponentProps } from '@edsheet/core'
 import { VueComponent, FocusAble, Options, Context } from '@/types'
 import { isString, isFunction, cloneDeep } from 'lodash-es'
 import { getInnerComponent, InnerText } from './InnerComponent'
@@ -61,13 +61,19 @@ export const TableCell = observer(
 
         component = mergePreview(component || InnerText /* preview */)
 
-        // dynamic props
-        let componentProps: Record<string, any> = {}
+        const componentProps: StaticComponentProps = { ...cell.staticComponentProps }
+        // FIXME: remove dynamic compoentProps, conficted with setComponentProps
         if (isFunction(colDef.componentProps)) {
-          componentProps = runWithContext(colDef.componentProps)
-        } else {
-          componentProps = colDef.componentProps || {}
+          const dynamicComponentProps = runWithContext(colDef.componentProps)
+          Object.assign(componentProps, dynamicComponentProps)
         }
+
+        // dynamic disabled
+        let disabled = !!colDef.disabled
+        if (isFunction(colDef.disabled)) {
+          disabled = runWithContext(colDef.disabled)
+        }
+        Object.assign(componentProps, { disabled })
 
         // enum
         const mergeProps = mergePropsFromColumn(colDef)
@@ -76,6 +82,10 @@ export const TableCell = observer(
         if (component) {
           const originInput = componentListener.input
           bindValueUpdateListener(componentListener, (val: CellValue) => {
+            val = cloneDeep(val)
+            if (colDef.type === 'number') {
+              val = parseFloat(String(val))
+            }
             worktable.inputValue(cell.position, cloneDeep(val))
             if (isFunction(originInput)) {
               originInput(val, rowProxy)

@@ -10,19 +10,25 @@ export const InnerAsyncSelect = defineComponent({
   props: {
     remoteMethod: {
       type: Function,
-      required: true,
+      default: () => Promise.resolve([]),
     },
     lazy: Boolean,
-    remote: Boolean,
+    search: Boolean,
+    options: {
+      type: Array,
+      default: () => [],
+    },
   },
   setup(props, { attrs, listeners }) {
-    const options: Ref<any[]> = shallowRef([])
+    const options: Ref<any[]> = shallowRef(props.options)
+
     let fetched = false
+    let searched = false
     let remoteMethod: () => void = noop
     const loading = ref(false)
-    const on = { ...listeners }
+    const on: Record<string, any> = { ...listeners }
 
-    const fetch = (search?: string) => {
+    const fetch = (search = '') => {
       if (isFunction(props.remoteMethod)) {
         loading.value = true
         props
@@ -30,6 +36,7 @@ export const InnerAsyncSelect = defineComponent({
           .then((optionList: any[]) => {
             options.value = optionList
             fetched = true
+            searched = searched || props.search // set searched true in search mode
           })
           .finally(() => {
             loading.value = false
@@ -38,7 +45,7 @@ export const InnerAsyncSelect = defineComponent({
     }
 
     // not search mode
-    if (!props.remote) {
+    if (!props.search) {
       if (!props.lazy) {
         onBeforeMount(fetch)
       } else {
@@ -61,6 +68,8 @@ export const InnerAsyncSelect = defineComponent({
           options: options.value,
           loading: loading.value,
           remoteMethod,
+          remote: !!props.search,
+          filterable: !!props.search,
         }),
         on,
       })

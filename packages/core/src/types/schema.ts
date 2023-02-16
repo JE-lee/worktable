@@ -1,4 +1,5 @@
 import { RuleItem } from 'async-validator'
+import { StaticComponentProps } from './share'
 
 export type Options = Array<{ label: string; value: any }>
 
@@ -18,13 +19,15 @@ export type RowRaw = {
   [field: string]: CellValue | RowRaw[]
 } & { children?: RowRaw[] }
 
+export type RowProxy = RowRaw
+
 export type RowRaws = Array<RowRaw>
 
 export type EventContext = any[]
 
 type ColumnComponent = any
 
-type ColumnComponentProps = Record<string, any> | ((row: RowRaw) => Record<string, any>)
+type ColumnComponentProps = StaticComponentProps /* | ((row: RowRaw) => StaticComponentProps) */ //  remove component props of function type, conficted with setComponentProps
 
 type ColumnConponentListeners = Record<string, (...args: any[]) => void>
 
@@ -38,12 +41,13 @@ export interface Column {
   title?: string
   field: string
   type?: ValueType
-  width?: number
+  disabled?: boolean | ((row: RowRaw) => boolean)
   component?: ColumnComponent
   preview?: ColumnComponent
   componentProps?: ColumnComponentProps
   componentListeners?: ColumnConponentListeners
   default?: CellValue | (() => CellValue)
+  value?: (row: RowRaw) => CellValue // dynamic value
   enum?: Options
   rule?: Rule
   hidden?: boolean
@@ -51,4 +55,5 @@ export interface Column {
   effects?: {
     [eventName: string]: EffectListener
   }
+  width?: number
 }

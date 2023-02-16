@@ -31,10 +31,17 @@ export const InnerRender = observer(
         toggleExpansion,
       }
 
+      // FIXME: the runtime error of  render function was catched silently
       return () => {
-        const render = props.render
-        if (isFunction(render)) {
-          return render(rowProxy, rowAction)
+        try {
+          const render = props.render
+          if (isFunction(render)) {
+            return render(rowProxy, rowAction)
+          }
+        } catch (err) {
+          if (process.env.NODE_ENV === 'development') {
+            console.error(err)
+          }
         }
       }
     },

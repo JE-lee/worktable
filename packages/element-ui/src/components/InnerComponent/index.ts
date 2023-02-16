@@ -6,6 +6,7 @@ import { InnerDatePicker } from './InnerDatePicker'
 import { InnerRender } from './InnerRender'
 import { InnerText } from './InnerText'
 import { InnerRawText } from './InnerRawText'
+import { InnerCascader } from './InnerCascader'
 
 const innerComponentMap: {
   [props in InnerComponent]: VueComponent
@@ -17,6 +18,7 @@ const innerComponentMap: {
   text: InnerRawText,
   render: InnerRender,
   ['async-select']: InnerAsyncSelect,
+  cascader: InnerCascader,
 }
 
 export function getInnerComponent(key: InnerComponent) {
