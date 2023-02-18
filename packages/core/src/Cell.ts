@@ -43,54 +43,14 @@ export class Cell {
       setState: action,
       setComponentProps: action,
     })
-
-    // FIXME: nextTick
-    Promise.resolve().then(() => {
-      const field = this.colDef.field
-      const rowProxy = makeRowProxy(this.parent)
-      const rowAction = makeRowAction(this.parent)
-      this.evProxy?.notify(
-        field,
-        FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE,
-        cloneDeep(this.value),
-        rowProxy,
-        rowAction
-      )
-      this.evProxy?.notify(
-        TABLE_EFFECT_NAMESPACE,
-        TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE,
-        this.value,
-        rowProxy,
-        rowAction
-      )
-      if (isFunction(this.colDef.value)) {
-        this.track((row: RowRaw) => this.setState('value', this.colDef.value!(row)))
-      }
-    })
   }
 
   setState(state: CellState, val: any) {
     const prev = this[state]
     this[state] = val
     if (state === 'value' && !isEqual(prev, val)) {
-      const field = this.colDef.field
-      const rowProxy = makeRowProxy(this.parent)
-      const rowAction = makeRowAction(this.parent)
-      const copiedVal = cloneDeep(val)
-      this.evProxy?.notify(
-        field,
-        FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE,
-        copiedVal,
-        rowProxy,
-        rowAction
-      )
-      this.evProxy?.notify(
-        TABLE_EFFECT_NAMESPACE,
-        TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE,
-        copiedVal,
-        rowProxy,
-        rowAction
-      )
+      this.notifyValueFieldEvent(FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
+      this.notifyValueTableEvent(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
     }
   }
 
@@ -98,7 +58,27 @@ export class Cell {
     this.staticComponentProps = Object.assign({}, this.staticComponentProps, extralProps)
   }
 
-  track(reactor: (row: RowRaw) => void) {
+  trackDynamicValue() {
+    if (isFunction(this.colDef.value)) {
+      this.track((row: RowRaw) => this.setState('value', this.colDef.value!(row)))
+    }
+  }
+
+  notifyValueFieldEvent(eventName: FIELD_EVENT_NAME) {
+    const val = cloneDeep(this.value)
+    const rowProxy = makeRowProxy(this.parent)
+    const rowAction = makeRowAction(this.parent)
+    this.evProxy?.notify(this.colDef.field, eventName, val, rowProxy, rowAction)
+  }
+
+  notifyValueTableEvent(eventName: TABLE_EVENT_NAME) {
+    const val = cloneDeep(this.value)
+    const rowProxy = makeRowProxy(this.parent)
+    const rowAction = makeRowAction(this.parent)
+    this.evProxy?.notify(TABLE_EFFECT_NAMESPACE, eventName, val, rowProxy, rowAction)
+  }
+
+  private track(reactor: (row: RowRaw) => void) {
     const row = this.parent
     const colDef = this.colDef
     const reactionName = `${row.rid}-${colDef.field}-value-tracker`

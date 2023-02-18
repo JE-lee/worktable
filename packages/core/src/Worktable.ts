@@ -107,30 +107,13 @@ export class Worktable extends BaseWorktable {
     rows.forEach((row) => row.sort(comparator))
   }
 
-  // FIXME: select optionInChangeEvent 两个 value 不一样
   inputValue(position: CellPosition, value: CellValue) {
     const row = this.getRowByRid(position.rid)
     const cell = row?.data[position.field]
     if (cell) {
       cell.setState('value', value)
-      const field = cell.colDef.field
-      const rowProxy = makeRowProxy(row)
-      const rowAction = makeRowAction(row)
-      const copiedVal = cloneDeep(value)
-      this.notify(
-        field,
-        FIELD_EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE,
-        copiedVal,
-        rowProxy,
-        rowAction
-      )
-      this.notify(
-        TABLE_EFFECT_NAMESPACE,
-        TABLE_EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE,
-        copiedVal,
-        rowProxy,
-        rowAction
-      )
+      cell.notifyValueFieldEvent(FIELD_EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE)
+      cell.notifyValueTableEvent(TABLE_EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE)
       return true
     }
     return false

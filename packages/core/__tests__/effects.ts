@@ -31,22 +31,21 @@ describe('effects', () => {
       [FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE]: onFieldValueChange,
     })
 
-    // FIXME: onFieldValueChange is asynchronous when worktable initialized
+    onFieldValueChange
+    expect(onFieldValueChange).toHaveBeenCalled()
+    expect(onFieldValueChange.mock.calls[0][0]).toBe(1) // value
+    expect(onFieldValueChange.mock.calls[0][1].code).toBe(1) // row
+
+    const row = wt.rows[0]
+    wt.inputValue({ rid: row.rid, field: 'code' }, 2)
+    expect(onFieldInputValueChange.mock.calls.length).toBe(1)
+    expect(onFieldInputValueChange.mock.calls[0][0]).toBe(2) // value
+    expect(onFieldInputValueChange.mock.calls[0][1].code).toBe(2) // row
+
     // onFieldValueChange
-    // expect(onFieldValueChange).toHaveBeenCalled()
-    // expect(onFieldValueChange.mock.calls[0][0]).toBe(1) // value
-    // expect(onFieldValueChange.mock.calls[0][1].code).toBe(1) // row
-
-    // const row = wt.rows[0]
-    // wt.inputValue({ rid: row.rid, field: 'code' }, 2)
-    // expect(onFieldInputValueChange.mock.calls.length).toBe(1)
-    // expect(onFieldInputValueChange.mock.calls[0][0]).toBe(2) // value
-    // expect(onFieldInputValueChange.mock.calls[0][1].code).toBe(2) // row
-
-    // // onFieldValueChange
-    // expect(onFieldValueChange).toHaveBeenCalledTimes(2)
-    // expect(onFieldValueChange.mock.calls[1][0]).toBe(2) // value
-    // expect(onFieldValueChange.mock.calls[1][1].code).toBe(2) // row
+    expect(onFieldValueChange).toHaveBeenCalledTimes(2)
+    expect(onFieldValueChange.mock.calls[1][0]).toBe(2) // value
+    expect(onFieldValueChange.mock.calls[1][1].code).toBe(2) // row
   })
 
   test('event of validating field value', async () => {

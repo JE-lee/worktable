@@ -15,7 +15,7 @@ import { Worktable } from './Worktable'
 import { makeRowProxy, makeRowAction, noThrow, walk, getDefault } from './share'
 import { RuleItem } from 'async-validator'
 import ValidateSchema from 'async-validator'
-import { FIELD_EVENT_NAME } from './event'
+import { FIELD_EVENT_NAME, TABLE_EVENT_NAME } from './event'
 
 export class Row {
   static rid = 1
@@ -51,6 +51,10 @@ export class Row {
     this.rIndex = rIndex
     this.initialData = raw
     this.generate(raw)
+    // track dynamic value
+    Object.values(this.data).forEach((cell) => cell.trackDynamicValue())
+    // notify value change event
+    this.notifyCellValueEvent()
     this.trackRowValidateHandle()
   }
 
@@ -153,6 +157,13 @@ export class Row {
           : getDefault(cell.colDef.type)
       )
     }
+  }
+
+  private notifyCellValueEvent() {
+    Object.values(this.data).forEach((cell) => {
+      cell.notifyValueFieldEvent(FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
+      cell.notifyValueTableEvent(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
+    })
   }
 
   private findAll(filter: Filter) {
