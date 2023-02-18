@@ -53,6 +53,8 @@ export class Row {
     this.generate(raw)
     // track dynamic value
     Object.values(this.data).forEach((cell) => cell.trackDynamicValue())
+    // notify value initialization event
+    this.notifyCellInitializationEvent()
     // notify value change event
     this.notifyCellValueEvent()
     this.trackRowValidateHandle()
@@ -163,6 +165,12 @@ export class Row {
     Object.values(this.data).forEach((cell) => {
       cell.notifyValueFieldEvent(FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
       cell.notifyValueTableEvent(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
+    })
+  }
+
+  private notifyCellInitializationEvent() {
+    Object.values(this.data).forEach((cell) => {
+      cell.notifyValueFieldEvent(FIELD_EVENT_NAME.ON_FIELD_INIT)
     })
   }
 

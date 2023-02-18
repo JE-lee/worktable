@@ -1,4 +1,5 @@
 export enum FIELD_EVENT_NAME {
+  ON_FIELD_INIT = 'onFieldInit',
   ON_FIELD_VALUE_CHANGE = 'onFieldValueChange',
   ON_FIELD_INPUT_VALUE_CHANGE = 'onFieldInputValueChange',
   ON_FIELD_VALUE_VALIDATE_START = 'onFieldValueValidateStart',
