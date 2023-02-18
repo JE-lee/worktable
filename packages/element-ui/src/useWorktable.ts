@@ -35,6 +35,8 @@ export function useWorktable(opt: useWorkTableOpt) {
 
   return {
     ...worktable,
+    pauseEffects: worktable.pause.bind(worktable),
+    resumeEffects: worktable.resume.bind(worktable),
     addEffect: worktable.addEffect.bind(worktable),
     addFieldEffect: worktable.addFieldEffect.bind(worktable),
     removeEffect: worktable.removeEffect.bind(worktable),

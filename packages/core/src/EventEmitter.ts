@@ -3,7 +3,15 @@ import { EffectListener } from './types'
 type EventMap = Record<string, EffectListener[]>
 type Events = Record<string, EventMap>
 export class EventEmitter {
-  constructor(private events: Events = {}) {}
+  constructor(private events: Events = {}, private isPaused = false) {}
+
+  pause() {
+    this.isPaused = true
+  }
+
+  resume() {
+    this.isPaused = false
+  }
 
   on(namespace: string, eventName: string, cb: EffectListener) {
     this.events[namespace] = this.events[namespace] || {}
@@ -13,7 +21,11 @@ export class EventEmitter {
 
   notify(namespace: string, eventName: string, ...args: any[]) {
     if (this.events[namespace] && this.events[namespace][eventName]) {
-      this.events[namespace][eventName].forEach((cb) => cb(...args))
+      this.events[namespace][eventName].forEach((cb) => {
+        if (!this.isPaused) {
+          cb(...args)
+        }
+      })
     }
   }
 
