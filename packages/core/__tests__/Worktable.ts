@@ -149,7 +149,7 @@ describe('Worktable', () => {
     wt.addRow({ id: 1, code: 9 })
     wt.addRow({ id: 2, code: 9 })
     wt.addRow({ id: 3, code: 9 })
-    wt.remove((row) => row.id < 3)
+    wt.remove((row) => row.data.id < 3)
     expect(wt.rows.length).toBe(1)
 
     wt.removeAll()

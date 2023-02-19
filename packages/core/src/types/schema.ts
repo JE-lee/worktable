@@ -1,4 +1,5 @@
 import { RuleItem } from 'async-validator'
+import type { Row } from '../Row'
 import { StaticComponentProps } from './share'
 
 export type Options = Array<{ label: string; value: any }>
@@ -24,7 +25,21 @@ export type RowRaw = {
   [field: string]: CellValue | RowRaw[]
 } & { children?: RowRaw[] }
 
-export type RowProxy = RowRaw
+export type RowAction = Pick<
+  Row,
+  'reset' | 'addRow' | 'addRows' | 'removeRow' | 'removeSelf' | 'setComponentProps' | 'setValues'
+> & {
+  removeAllRow: Row['removeAll']
+  getValue: Row['getRaw']
+}
+
+export type RowProxy = {
+  parent?: RowProxy
+  children?: RowProxy[]
+  index: number
+  rid: number
+  data: RowRaw
+} & RowAction
 
 export type RowRaws = Array<RowRaw>
 
@@ -32,7 +47,7 @@ export type EventContext = any[]
 
 type ColumnComponent = any
 
-type ColumnComponentProps = StaticComponentProps /* | ((row: RowRaw) => StaticComponentProps) */ //  remove component props of function type, conficted with setComponentProps
+type ColumnComponentProps = StaticComponentProps | ((row: RowProxy) => StaticComponentProps)
 
 type ColumnConponentListeners = Record<string, (...args: any[]) => void>
 
@@ -46,13 +61,13 @@ export interface Column {
   title?: string
   field: string
   type?: ValueType
-  disabled?: boolean | ((row: RowRaw) => boolean)
+  disabled?: boolean | ((row: RowProxy) => boolean)
   component?: ColumnComponent
   preview?: ColumnComponent
   componentProps?: ColumnComponentProps
   componentListeners?: ColumnConponentListeners
   default?: CellValue | (() => CellValue)
-  value?: (row: RowRaw) => CellValue // dynamic value
+  value?: (row: RowProxy) => CellValue // dynamic value
   enum?: Options
   rule?: Rule
   hidden?: boolean

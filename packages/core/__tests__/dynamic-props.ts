@@ -5,7 +5,7 @@ describe('dynamic props', () => {
     const columns: Column[] = [
       { field: 'price1', type: 'number' },
       { field: 'price2', type: 'number' },
-      { field: 'total', value: (row) => +row.price1 + +row.price2 },
+      { field: 'total', value: (row) => +row.data.price1 + +row.data.price2 },
     ]
     const wt = new Worktable({ columns, initialData: [{ price1: 10, price2: 9 }] })
     let data = wt.getData()

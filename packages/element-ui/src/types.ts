@@ -1,4 +1,5 @@
-import { Column, makeRowAction, Row, RowRaw, RowRaws, Worktable } from '@edsheet/core'
+import { Column, Row, Worktable } from '@edsheet/core'
+import type { RowProxy, RowRaw, RowRaws } from '@edsheet/core'
 import { Component, ShallowRef } from 'vue-demi'
 import { IComputedValue } from 'Mobx'
 
@@ -44,14 +45,14 @@ export type Context = {
   layout: TableLayout
   rowDatas: IComputedValue<RowData[]>
   tableRef: ShallowRef<any>
-  toggleRowExpansion: (filter: (row: RowRaw) => boolean, expanded: boolean) => void
+  toggleRowExpansion: (filter: (row: RowProxy) => boolean, expanded: boolean) => void
 }
 
-export type RowAction = ReturnType<typeof makeRowAction> & {
+export type RenderRowProxy = RowProxy & {
   toggleExpansion: (expanded: boolean) => void
 }
 
-export type DynamicRender = (row: RowRaw, action: RowAction) => void
+export type DynamicRender = (row: RenderRowProxy) => void
 
 export type UIColumn = Column & {
   fixed?: string // left or right

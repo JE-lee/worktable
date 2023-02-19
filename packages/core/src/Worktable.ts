@@ -14,7 +14,7 @@ import { cloneDeep, isObject, isFunction } from 'lodash-es'
 import { BaseWorktable } from './BaseWorktable'
 import { runInAction, makeObservable, observable, action } from 'mobx'
 import { Row } from './Row'
-import { flatten, makeRowProxy, makeRowAction, walk } from './share'
+import { flatten, makeRowProxy, walk } from './share'
 import { FIELD_EVENT_NAME, TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME } from './event'
 import { deconstruct } from './field-parser'
 export class Worktable extends BaseWorktable {
@@ -69,7 +69,7 @@ export class Worktable extends BaseWorktable {
     const rows = this.findAll(filter)
     rows.forEach((row) => {
       if (isFunction(raw)) {
-        row.setValues(raw(makeRowProxy(row)))
+        row.setValues(raw(makeRowProxy(row, true)))
       } else {
         row.setValues(raw)
       }
@@ -195,8 +195,8 @@ export class Worktable extends BaseWorktable {
     }
   }
 
-  walk(processor: (row: RowProxy, action: ReturnType<typeof makeRowAction>) => void) {
-    walk(this.rows, (row) => processor(makeRowProxy(row), makeRowAction(row)))
+  walk(processor: (row: RowProxy) => void) {
+    walk(this.rows, (row) => processor(makeRowProxy(row)))
   }
 
   private _setColumns(columns: Column[]) {

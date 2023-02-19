@@ -1,6 +1,6 @@
 import { Row } from '../Row'
 import { EventEmitter } from './../EventEmitter'
-import { CellValue, Column, RowRaw, RowRaws } from './schema'
+import { CellValue, Column, RowProxy, RowRaws } from './schema'
 
 export interface WorktableConstructorOpt {
   columns: Column[]
@@ -9,7 +9,7 @@ export interface WorktableConstructorOpt {
 
 export type CellState = 'value' | 'previewing' | 'validating' | 'errors'
 
-export type Filter = (row: RowRaw) => boolean
+export type Filter = (row: RowProxy) => boolean
 
 export type CellFactoryContext = {
   parent: Row

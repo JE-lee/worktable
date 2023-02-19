@@ -1,11 +1,11 @@
 import { FIELD_EVENT_NAME, TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME } from './event'
-import { CellPosition, RowRaw } from './types/schema'
+import { CellPosition, RowProxy, RowRaw } from './types/schema'
 import { CellState, CellValue, Column, CellFactoryContext, StaticComponentProps } from './types'
 import { isUndefined, isEqual, cloneDeep, isFunction, get, set } from 'lodash-es'
 import { action, makeObservable, observable, Reaction } from 'mobx'
 import { EventEmitter } from './EventEmitter'
 import { Row } from './Row'
-import { makeRowProxy, makeRowAction, getDefault } from './share'
+import { makeRowProxy, getDefault } from './share'
 
 // TODO: getter of previweing and validating
 export class Cell {
@@ -63,22 +63,20 @@ export class Cell {
 
   trackDynamicValue() {
     if (isFunction(this.colDef.value)) {
-      this.track((row: RowRaw) => this.setState('value', this.colDef.value!(row)))
+      this.track((row: RowProxy) => this.setState('value', this.colDef.value!(row)))
     }
   }
 
   notifyValueFieldEvent(eventName: FIELD_EVENT_NAME) {
     const val = cloneDeep(this.value)
     const rowProxy = makeRowProxy(this.parent)
-    const rowAction = makeRowAction(this.parent)
-    this.evProxy?.notify(this.colDef.field, eventName, val, rowProxy, rowAction)
+    this.evProxy?.notify(this.colDef.field, eventName, val, rowProxy)
   }
 
   notifyValueTableEvent(eventName: TABLE_EVENT_NAME) {
     const val = cloneDeep(this.value)
     const rowProxy = makeRowProxy(this.parent)
-    const rowAction = makeRowAction(this.parent)
-    this.evProxy?.notify(TABLE_EFFECT_NAMESPACE, eventName, val, rowProxy, rowAction)
+    this.evProxy?.notify(TABLE_EFFECT_NAMESPACE, eventName, val, rowProxy)
   }
 
   deconstructValue() {
@@ -103,11 +101,11 @@ export class Cell {
     return merged as CellValue
   }
 
-  private track(reactor: (row: RowRaw) => void) {
+  private track(reactor: (row: RowProxy) => void) {
     const row = this.parent
     const colDef = this.colDef
     const reactionName = `${row.rid}-${colDef.field}-value-tracker`
-    const rowProxy = makeRowProxy(row)
+    const rowProxy = makeRowProxy(row, true)
     const reaction: Reaction = new Reaction(reactionName, () =>
       reaction.track(() => reactor(rowProxy))
     )

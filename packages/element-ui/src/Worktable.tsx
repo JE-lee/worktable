@@ -11,7 +11,7 @@ import {
 } from 'vue-demi'
 import { Table as ElTable, TableColumn as ElTableColumn } from 'element-ui'
 import { getWorktableInjectKey, innerDefaultKey, ROWID, useFlashingValue } from '@/shared'
-import { makeRowAction, makeRowProxy, TABLE_EVENT_NAME } from '@edsheet/core'
+import { TABLE_EVENT_NAME } from '@edsheet/core'
 import { TableCell } from '@/components/TableCell'
 import { splitPosKey } from '@/shared/pos-key'
 import { computed as mcomputed } from 'mobx'

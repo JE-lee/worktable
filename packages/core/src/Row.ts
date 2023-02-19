@@ -12,7 +12,7 @@ import {
 } from './types'
 import { Cell } from './Cell'
 import { Worktable } from './Worktable'
-import { makeRowProxy, makeRowAction, noThrow, walk, getDefault } from './share'
+import { makeRowProxy, noThrow, walk, getDefault } from './share'
 import { RuleItem } from 'async-validator'
 import ValidateSchema from 'async-validator'
 import { FIELD_EVENT_NAME, TABLE_EVENT_NAME } from './event'
@@ -178,7 +178,7 @@ export class Row {
   private findAll(filter: Filter) {
     const rows: Row[] = []
     walk(this.children, (row) => {
-      if (filter(row.getRaw())) {
+      if (filter(makeRowProxy(row))) {
         rows.push(row)
       }
     })
@@ -197,6 +197,7 @@ export class Row {
     const reaction: Reaction = new Reaction(`${this.rid}-${cell.colDef.field}-validator`, () =>
       reaction.track(() => validator(false))
     )
+    // FIXME: not call validator when first track
     reaction.track(() => validator(true))
     const disposer = () => reaction.dispose()
     return disposer
@@ -213,8 +214,7 @@ export class Row {
         colDef.field,
         FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START,
         cell.value,
-        makeRowProxy(this),
-        makeRowAction(this)
+        makeRowProxy(this)
       )
     }
     return validator
@@ -228,8 +228,7 @@ export class Row {
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_SUCCESS,
             cell.value,
-            makeRowProxy(this),
-            makeRowAction(this)
+            makeRowProxy(this)
           )
         }
         return true
@@ -243,8 +242,7 @@ export class Row {
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FAIL,
             errors,
             cell.value,
-            makeRowProxy(this),
-            makeRowAction(this)
+            makeRowProxy(this)
           )
         }
         throw err
@@ -256,8 +254,7 @@ export class Row {
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH,
             cell.value,
-            makeRowProxy(this),
-            makeRowAction(this)
+            makeRowProxy(this)
           )
         }
       })
@@ -313,7 +310,7 @@ export class Row {
     return descriptor
   }
 
-  private makeCellAsyncVaidatorFn(colDef: Column, rawRow: RowRaw) {
+  private makeCellAsyncVaidatorFn(colDef: Column, rawRow: RowProxy) {
     return async (rule: any, value: any) => {
       if (isFunction(colDef?.rule?.validator)) {
         const success = await colDef?.rule?.validator(value, rawRow)

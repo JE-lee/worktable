@@ -1,6 +1,6 @@
 import { Context, RowData, UIColumn, useWorkTableOpt } from '@/types'
 import { computed as mcomputed } from 'mobx'
-import { Column, makeRowProxy, Row, RowRaw, Worktable } from '@edsheet/core'
+import { Column, makeRowProxy, Row, RowProxy, Worktable } from '@edsheet/core'
 import { provide, shallowRef } from 'vue-demi'
 import { getWorktableInjectKey, mergePosKey, ROWID, walk } from '@/shared'
 import { InnerRender } from '@/components/InnerComponent'
@@ -12,7 +12,7 @@ export function useWorktable(opt: useWorkTableOpt) {
   const injectKey = getWorktableInjectKey(opt.key)
   const rowDatas = mcomputed(() => generatePosData(worktable.rows, worktable.columns))
   const tableRef = shallowRef(null as any)
-  const toggleRowExpansion = (filter: (row: RowRaw) => boolean, expanded: boolean) => {
+  const toggleRowExpansion = (filter: (row: RowProxy) => boolean, expanded: boolean) => {
     const targets: RowData[] = []
     const datas = rowDatas.get()
     walk(datas, (item) => {

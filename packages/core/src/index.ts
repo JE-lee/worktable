@@ -4,6 +4,6 @@ export * from './types'
 export * from './Cell'
 export * from './EventEmitter'
 export * from './event'
-import { makeRowProxy, makeRowAction } from './share'
+import { makeRowProxy } from './share'
 
-export { makeRowProxy, makeRowAction }
+export { makeRowProxy }

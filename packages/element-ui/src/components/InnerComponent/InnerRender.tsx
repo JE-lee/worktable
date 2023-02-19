@@ -1,7 +1,7 @@
-import { defineComponent, inject, nextTick } from 'vue-demi'
+import { defineComponent, inject } from 'vue-demi'
 import { innerDefaultKey } from '@/shared'
-import { Cell, makeRowProxy, makeRowAction } from '@edsheet/core'
-import { Context, RowAction } from '@/types'
+import { Cell, makeRowProxy } from '@edsheet/core'
+import { Context } from '@/types'
 import { observer } from 'mobx-vue'
 import { isFunction } from 'lodash-es'
 
@@ -26,17 +26,22 @@ export const InnerRender = observer(
         toggleRowExpansion((row) => row.rid === cell.position.rid, expanded)
       }
 
-      const rowAction: RowAction = {
-        ...makeRowAction(row!),
-        toggleExpansion,
-      }
+      const renderRowProxy = new Proxy(rowProxy, {
+        get(target, prop) {
+          if (prop === 'toggleExpansion') {
+            return toggleExpansion
+          } else {
+            return Reflect.get(target, prop)
+          }
+        },
+      })
 
       // FIXME: the runtime error of  render function was catched silently
       return () => {
         try {
           const render = props.render
           if (isFunction(render)) {
-            return render(rowProxy, rowAction)
+            return render(renderRowProxy)
           }
         } catch (err) {
           if (process.env.NODE_ENV === 'development') {

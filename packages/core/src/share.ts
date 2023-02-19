@@ -1,6 +1,6 @@
-import { ValueType } from './types/schema'
+import { RowProxy, ValueType } from './types/schema'
 import { isObject } from 'lodash-es'
-import { Filter, RowRaw } from './types'
+import { RowRaw } from './types'
 import { Row } from './Row'
 
 export function getDefault(type: ValueType = 'string') {
@@ -53,7 +53,9 @@ export function noThrow<T>(fn: (...args: any[]) => Promise<T>) {
 }
 
 // TODO: correct type delaretion
-export function makeRowProxy(row: Row, immutable = false): RowRaw {
+export function makeRowProxy(row: Row, immutable = false) {
+  const rowDataProxy = makeRowDataProxy(row, immutable)
+  const rowAction = makeRowAction(row)
   const handler: ProxyHandler<Row> = {
     get(target: Row, prop: string) {
       if (typeof prop === 'string') {
@@ -65,31 +67,17 @@ export function makeRowProxy(row: Row, immutable = false): RowRaw {
           return target.rIndex
         } else if (prop === 'rid') {
           return target.rid
+        } else if (prop === 'data') {
+          return rowDataProxy
         } else {
-          const cell = target.data[prop]
-          return isObject(cell) ? cell.value : target.initialData[prop]
+          return Reflect.get(rowAction, prop)
         }
       } else {
-        return Reflect.get(target, prop)
+        return undefined
       }
     },
   }
-  if (!immutable) {
-    handler.set = function (target: Row, prop: string, newValue: any) {
-      if (typeof prop === 'string') {
-        const cell = target.data[prop]
-        if (isObject(cell)) {
-          cell.setState('value', newValue)
-          return true
-        } else {
-          return Reflect.set(target.initialData, prop, newValue)
-        }
-      } else {
-        return false
-      }
-    }
-  }
-  return new Proxy(row, handler) as unknown as RowRaw
+  return new Proxy(row, handler) as unknown as RowProxy
 }
 
 export function makeRowAction(row: Row) {
@@ -114,4 +102,33 @@ export function makeRowAction(row: Row) {
     setValues,
     getValue,
   }
+}
+
+function makeRowDataProxy(row: Row, immutable = false) {
+  const handler: ProxyHandler<Row> = {
+    get(target: Row, prop: string) {
+      if (typeof prop === 'string') {
+        const cell = target.data[prop]
+        return isObject(cell) ? cell.value : target.initialData[prop]
+      } else {
+        return undefined
+      }
+    },
+  }
+  if (!immutable) {
+    handler.set = function (target: Row, prop: string, newValue: any) {
+      if (typeof prop === 'string') {
+        const cell = target.data[prop]
+        if (isObject(cell)) {
+          cell.setState('value', newValue)
+          return true
+        } else {
+          return Reflect.set(target.initialData, prop, newValue)
+        }
+      } else {
+        return false
+      }
+    }
+  }
+  return new Proxy(row, handler) as unknown as RowRaw
 }

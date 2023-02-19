@@ -36,30 +36,30 @@ describe('effects', () => {
     // onFieldInit
     expect(onFieldInit).toHaveBeenCalled()
     expect(onFieldInit.mock.calls[0][0]).toBe(1) // value
-    expect(onFieldInit.mock.calls[0][1].code).toBe(1) // row
+    expect(onFieldInit.mock.calls[0][1].data.code).toBe(1) // row
 
     // onFieldValueChange
     expect(onFieldValueChange).toHaveBeenCalled()
     expect(onFieldValueChange.mock.calls[0][0]).toBe(1) // value
-    expect(onFieldValueChange.mock.calls[0][1].code).toBe(1) // row
+    expect(onFieldValueChange.mock.calls[0][1].data.code).toBe(1) // row
 
     const row = wt.rows[0]
     wt.inputValue({ rid: row.rid, field: 'code' }, 2)
     expect(onFieldInputValueChange.mock.calls.length).toBe(1)
     expect(onFieldInputValueChange.mock.calls[0][0]).toBe(2) // value
-    expect(onFieldInputValueChange.mock.calls[0][1].code).toBe(2) // row
+    expect(onFieldInputValueChange.mock.calls[0][1].data.code).toBe(2) // row
 
     // onFieldValueChange
     expect(onFieldValueChange).toHaveBeenCalledTimes(2)
     expect(onFieldValueChange.mock.calls[1][0]).toBe(2) // value
-    expect(onFieldValueChange.mock.calls[1][1].code).toBe(2) // row
+    expect(onFieldValueChange.mock.calls[1][1].data.code).toBe(2) // row
   })
 
   test('event of field validating', async () => {
-    const start = jest.fn((value, row) => [value, row.code])
-    const finish = jest.fn((value, row) => [value, row.code])
-    const success = jest.fn((value, row) => [value, row.code])
-    const fail = jest.fn((errors, value, row) => [errors, value, row.code])
+    const start = jest.fn((value, row) => [value, row.data.code])
+    const finish = jest.fn((value, row) => [value, row.data.code])
+    const success = jest.fn((value, row) => [value, row.data.code])
+    const fail = jest.fn((errors, value, row) => [errors, value, row.data.code])
     const wt = generateWorktable({
       [FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START]: start,
       [FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH]: finish,
