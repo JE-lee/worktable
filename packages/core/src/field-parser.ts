@@ -9,7 +9,7 @@ function tryDeconstructArray(field: string): FieldDeconstructMeta | undefined {
   if (pattern.test(field)) {
     const match = field.match(pattern)
     if (match && match[1]) {
-      const nestItems = match[1].trim().split(',')
+      const nestItems = splitArrayField(match[1].trim())
       const props: Array<[string, string]> = []
       nestItems.forEach((nestField, index) => {
         nestField = nestField.trim()
@@ -51,4 +51,28 @@ function tryDeconstructObject(field: string): FieldDeconstructMeta | undefined {
       }
     }
   }
+}
+
+function splitArrayField(field: string): string[] {
+  const items: string[] = []
+  let isTokenStarted = false
+  let slice = ''
+  for (let i = 0; i < field.length; i++) {
+    if (field[i] === '{') {
+      isTokenStarted = true
+    } else if (field[i] === '}') {
+      isTokenStarted = false
+    } else if (field[i] === ',') {
+      if (!isTokenStarted) {
+        items.push(slice)
+        slice = ''
+        continue
+      }
+    }
+    slice += field[i]
+  }
+  if (slice) {
+    items.push(slice)
+  }
+  return items
 }

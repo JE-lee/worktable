@@ -24,6 +24,15 @@ describe('field parser', () => {
       ['1', 'price'],
     ])
 
+    field = '[{ code:productCode, code2: productCode2}, price]'
+    meta = deconstruct(field)
+    expect(meta?.type).toBe('array')
+    expect(meta?.keyMaps).toEqual([
+      ['[0].code', 'productCode'],
+      ['[0].code2', 'productCode2'],
+      ['1', 'price'],
+    ])
+
     field = `{
       code: productCode
     }`
