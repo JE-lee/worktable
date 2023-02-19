@@ -39,9 +39,9 @@ describe('effects', () => {
     expect(onFieldInit.mock.calls[0][1].data.code).toBe(1) // row
 
     // onFieldValueChange
-    expect(onFieldValueChange).toHaveBeenCalled()
-    expect(onFieldValueChange.mock.calls[0][0]).toBe(1) // value
-    expect(onFieldValueChange.mock.calls[0][1].data.code).toBe(1) // row
+    expect(onFieldValueChange).not.toHaveBeenCalled()
+    // expect(onFieldValueChange.mock.calls[0][0]).toBe(1) // value
+    // expect(onFieldValueChange.mock.calls[0][1].data.code).toBe(1) // row
 
     const row = wt.rows[0]
     wt.inputValue({ rid: row.rid, field: 'code' }, 2)
@@ -50,9 +50,9 @@ describe('effects', () => {
     expect(onFieldInputValueChange.mock.calls[0][1].data.code).toBe(2) // row
 
     // onFieldValueChange
-    expect(onFieldValueChange).toHaveBeenCalledTimes(2)
-    expect(onFieldValueChange.mock.calls[1][0]).toBe(2) // value
-    expect(onFieldValueChange.mock.calls[1][1].data.code).toBe(2) // row
+    expect(onFieldValueChange).toHaveBeenCalledTimes(1)
+    expect(onFieldValueChange.mock.calls[0][0]).toBe(2) // value
+    expect(onFieldValueChange.mock.calls[0][1].data.code).toBe(2) // row
   })
 
   test('event of field validating', async () => {

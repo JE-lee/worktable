@@ -57,7 +57,7 @@ export class Row {
     // notify value initialization event
     this.notifyCellInitializationEvent()
     // notify value change event
-    this.notifyCellValueEvent()
+    // this.notifyCellValueEvent()
     this.trackRowValidateHandle()
   }
 
@@ -162,12 +162,12 @@ export class Row {
     }
   }
 
-  private notifyCellValueEvent() {
-    Object.values(this.data).forEach((cell) => {
-      cell.notifyValueFieldEvent(FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
-      cell.notifyValueTableEvent(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
-    })
-  }
+  // private notifyCellValueEvent() {
+  //   Object.values(this.data).forEach((cell) => {
+  //     cell.notifyValueFieldEvent(FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
+  //     cell.notifyValueTableEvent(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
+  //   })
+  // }
 
   private notifyCellInitializationEvent() {
     Object.values(this.data).forEach((cell) => {
