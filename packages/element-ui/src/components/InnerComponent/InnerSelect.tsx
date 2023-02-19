@@ -1,6 +1,6 @@
 import { defineComponent, h, computed } from 'vue-demi'
 import { Select as ElSelect, Option as ElOption } from 'element-ui'
-import { FocusAble } from '@/types'
+import { FocusAble, Listener } from '@/types'
 import { observer } from 'mobx-vue'
 import { isFunction } from 'lodash-es'
 
@@ -13,7 +13,7 @@ export const InnerSelect = observer(
         type: Array,
         default: () => [],
       },
-      optionInChangeEvent: Boolean,
+      optionInValue: Boolean,
       labelProp: {
         type: String,
         default: 'label',
@@ -27,21 +27,38 @@ export const InnerSelect = observer(
     setup(props, { attrs, listeners }) {
       const _listeners = computed(() => {
         const originChange = listeners.change
-        return {
-          ...listeners,
-          change: (val: any) => {
-            if (props.optionInChangeEvent) {
+        const originInput = listeners.input
+        const makeEvent = (originEvent: Listener) => {
+          return (val: string | number) => {
+            if (props.optionInValue) {
               val = (props.options as any[]).find((option) => option[props.valueProp] === val)
             }
-            isFunction(originChange) && originChange(val)
-          },
+            const listeners = Array.isArray(originEvent) ? originEvent : [originEvent]
+            listeners.forEach((cb) => {
+              isFunction(cb) && cb(val)
+            })
+          }
+        }
+        return {
+          ...listeners,
+          change: makeEvent(originChange as any),
+          input: makeEvent(originInput as any),
         }
       })
+
+      const value = computed(() => {
+        if (props.optionInValue) {
+          return props.value[props.valueProp]
+        } else {
+          return props.value
+        }
+      })
+
       return () =>
         h(
           ElSelect,
           {
-            attrs: Object.assign({ value: props.value }, attrs),
+            attrs: Object.assign({ value: value.value }, attrs),
             on: _listeners.value,
             ref: SELECT_REF,
           },

@@ -68,3 +68,5 @@ export type RowData = Record<string, string> & {
   children?: Array<Record<string, string>>
   _row?: Row
 }
+
+export type Listener = (...args: any[]) => void | Array<(...args: any[]) => void>

@@ -2,6 +2,7 @@ import { defineComponent, h, computed } from 'vue-demi'
 import { Cascader as ElCascader } from 'element-ui'
 import { isFunction } from 'lodash-es'
 import { flatten } from '@/shared'
+import { Listener } from '@/types'
 
 export const InnerCascader = defineComponent({
   name: 'InnerCascader',
@@ -10,7 +11,7 @@ export const InnerCascader = defineComponent({
       type: Array,
       default: () => [],
     },
-    optionInChangeEvent: Boolean,
+    optionInValue: Boolean,
     labelProp: {
       type: String,
       default: 'label',
@@ -24,24 +25,41 @@ export const InnerCascader = defineComponent({
   setup(props, { attrs, listeners }) {
     const _listeners = computed(() => {
       const originChange = listeners.change
-      return {
-        ...listeners,
-        change: (val: any[], ...args: any[]) => {
-          if (props.optionInChangeEvent) {
+      const originInput = listeners.input
+      const makeEvent = (originEvent: Listener) => {
+        return (val: any[]) => {
+          if (props.optionInValue) {
             const map: Record<string, any> = {}
             flatten(props.options as any[]).forEach((option) => {
               map[option[props.valueProp]] = option
             })
             val = val.map((v) => map[v])
           }
-          isFunction(originChange) && originChange(val)
-        },
+          const listeners = Array.isArray(originEvent) ? originEvent : [originEvent]
+          listeners.forEach((cb) => {
+            isFunction(cb) && cb(val)
+          })
+        }
+      }
+      return {
+        ...listeners,
+        change: makeEvent(originChange as any),
+        input: makeEvent(originInput as any),
+      }
+    })
+
+    const value = computed(() => {
+      if (props.optionInValue) {
+        return props.value.map((val: any) => val?.[props.valueProp])
+      } else {
+        return props.value
       }
     })
 
     return () => {
       return h(ElCascader, {
         attrs: Object.assign({}, attrs, props, {
+          value: value.value,
           props: Object.assign({}, attrs.props || {}, {
             value: props.valueProp,
             label: props.labelProp,
