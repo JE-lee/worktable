@@ -16,6 +16,7 @@ import { makeRowProxy, makeRowAction, noThrow, walk, getDefault } from './share'
 import { RuleItem } from 'async-validator'
 import ValidateSchema from 'async-validator'
 import { FIELD_EVENT_NAME, TABLE_EVENT_NAME } from './event'
+import { deconstruct } from './field-parser'
 
 export class Row {
   static rid = 1
@@ -273,6 +274,19 @@ export class Row {
       cell.position.field = col.field
       this.data[col.field] = cell
     })
+
+    // bind deconstructed fields
+    Object.entries(this.data).forEach(([field, cell]) => {
+      const meta = deconstruct(field)
+      if (meta) {
+        cell.deconstructedType = meta.type
+        meta.keyMaps.forEach(([from, to]) => {
+          cell.deconstructedCells[from] = this.data[to]
+        })
+        cell.value = cell.mergeValue()
+      }
+    })
+
     if (Array.isArray(raw?.children)) {
       this.children = Row.generateRows(this.columns, raw!.children!, this, this.wt)
     }

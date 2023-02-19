@@ -1,7 +1,7 @@
 import { FIELD_EVENT_NAME, TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME } from './event'
 import { CellPosition, RowRaw } from './types/schema'
 import { CellState, CellValue, Column, CellFactoryContext, StaticComponentProps } from './types'
-import { isUndefined, isEqual, cloneDeep, isFunction } from 'lodash-es'
+import { isUndefined, isEqual, cloneDeep, isFunction, get, set } from 'lodash-es'
 import { action, makeObservable, observable, Reaction } from 'mobx'
 import { EventEmitter } from './EventEmitter'
 import { Row } from './Row'
@@ -18,6 +18,8 @@ export class Cell {
   colDef: Column
   evProxy?: EventEmitter
   staticComponentProps: StaticComponentProps
+  deconstructedType = ''
+  deconstructedCells: Record<string, Cell> = {} // deconstructed fields
 
   static generateBaseCell(ctx: CellFactoryContext) {
     const { value, colDef, parent, evProxy } = ctx
@@ -51,6 +53,7 @@ export class Cell {
     if (state === 'value' && !isEqual(prev, val)) {
       this.notifyValueFieldEvent(FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
       this.notifyValueTableEvent(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
+      this.deconstructValue()
     }
   }
 
@@ -76,6 +79,28 @@ export class Cell {
     const rowProxy = makeRowProxy(this.parent)
     const rowAction = makeRowAction(this.parent)
     this.evProxy?.notify(TABLE_EFFECT_NAMESPACE, eventName, val, rowProxy, rowAction)
+  }
+
+  deconstructValue() {
+    // set value of deconstructed cells
+    Object.entries(this.deconstructedCells).forEach(([from, cell]) => {
+      cell.setState('value', get(this.value, from))
+    })
+  }
+
+  mergeValue() {
+    if (this.deconstructedType !== 'object' && this.deconstructedType !== 'array') return this.value
+    let merged: object
+    if (this.deconstructedType === 'object') {
+      merged = {}
+    } else {
+      merged = []
+    }
+
+    Object.entries(this.deconstructedCells).forEach(([from, cell]) => {
+      set(merged, from, cell.value)
+    })
+    return merged as CellValue
   }
 
   private track(reactor: (row: RowRaw) => void) {

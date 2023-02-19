@@ -16,6 +16,7 @@ import { runInAction, makeObservable, observable, action } from 'mobx'
 import { Row } from './Row'
 import { flatten, makeRowProxy, makeRowAction, walk } from './share'
 import { FIELD_EVENT_NAME, TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME } from './event'
+import { deconstruct } from './field-parser'
 export class Worktable extends BaseWorktable {
   constructor(opt: WorktableConstructorOpt)
   constructor(columns: Column[])
@@ -46,17 +47,17 @@ export class Worktable extends BaseWorktable {
     this.addRows(raws)
   }
 
-  updateColumn(field: string, newCol: Column | ((oldCol: Column) => Column)) {
-    const colIndex = this.columns.findIndex((col) => col.field === field)
+  // updateColumn(field: string, newCol: Column | ((oldCol: Column) => Column)) {
+  //   const colIndex = this.columns.findIndex((col) => col.field === field)
 
-    if (colIndex > -1) {
-      if (isFunction(newCol)) {
-        newCol = newCol(this.columns[colIndex])
-      }
-      const columns = [...this.columns]
-      columns.splice(colIndex, 1, newCol)
-    }
-  }
+  //   if (colIndex > -1) {
+  //     if (isFunction(newCol)) {
+  //       newCol = newCol(this.columns[colIndex])
+  //     }
+  //     const columns = [...this.columns]
+  //     columns.splice(colIndex, 1, newCol)
+  //   }
+  // }
 
   getData() {
     return this.getRaws()
@@ -200,6 +201,13 @@ export class Worktable extends BaseWorktable {
 
   private _setColumns(columns: Column[]) {
     const cols = cloneDeep(columns.filter((col) => isObject(col)))
+    // deconstruct column field
+    const appendCols: Column[] = []
+    cols.forEach((colDef) => {
+      appendCols.push(...(this.tryDeconstructField(colDef) || []))
+    })
+    cols.push(...appendCols)
+
     // remove all effect event listeners of field
     this.removeAllFieldEffects()
     runInAction(() => (this.columns = cols))
@@ -212,6 +220,19 @@ export class Worktable extends BaseWorktable {
         )
       }
     })
+  }
+
+  private tryDeconstructField(colDef: Column): Column[] | undefined {
+    const meta = deconstruct(colDef.field)
+    if (meta) {
+      colDef.virtual = true
+      const cols: Column[] = []
+
+      meta.keyMaps.forEach(([from, to]) => {
+        cols.push({ field: to, hidden: true })
+      })
+      return cols
+    }
   }
 
   private removeAllFieldEffects() {
@@ -230,7 +251,7 @@ export class Worktable extends BaseWorktable {
       add: action,
       removeAll: action,
       removeRow: action,
-      updateColumn: action,
+      // updateColumn: action,
       inputValue: action,
       setComponentProps: action,
       sort: action,

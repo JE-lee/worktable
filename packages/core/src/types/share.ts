@@ -19,3 +19,8 @@ export type CellFactoryContext = {
 }
 
 export type StaticComponentProps = Record<string, any>
+
+export type FieldDeconstructMeta = {
+  type: 'array' | 'object'
+  keyMaps: Array<[string, string]>
+}

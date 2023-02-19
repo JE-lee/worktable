@@ -7,7 +7,12 @@ export type ValueType = 'boolean' | 'string' | 'number' | 'object' | 'array'
 
 type BaseCellValue = string | number | boolean
 
-export type CellValue = BaseCellValue | Record<string, BaseCellValue> | Array<BaseCellValue>
+type BaseObjectCellValue = Record<string, BaseCellValue>
+
+export type CellValue =
+  | BaseCellValue
+  | BaseObjectCellValue
+  | Array<BaseCellValue | BaseObjectCellValue>
 
 export interface CellPosition {
   rid: number // row id
