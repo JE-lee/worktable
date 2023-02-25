@@ -61,6 +61,7 @@ export interface Column {
   title?: string
   field: string
   type?: ValueType
+  required?: boolean
   disabled?: boolean | ((row: RowProxy) => boolean)
   component?: ColumnComponent
   preview?: ColumnComponent

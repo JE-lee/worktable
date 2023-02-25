@@ -1,0 +1,5 @@
+.worktable .required::before {
+  content: '*';
+  display: 'inline';
+  color: #fa4b51;
+}

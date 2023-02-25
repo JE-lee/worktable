@@ -46,9 +46,7 @@ export const InnerAsyncSelect = defineComponent({
 
     // not search mode
     if (!props.search) {
-      if (!props.lazy) {
-        onBeforeMount(fetch)
-      } else {
+      if (props.lazy) {
         const onFocus = on['focus']
         on.focus = (...args: any[]) => {
           if (!fetched) {
@@ -59,6 +57,10 @@ export const InnerAsyncSelect = defineComponent({
       }
     } else {
       remoteMethod = fetch
+    }
+
+    if (!props.lazy) {
+      onBeforeMount(fetch)
     }
 
     return () => {

@@ -95,7 +95,8 @@ const InnerWorktable = defineComponent({
                 add: worktable.add.bind(worktable),
               }) as any
             } else {
-              return h('span', col.title)
+              const required = col.required
+              return h('span', { class: { required } }, col.title)
             }
           }
           return h(ElTableColumn, {
@@ -142,6 +143,7 @@ const InnerWorktable = defineComponent({
       return h(
         ElTable,
         {
+          staticClass: 'worktable',
           ref: 'tableRef',
           attrs: Object.assign({}, attrs, {
             data: visibleDatas.get(),

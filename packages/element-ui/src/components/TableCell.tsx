@@ -93,7 +93,7 @@ export const TableCell = observer(
           })
         }
         return h(component, {
-          style: { display: 'inline-block' },
+          style: { display: 'inline-block' }, // FIXME: not 100% width
           attrs: Object.assign(
             {},
             mergeProps,
