@@ -10,7 +10,7 @@ import {
   StaticComponentProps,
   RowProxy,
 } from './types'
-import { cloneDeep, isObject, isFunction } from 'lodash-es'
+import { cloneDeep, isObject, isFunction, isEmpty } from 'lodash-es'
 import { BaseWorktable } from './BaseWorktable'
 import { runInAction, makeObservable, observable, action } from 'mobx'
 import { Row } from './Row'
@@ -200,7 +200,7 @@ export class Worktable extends BaseWorktable {
   }
 
   private _setColumns(columns: Column[]) {
-    const cols = cloneDeep(columns.filter((col) => isObject(col)))
+    const cols = cloneDeep(columns.filter((col) => isObject(col) && !isEmpty(col)))
     // deconstruct column field
     const appendCols: Column[] = []
     cols.forEach((colDef) => {

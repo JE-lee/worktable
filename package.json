@@ -21,7 +21,6 @@
   "author": "jelee",
   "license": "MIT",
   "dependencies": {
-    "@edsheet/element-ui": "^1.0.0",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
