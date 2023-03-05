@@ -18,6 +18,7 @@ import { computed as mcomputed } from 'mobx'
 import { observer } from 'mobx-vue'
 import { Context, UIColumn } from './types'
 import { usePagination, InnerPagination } from '@/components/InnerPagination'
+import { isFunction } from 'lodash-es'
 
 const InnerWorktable = defineComponent({
   name: 'Worktable',
@@ -44,12 +45,17 @@ const InnerWorktable = defineComponent({
       }
     })
 
-    // HACK: re-render summary-line when every field changes of value
-    // FIXME: layout shift of summary-line
     // FIXME: avoid re-rendering the entire table when field values change
     const [isTwinking, flash] = useFlashingValue()
+    let cacheSummaries: string[] = []
     const summaryMethod = computed<() => any>(() => {
-      return isTwinking.value ? () => [''] : props.summaryMethod // the space is crucial
+      const _summaryMethod = (...args: any[]) => {
+        if (isFunction(props.summaryMethod)) {
+          cacheSummaries = props.summaryMethod(...args)
+        }
+        return cacheSummaries
+      }
+      return isTwinking.value ? () => cacheSummaries : _summaryMethod
     })
     watchEffect(() => {
       if (props.showSummary) {
