@@ -73,7 +73,8 @@ export const TableCell = observer(
         if (isFunction(colDef.disabled)) {
           disabled = runWithContext(colDef.disabled)
         }
-        Object.assign(componentProps, { disabled })
+
+        Object.assign({ disabled }, componentProps)
 
         // enum
         const mergeProps = mergePropsFromColumn(colDef)
