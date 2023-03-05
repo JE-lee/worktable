@@ -84,7 +84,7 @@ export const TableCell = observer(
           bindValueUpdateListener(componentListener, (val: CellValue) => {
             val = cloneDeep(val)
             if (colDef.type === 'number') {
-              val = parseFloat(String(val))
+              val = Number(val)
             }
             worktable.inputValue(cell.position, cloneDeep(val))
             if (isFunction(originInput)) {
