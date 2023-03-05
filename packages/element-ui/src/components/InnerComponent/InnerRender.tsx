@@ -1,9 +1,9 @@
-import { defineComponent, inject } from 'vue-demi'
+import { defineComponent, inject, h } from 'vue-demi'
 import { innerDefaultKey } from '@/shared'
 import { Cell, makeRowProxy } from '@edsheet/core'
 import { Context } from '@/types'
 import { observer } from 'mobx-vue'
-import { isFunction } from 'lodash-es'
+import { isFunction, isString, isNumber, isBoolean } from 'lodash-es'
 
 export const InnerRender = observer(
   defineComponent({
@@ -41,7 +41,8 @@ export const InnerRender = observer(
         try {
           const render = props.render
           if (isFunction(render)) {
-            return render(renderRowProxy)
+            const vnode = render(renderRowProxy)
+            return isPrimitive(vnode) ? h('div', String(vnode)) : vnode
           }
         } catch (err) {
           if (process.env.NODE_ENV === 'development') {
@@ -52,3 +53,7 @@ export const InnerRender = observer(
     },
   }) as any
 )
+
+function isPrimitive(val: any) {
+  return isString(val) || isNumber(val) || isBoolean(val)
+}
