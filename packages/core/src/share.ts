@@ -9,7 +9,7 @@ export function getDefault(type: ValueType = 'string') {
   } else if (type === 'string') {
     return ''
   } else if (type === 'number') {
-    return ''
+    return 0
   } else if (type === 'object') {
     return {}
   } else if (type === 'array') {

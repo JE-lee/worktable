@@ -1,4 +1,4 @@
-import { isBoolean, isFunction, omit } from 'lodash-es'
+import { isBoolean, isFunction, isUndefined, omit } from 'lodash-es'
 import { observable, makeObservable, action, Reaction } from 'mobx'
 import {
   Column,
@@ -262,10 +262,11 @@ export class Row {
 
   private generate(raw: RowRaw) {
     this.columns.forEach((col) => {
+      const val = raw?.[col.field] as CellValue
       const cell = Cell.generateBaseCell({
         parent: this,
         colDef: col,
-        value: (raw?.[col.field] as CellValue) || this.getDefaultValue(col.default),
+        value: isUndefined(val) ? this.getDefaultValue(col.default) : val,
         evProxy: this.wt,
       })
       cell.position.field = col.field
