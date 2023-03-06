@@ -61,7 +61,7 @@ export const TableCell = observer(
 
         component = mergePreview(component || InnerText /* preview */)
 
-        const componentProps: StaticComponentProps = { ...cell.staticComponentProps }
+        let componentProps: StaticComponentProps = { ...cell.staticComponentProps }
         // FIXME: remove dynamic compoentProps, conficted with setComponentProps
         if (isFunction(colDef.componentProps)) {
           const dynamicComponentProps = runWithContext(colDef.componentProps)
@@ -74,7 +74,7 @@ export const TableCell = observer(
           disabled = runWithContext(colDef.disabled)
         }
 
-        Object.assign({ disabled }, componentProps)
+        componentProps = Object.assign({ disabled }, componentProps)
 
         // enum
         const mergeProps = mergePropsFromColumn(colDef)
