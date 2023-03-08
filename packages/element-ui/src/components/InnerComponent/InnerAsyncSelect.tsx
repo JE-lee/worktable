@@ -12,8 +12,15 @@ export const InnerAsyncSelect = defineComponent({
       type: Function,
       default: () => Promise.resolve([]),
     },
-    lazy: Boolean,
+    lazy: {
+      type: Boolean,
+      default: true,
+    },
     search: Boolean,
+    searchImmediate: {
+      type: Boolean,
+      default: true,
+    },
     options: {
       type: Array,
       default: () => [],
@@ -24,7 +31,7 @@ export const InnerAsyncSelect = defineComponent({
 
     let fetched = false
     let searched = false
-    let remoteMethod: () => void = noop
+
     const loading = ref(false)
     const on: Record<string, any> = { ...listeners }
 
@@ -44,22 +51,19 @@ export const InnerAsyncSelect = defineComponent({
       }
     }
 
-    // not search mode
-    if (!props.search) {
-      if (props.lazy) {
-        const onFocus = on['focus']
-        on.focus = (...args: any[]) => {
+    const remoteMethod = fetch
+
+    if (props.lazy) {
+      const onFocus = on['focus']
+      on.focus = (...args: any[]) => {
+        if (!props.search || (props.search && props.searchImmediate)) {
           if (!fetched) {
             fetch()
           }
-          isFunction(onFocus) && onFocus(...args)
         }
+        isFunction(onFocus) && onFocus(...args)
       }
     } else {
-      remoteMethod = fetch
-    }
-
-    if (!props.lazy) {
       onBeforeMount(fetch)
     }
 
