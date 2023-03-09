@@ -21,6 +21,10 @@ export class Cell {
   deconstructedType = ''
   deconstructedCells: Record<string, Cell> = {} // deconstructed fields
 
+  get cellValue() {
+    return this.colDef.type === 'number' ? Number(this.value) : this.value
+  }
+
   static generateBaseCell(ctx: CellFactoryContext) {
     const { value, colDef, parent, evProxy } = ctx
     const formatedValue = isUndefined(value) ? getDefault(colDef.type || 'string') : value // TODO: infer default value from it's type
@@ -68,13 +72,13 @@ export class Cell {
   }
 
   notifyValueFieldEvent(eventName: FIELD_EVENT_NAME) {
-    const val = cloneDeep(this.value)
+    const val = cloneDeep(this.cellValue)
     const rowProxy = makeRowProxy(this.parent)
     this.evProxy?.notify(this.colDef.field, eventName, val, rowProxy)
   }
 
   notifyValueTableEvent(eventName: TABLE_EVENT_NAME) {
-    const val = cloneDeep(this.value)
+    const val = cloneDeep(this.cellValue)
     const rowProxy = makeRowProxy(this.parent)
     this.evProxy?.notify(TABLE_EFFECT_NAMESPACE, eventName, val, rowProxy)
   }

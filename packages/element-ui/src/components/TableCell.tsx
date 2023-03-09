@@ -84,10 +84,7 @@ export const TableCell = observer(
           const originInput = componentListener.input
           bindValueUpdateListener(componentListener, (val: CellValue) => {
             val = cloneDeep(val)
-            if (colDef.type === 'number') {
-              val = Number(val)
-            }
-            worktable.inputValue(cell.position, cloneDeep(val))
+            worktable.inputValue(cell.position, val)
             if (isFunction(originInput)) {
               originInput(val, rowProxy)
             }

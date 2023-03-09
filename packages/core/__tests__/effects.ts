@@ -81,20 +81,24 @@ describe('effects', () => {
 
     const row = wt.rows[0]
     wt.inputValue({ rid: row.rid, field: 'code' }, '')
-
     await delay(10)
 
     expect(start.mock.calls.length).toBe(2)
     expect(finish.mock.calls.length).toBe(2)
-    expect(success.mock.calls.length).toBe(1)
+    expect(success.mock.calls.length).toBe(2) // empty string will be converted to zero when the type of field is Number
+    expect(fail.mock.calls.length).toBe(0)
+
+    expect(success.mock.results[1].value).toEqual([0, 0])
+    expect(start.mock.results[1].value).toEqual([0, 0])
+    expect(finish.mock.results[1].value).toEqual([0, 0])
+
+    wt.inputValue({ rid: row.rid, field: 'code' }, 'ABC')
+    await delay(10)
+    expect(start.mock.calls.length).toBe(3)
+    expect(finish.mock.calls.length).toBe(3)
+    expect(success.mock.calls.length).toBe(2)
     expect(fail.mock.calls.length).toBe(1)
 
-    expect(success.mock.results[0].value).toEqual([1, 1])
-
-    expect(start.mock.results[1].value).toEqual(['', ''])
-
-    expect(finish.mock.results[1].value).toEqual(['', ''])
-
-    expect(fail.mock.results[0].value).toEqual([[message], '', ''])
+    expect(fail.mock.results[0].value).toEqual([[message], NaN, NaN])
   })
 })

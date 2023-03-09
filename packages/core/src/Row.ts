@@ -65,7 +65,7 @@ export class Row {
     let raw: Record<string, any> = {}
     for (const k in this.data) {
       if (!this.data[k].colDef.virtual) {
-        raw[k] = this.data[k].value
+        raw[k] = this.data[k].cellValue
       }
     }
     raw = Object.assign(omit(this.initialData || {}, 'children'), raw)
@@ -206,14 +206,14 @@ export class Row {
   private validateCell(cell: Cell, isFirstTrack = false) {
     const colDef = cell.colDef
     const descriptor = this.makeCellVaidateDescriptor(colDef)
-    const target = { [colDef.field]: cell.value }
+    const target = { [colDef.field]: cell.cellValue }
     cell.setState('validating', true)
     const validator = new ValidateSchema(descriptor)
     if (!isFirstTrack) {
       this.wt?.notify(
         colDef.field,
         FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START,
-        cell.value,
+        cell.cellValue,
         makeRowProxy(this)
       )
     }
@@ -227,7 +227,7 @@ export class Row {
           this.wt?.notify(
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_SUCCESS,
-            cell.value,
+            cell.cellValue,
             makeRowProxy(this)
           )
         }
@@ -241,7 +241,7 @@ export class Row {
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FAIL,
             errors,
-            cell.value,
+            cell.cellValue,
             makeRowProxy(this)
           )
         }
@@ -253,7 +253,7 @@ export class Row {
           this.wt?.notify(
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH,
-            cell.value,
+            cell.cellValue,
             makeRowProxy(this)
           )
         }
@@ -300,7 +300,7 @@ export class Row {
     if (colDef.rule) {
       const rule = this.getRule(colDef.rule)
       rule.type = rule.type || colDef.type
-      descriptor[colDef.field] = this.getRule(colDef.rule)
+      descriptor[colDef.field] = rule
       // validator
       if (isFunction(colDef.rule.validator)) {
         Object.assign(descriptor[colDef.field], {

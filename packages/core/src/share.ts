@@ -109,7 +109,7 @@ function makeRowDataProxy(row: Row, immutable = false) {
     get(target: Row, prop: string) {
       if (typeof prop === 'string') {
         const cell = target.data[prop]
-        return isObject(cell) ? cell.value : target.initialData[prop]
+        return isObject(cell) ? cell.cellValue : target.initialData[prop]
       } else {
         return undefined
       }
