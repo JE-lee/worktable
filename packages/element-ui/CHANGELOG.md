@@ -1,5 +1,11 @@
 # @edsheet/element-ui
 
+## 1.0.19
+
+### Patch Changes
+
+- 49b8aa7: fix data in summary-method of element-ui
+
 ## 1.0.18
 
 ### Patch Changes
