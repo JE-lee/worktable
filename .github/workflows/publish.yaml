@@ -10,7 +10,7 @@ jobs:
   publish:
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    enviroment: npm publish
+    environment: npm publish
     steps:
       - name: checkout code repository
         uses: actions/checkout@v2
