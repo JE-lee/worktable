@@ -7,7 +7,13 @@ import { InnerRender } from '@/components/InnerComponent'
 
 export function useWorktable(opt: useWorkTableOpt) {
   const _opt = { ...opt }
-  _opt.columns = formatColumns(_opt.columns)
+  const columns = [...opt.columns]
+  const selectionCtx: Context['selectionCtx'] = { selections: [] }
+  if ((columns[0].type as any) === 'selection') {
+    selectionCtx.selectable = true
+    selectionCtx.selectedAbleColDef = columns.shift()
+  }
+  _opt.columns = formatColumns(columns)
   const worktable = new Worktable(_opt)
   const injectKey = getWorktableInjectKey(opt.key)
   const rowDatas = mcomputed(() => generatePosData(worktable.rows, worktable.columns))
@@ -30,8 +36,17 @@ export function useWorktable(opt: useWorkTableOpt) {
     rowDatas,
     tableRef,
     toggleRowExpansion,
+    opt: _opt,
+    selectionCtx,
   }
   provide(injectKey, ctx)
+
+  function removeSelectedRows() {
+    selectionCtx.selections.forEach((row) => {
+      worktable.remove(row.rid)
+    })
+    selectionCtx.selections = []
+  }
 
   return {
     ...worktable,
@@ -53,6 +68,7 @@ export function useWorktable(opt: useWorkTableOpt) {
     sort: worktable.sort.bind(worktable),
     sortChildInEach: worktable.sortChildInEach.bind(worktable),
     walk: worktable.walk.bind(worktable),
+    removeSelectedRows,
   }
 }
 

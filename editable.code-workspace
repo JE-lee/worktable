@@ -15,11 +15,6 @@
       "name": "element-ui",
       "path": "./packages/element-ui"
     },
-		{
-      // Source code
-      "name": "vue",
-      "path": "./packages/vue"
-    },
 	],
 	"settings": {
 		"jest.disabledWorkspaceFolders": [

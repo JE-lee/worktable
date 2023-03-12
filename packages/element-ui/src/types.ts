@@ -13,7 +13,6 @@ export type useWorkTableOpt = {
   key?: string
   columns: Array<Column>
   initialData?: RowRaws
-  selectable?: boolean
   layout: TableLayout
 }
 
@@ -46,6 +45,12 @@ export type Context = {
   rowDatas: IComputedValue<RowData[]>
   tableRef: ShallowRef<any>
   toggleRowExpansion: (filter: (row: RowProxy) => boolean, expanded: boolean) => void
+  opt: useWorkTableOpt
+  selectionCtx: {
+    selectedAbleColDef?: Record<string, any>
+    selections: RowProxy[]
+    selectable?: boolean
+  }
 }
 
 export type RenderRowProxy = RowProxy & {
