@@ -1,5 +1,11 @@
 # @edsheet/element-ui
 
+## 1.1.0
+
+### Minor Changes
+
+- b8a0a65: add selectable and removeSelectedRows
+
 ## 1.0.18
 
 ### Patch Changes
