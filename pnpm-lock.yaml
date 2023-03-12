@@ -115,9 +115,6 @@ importers:
       vue-template-compiler: registry.npmmirror.com/vue-template-compiler/2.7.14
       vuepress: registry.npmmirror.com/vuepress/1.9.7
 
-  packages/vue:
-    specifiers: {}
-
 packages:
 
   /@ampproject/remapping/2.2.0:

@@ -1,7 +1,7 @@
 import { Column, Row, Worktable } from '@edsheet/core'
 import type { RowProxy, RowRaw, RowRaws } from '@edsheet/core'
 import { Component, ShallowRef } from 'vue-demi'
-import { IComputedValue } from 'Mobx'
+import { IComputedValue } from 'mobx'
 
 export type Feedbacklayout = 'terse' | 'popover'
 export interface TableLayout {
