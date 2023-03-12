@@ -48,10 +48,11 @@ const InnerWorktable = defineComponent({
     // FIXME: avoid re-rendering the entire table when field values change
     const [isTwinking, flash] = useFlashingValue()
     let cacheSummaries: string[] = []
-    const summaryMethod = computed<() => any>(() => {
-      const _summaryMethod = (...args: any[]) => {
+    const summaryMethod = computed<(...args: any[]) => any>(() => {
+      const _summaryMethod = (ctx: { columns: any[] }) => {
         if (isFunction(props.summaryMethod)) {
-          cacheSummaries = props.summaryMethod(...args)
+          const data = worktable.getData()
+          cacheSummaries = props.summaryMethod({ columns: ctx.columns, data })
         }
         return cacheSummaries
       }
