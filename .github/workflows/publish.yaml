@@ -31,7 +31,7 @@ jobs:
       - name: create and publish versions
         uses: changesets/action@v1
         with:
-          publish: npm run ci:publish
+          publish: pnpm ci:publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GTOKEN }}
