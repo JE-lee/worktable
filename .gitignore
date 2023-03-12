@@ -3,3 +3,4 @@
 **/coverage
 **/debug
 **/esm
+.pnpm-store
