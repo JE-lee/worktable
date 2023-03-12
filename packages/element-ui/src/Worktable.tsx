@@ -87,7 +87,7 @@ const InnerWorktable = defineComponent({
             }
 
             return h(TableCell, {
-              attrs: { cell, colDef: col },
+              attrs: { cell, colDef: col, colIndex },
             })
           }
           // column header

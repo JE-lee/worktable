@@ -21,6 +21,10 @@ export const TableCell = observer(
         type: Object,
         required: true,
       },
+      colIndex: {
+        type: Number,
+        default: 0,
+      },
     },
     setup(props) {
       const { worktable } = inject(innerDefaultKey) as Context
@@ -90,19 +94,15 @@ export const TableCell = observer(
             }
           })
         }
+        const style: Record<string, string> = { display: 'inline-block' }
+        // The width of component of TableCell excepted the first column is 100%.
+        // when the data of table is tree-like, element-ui will append a toggle icon in the first column.
+        if (props.colIndex > 0) {
+          style.width = '100%'
+        }
         return h(component, {
-          style: { display: 'inline-block' }, // FIXME: not 100% width
-          attrs: Object.assign(
-            {},
-            mergeProps,
-            componentProps || {},
-            props
-            // (
-            //   colDef as Column & {
-            //     advanceComponentProps: Ref<Record<string, any>>
-            //   }
-            // ).advanceComponentProps.value
-          ),
+          style, // FIXME: not 100% width
+          attrs: Object.assign({}, mergeProps, componentProps || {}, props),
           on: componentListener,
         })
       }
