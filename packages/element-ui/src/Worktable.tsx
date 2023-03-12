@@ -11,12 +11,12 @@ import {
 } from 'vue-demi'
 import { Table as ElTable, TableColumn as ElTableColumn } from 'element-ui'
 import { getWorktableInjectKey, innerDefaultKey, ROWID, useFlashingValue } from '@/shared'
-import { TABLE_EVENT_NAME } from '@edsheet/core'
+import { makeRowProxy, TABLE_EVENT_NAME } from '@edsheet/core'
 import { TableCell } from '@/components/TableCell'
 import { splitPosKey } from '@/shared/pos-key'
 import { computed as mcomputed } from 'mobx'
 import { observer } from 'mobx-vue'
-import { Context, UIColumn } from './types'
+import { Context, RowData, UIColumn } from './types'
 import { usePagination, InnerPagination } from '@/components/InnerPagination'
 import { isFunction } from 'lodash-es'
 
@@ -116,16 +116,13 @@ const InnerWorktable = defineComponent({
           })
         })
       // 可多选
-      // if (context.selectable) {
-      //   _columns.unshift(
-      //     h(ElTableColumn, {
-      //       props: {
-      //         type: 'selection',
-      //         width: 55,
-      //       },
-      //     })
-      //   )
-      // }
+      if (ctx.selectionCtx.selectable) {
+        _columns.unshift(
+          h(ElTableColumn, {
+            props: ctx.selectionCtx.selectedAbleColDef,
+          })
+        )
+      }
 
       return _columns
     }
@@ -139,12 +136,12 @@ const InnerWorktable = defineComponent({
       })
     }
 
-    // TODO: selectable
-    // const onSelectionChange = listeners['selection-change']
-    // function onTableSelectionChange(rows: any[]) {
-    //   selectRows(rows.map((row) => row[ROWID]))
-    //   isFunction(onSelectionChange) && onSelectionChange(rows)
-    // }
+    const onSelectionChange = listeners['selection-change']
+    function onTableSelectionChange(rows: RowData[]) {
+      const rowProxys = rows.map((row) => row._row).map((row) => makeRowProxy(row!, true))
+      ctx.selectionCtx.selections = rowProxys
+      isFunction(onSelectionChange) && onSelectionChange([...rowProxys])
+    }
 
     function renderTable() {
       return h(
@@ -158,10 +155,9 @@ const InnerWorktable = defineComponent({
             showSummary: props.showSummary,
             summaryMethod: summaryMethod.value,
           }),
-          // on: Object.assign({}, listeners, {
-          //   'selection-change': onTableSelectionChange,
-          // }) as any,
-          on: listeners,
+          on: Object.assign({}, listeners, {
+            'selection-change': onTableSelectionChange,
+          }),
         },
         [renderColumns()]
       )

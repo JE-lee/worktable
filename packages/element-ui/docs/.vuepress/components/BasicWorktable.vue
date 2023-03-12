@@ -6,8 +6,9 @@
       <el-button type="primary" size="mini" @click="toggleAll">展开全部</el-button>
       <el-button type="primary" size="mini" @click="validate">校验</el-button>
       <el-button type="primary" size="mini" @click="save">保存</el-button>
+      <el-button type="danger" size="mini" @click="removeSelected">删除选中</el-button>
     </div>
-    <worktable show-summary :summary-method="getSummaries"></worktable>
+    <worktable show-summary :summary-method="getSummaries" @selection-change="onSelectionChange"></worktable>
   </div>
 </template>
 
@@ -52,6 +53,7 @@ export default defineComponent({
   components: { Worktable, UserPicker },
   setup() {
     const columns = [
+      { type: 'selection', width: 80 },
       {
         title: '序号',
         field: 'seq',
@@ -169,7 +171,7 @@ export default defineComponent({
       columns,
       layout: {
         pagination: true,
-      }
+      },
     })
 
     const save = () => {
@@ -190,6 +192,11 @@ export default defineComponent({
         return row.children.length > 0
       }, true)
     }
+
+    function onSelectionChange(...args) {
+      console.log('selected:', args)
+    }
+
     return {
       title: '基本用法',
       validate: wt.validate,
@@ -197,6 +204,8 @@ export default defineComponent({
       add: () => wt.add(),
       getSummaries,
       toggleAll,
+      onSelectionChange,
+      removeSelected: () => wt.removeSelectedRows()
     }
   }
 
