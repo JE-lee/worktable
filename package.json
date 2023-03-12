@@ -11,6 +11,7 @@
   "scripts": {
     "build": "nx run-many --target=build",
     "clean": "pnpm --stream -r clean",
+    "test": "pnpm --stream -r test",
     "build:core": "nx build @edsheet/core",
     "dev:element-ui": "npm run build:core && concurrently \"nx dev:build @edsheet/core\" \"nx docs:dev @edsheet/element-ui\"",
     "ci:publish": "pnpm publish -r -no-git-checks"
