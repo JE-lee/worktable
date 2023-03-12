@@ -4,11 +4,16 @@
   "description": "editable table component, supported react and vue",
   "main": "index.js",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JE-lee/worktable.git"
+  },
   "scripts": {
     "build": "nx run-many --target=build",
     "clean": "pnpm --stream -r clean",
     "build:core": "nx build @edsheet/core",
-    "dev:element-ui": "npm run build:core && concurrently \"nx dev:build @edsheet/core\" \"nx docs:dev @edsheet/element-ui\""
+    "dev:element-ui": "npm run build:core && concurrently \"nx dev:build @edsheet/core\" \"nx docs:dev @edsheet/element-ui\"",
+    "ci:publish": "pnpm publish -r"
   },
   "keywords": [
     "formily",
@@ -21,6 +26,7 @@
   "author": "jelee",
   "license": "MIT",
   "dependencies": {
+    "@changesets/cli": "^2.26.0",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
