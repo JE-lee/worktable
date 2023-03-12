@@ -26,6 +26,8 @@ jobs:
         run: pnpm config set store-dir $PNPM_CACHE_FOLDER
       - name: install dependencies
         run: pnpm install
+      - name: test
+        run: npm test
       - name: build
         run: npm run build
       - name: create and publish versions
