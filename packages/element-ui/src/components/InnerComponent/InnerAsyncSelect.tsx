@@ -2,7 +2,6 @@ import { defineComponent, h, shallowRef, onBeforeMount, Ref, ref } from 'vue-dem
 import { InnerSelect } from './InnerSelect'
 import { isFunction } from 'lodash-es'
 import { FocusAble } from '@/types'
-import { noop } from '@/shared'
 
 const SELECT_REF = 'select-ref'
 export const InnerAsyncSelect = defineComponent({
@@ -53,7 +52,9 @@ export const InnerAsyncSelect = defineComponent({
             }
           })
           .finally(() => {
-            loading.value = false
+            if (anchor === mark) {
+              loading.value = false
+            }
           })
       }
     }
@@ -64,7 +65,7 @@ export const InnerAsyncSelect = defineComponent({
       const onFocus = on['focus']
       on.focus = (...args: any[]) => {
         if (!props.search || (props.search && props.searchImmediate)) {
-          if (!fetched) {
+          if (!fetched && !loading.value) {
             fetch()
           }
         }
