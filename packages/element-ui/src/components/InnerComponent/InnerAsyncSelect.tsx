@@ -31,19 +31,26 @@ export const InnerAsyncSelect = defineComponent({
 
     let fetched = false
     let searched = false
+    let times = 0
+    let anchor = 0
 
     const loading = ref(false)
     const on: Record<string, any> = { ...listeners }
 
     const fetch = (search = '') => {
       if (isFunction(props.remoteMethod)) {
+        const mark = ++times
+        anchor = mark
         loading.value = true
         props
           .remoteMethod(search)
           .then((optionList: any[]) => {
-            options.value = optionList
-            fetched = true
-            searched = searched || props.search // set searched true in search mode
+            // timing control
+            if (anchor === mark) {
+              options.value = optionList
+              fetched = true
+              searched = searched || props.search // set searched true in search mode
+            }
           })
           .finally(() => {
             loading.value = false

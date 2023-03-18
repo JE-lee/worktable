@@ -136,13 +136,19 @@ export default defineComponent({
           optionInValue: true,
           multiple: true,
           remoteMethod: (query) => {
+            let timeout = 600
+            if (!query) {
+              timeout = 2000
+            }
             return new Promise((resolve) => {
               setTimeout(() => {
-                resolve(states.filter(item => {
+                const cities = states.filter(item => {
                   return item.label.toLowerCase()
                     .indexOf(query.toLowerCase()) > -1;
-                }))
-              }, 600)
+                })
+                console.log('resolve key', query, cities.length)
+                resolve(cities)
+              }, timeout)
             })
           },
         },
