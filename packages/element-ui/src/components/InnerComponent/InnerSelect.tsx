@@ -31,7 +31,7 @@ export const InnerSelect = observer(
         const makeEvent = (originEvent: Listener) => {
           return (val: string | number) => {
             if (props.optionInValue) {
-              val = (props.options as any[]).find((option) => option[props.valueProp] === val)
+              val = (props.options as any[]).find((option) => option[props.valueProp] === val) || {}
             }
             const listeners = Array.isArray(originEvent) ? originEvent : [originEvent]
             listeners.forEach((cb) => {

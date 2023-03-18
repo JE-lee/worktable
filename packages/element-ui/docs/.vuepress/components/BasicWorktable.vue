@@ -111,9 +111,12 @@ export default defineComponent({
         field: 'city',
         title: '城市',
         width: 200,
+        type: 'object',
         component: 'async-select',
         componentProps: {
           search: true,
+          clearable: true,
+          optionInValue: true,
           remoteMethod: (query) => {
             return new Promise((resolve) => {
               setTimeout(() => {
