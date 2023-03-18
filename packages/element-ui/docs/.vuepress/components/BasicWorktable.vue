@@ -108,15 +108,33 @@ export default defineComponent({
         default: ''
       },
       {
+        field: 'base',
+        title: '是否城市户口',
+        width: 200,
+        type: 'array',
+        component: 'select',
+        componentProps: {
+          clearable: true,
+          optionInValue: true,
+          multiple: true
+        },
+        enum: [
+          { label: '是', value: 'y' },
+          { label: '否', value: 'n' }
+        ]
+
+      },
+      {
         field: 'city',
         title: '城市',
         width: 200,
-        type: 'object',
+        type: 'array',
         component: 'async-select',
         componentProps: {
           search: true,
           clearable: true,
           optionInValue: true,
+          multiple: true,
           remoteMethod: (query) => {
             return new Promise((resolve) => {
               setTimeout(() => {
