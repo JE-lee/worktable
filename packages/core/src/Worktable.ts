@@ -66,7 +66,7 @@ export class Worktable extends BaseWorktable {
   setValuesInEach(raw: (row: RowProxy) => Record<string, any>, filter: Filter): void
   setValuesInEach(raw: Record<string, any>, filter: Filter): void
   setValuesInEach(raw: any, filter: Filter): void {
-    const rows = this.findAll(filter)
+    const rows = this.findAllRows(filter)
     rows.forEach((row) => {
       if (isFunction(raw)) {
         row.setValues(raw(makeRowProxy(row, true)))
@@ -81,7 +81,7 @@ export class Worktable extends BaseWorktable {
     if (!filter) {
       this.addRows(raws)
     } else {
-      const parents = this.findAll(filter)
+      const parents = this.findAllRows(filter)
       parents.forEach((parent) => parent.addRows(raws))
     }
   }
@@ -91,7 +91,7 @@ export class Worktable extends BaseWorktable {
   remove(filter: any): void {
     const rows: Row[] = []
     if (isFunction(filter)) {
-      rows.push(...this.findAll(filter as Filter))
+      rows.push(...this.findAllRows(filter as Filter))
     } else {
       const row = this.getRowByRid(filter)
       row && rows.push(row)
@@ -104,7 +104,7 @@ export class Worktable extends BaseWorktable {
   }
 
   sortChildInEach(comparator: (a: RowProxy, b: RowProxy) => number, filter: Filter) {
-    const rows = this.findAll(filter)
+    const rows = this.findAllRows(filter)
     rows.forEach((row) => row.sort(comparator))
   }
 
@@ -140,13 +140,19 @@ export class Worktable extends BaseWorktable {
   }
 
   findAll(filter: Filter) {
-    const rows: Row[] = []
-    walk(this.rows, (row) => {
-      if (filter(makeRowProxy(row, true))) {
-        rows.push(row)
-      }
-    })
-    return rows
+    return this.findAllRows(filter).map((row) => makeRowProxy(row))
+  }
+
+  filter(filter: Filter) {
+    return this.findAll(filter)
+  }
+
+  find(filter: Filter): RowProxy | null {
+    return this.findAll(filter)[0] || null
+  }
+
+  forEach(processor: (row: RowProxy) => void) {
+    this.walk(processor)
   }
 
   setCellEditable(pos: CellPosition) {
@@ -197,6 +203,16 @@ export class Worktable extends BaseWorktable {
 
   walk(processor: (row: RowProxy) => void) {
     walk(this.rows, (row) => processor(makeRowProxy(row)))
+  }
+
+  private findAllRows(filter: Filter) {
+    const rows: Row[] = []
+    walk(this.rows, (row) => {
+      if (filter(makeRowProxy(row, true))) {
+        rows.push(row)
+      }
+    })
+    return rows
   }
 
   private _setColumns(columns: Column[]) {

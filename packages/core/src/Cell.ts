@@ -55,6 +55,7 @@ export class Cell {
     const prev = this[state]
     this[state] = val
     if (state === 'value' && !isEqual(prev, val)) {
+      // FIXME: set deconstruacted value
       this.deconstructValue()
       this.notifyValueFieldEvent(FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
       this.notifyValueTableEvent(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
