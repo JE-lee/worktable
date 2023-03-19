@@ -1,4 +1,4 @@
-import { defineComponent, h, shallowRef, onBeforeMount, Ref, ref } from 'vue-demi'
+import { defineComponent, h, shallowRef, onBeforeMount, Ref, ref, watchEffect } from 'vue-demi'
 import { InnerSelect } from './InnerSelect'
 import { isFunction } from 'lodash-es'
 import { FocusAble } from '@/types'
@@ -26,7 +26,7 @@ export const InnerAsyncSelect = defineComponent({
     },
   },
   setup(props, { attrs, listeners }) {
-    const options: Ref<any[]> = shallowRef(props.options)
+    const options: Ref<any[]> = shallowRef([])
 
     let fetched = false
     let searched = false
@@ -35,6 +35,8 @@ export const InnerAsyncSelect = defineComponent({
 
     const loading = ref(false)
     const on: Record<string, any> = { ...listeners }
+
+    watchEffect(() => (options.value = props.options || []))
 
     const fetch = (search = '') => {
       if (isFunction(props.remoteMethod)) {

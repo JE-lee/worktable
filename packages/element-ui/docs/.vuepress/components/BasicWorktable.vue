@@ -111,17 +111,28 @@ export default defineComponent({
         field: 'base',
         title: '是否城市户口',
         width: 200,
-        type: 'array',
+        type: 'string',
         component: 'select',
         componentProps: {
           clearable: true,
-          optionInValue: true,
-          multiple: true
+          // optionInValue: true,
+          // multiple: true
         },
         enum: [
           { label: '是', value: 'y' },
           { label: '否', value: 'n' }
-        ]
+        ],
+        effects: {
+          onFieldValueChange(val, row) {
+            if (val === 'n') {
+              row.setComponentProps('city', {
+                options: [
+                  { label: 'heyuan', value: 'heyuan' }
+                ]
+              })
+            }
+          }
+        }
 
       },
       {
@@ -130,27 +141,32 @@ export default defineComponent({
         width: 200,
         type: 'array',
         component: 'async-select',
-        componentProps: {
-          search: true,
-          clearable: true,
-          optionInValue: true,
-          multiple: true,
-          remoteMethod: (query) => {
-            let timeout = 600
-            if (!query) {
-              timeout = 2000
-            }
-            return new Promise((resolve) => {
-              setTimeout(() => {
-                const cities = states.filter(item => {
-                  return item.label.toLowerCase()
-                    .indexOf(query.toLowerCase()) > -1;
-                })
-                console.log('resolve key', query, cities.length)
-                resolve(cities)
-              }, timeout)
-            })
-          },
+        componentProps: row => {
+          return {
+            search: true,
+            clearable: row.data.base === 'y',
+            // optionInValue: true,
+            multiple: true,
+            reserveKeyword: true,
+            // disabled: row.data.base !== 'y',
+            remoteMethod: (query) => {
+
+              let timeout = 600
+              if (!query) {
+                timeout = 2000
+              }
+              return new Promise((resolve) => {
+                setTimeout(() => {
+                  const cities = states.filter(item => {
+                    return item.label.toLowerCase()
+                      .indexOf(query.toLowerCase()) > -1;
+                  })
+                  console.log('resolve key', query, cities.length)
+                  resolve(cities)
+                }, timeout)
+              })
+            },
+          }
         },
       },
       {
@@ -205,7 +221,7 @@ export default defineComponent({
       console.log('data: ', wt.getData())
     }
 
-    const getSummaries = ({columns, data}) => {
+    const getSummaries = ({ columns, data }) => {
       const sums = ['合计']
       const ageIndex = columns.findIndex(col => col.property === 'age')
       sums[ageIndex] = data.reduce((sum, cur) => {
