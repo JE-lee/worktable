@@ -6,3 +6,4 @@ jest.config.ts
 rollup.config.mjs
 tsconfig.**.json
 __test__
+docs

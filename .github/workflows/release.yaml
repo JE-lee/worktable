@@ -25,7 +25,7 @@ jobs:
       - name: setup pnpm config
         run: pnpm config set store-dir $PNPM_CACHE_FOLDER
       - name: install dependencies
-        run: pnpm install
+        run: pnpm install --fix-lockfile
       - name: test
         run: npm test
       - name: build
