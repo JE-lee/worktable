@@ -3,6 +3,7 @@ import { innerDefaultKey } from '@/shared'
 import { Context } from '@/types'
 
 export const Feedback = defineComponent({
+  name: 'Feedback',
   props: { feedback: String, isError: Boolean },
   setup(props, { slots }) {
     const { layout } = inject(innerDefaultKey) as Context

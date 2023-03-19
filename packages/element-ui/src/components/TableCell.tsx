@@ -1,7 +1,15 @@
 import { defineComponent, inject, h, getCurrentInstance, nextTick } from 'vue-demi'
 import { VNodeData, VNode } from 'vue'
 import { innerDefaultKey } from '@/shared'
-import { Column, Cell, CellValue, makeRowProxy, StaticComponentProps } from '@edsheet/core'
+import {
+  Column,
+  Cell,
+  CellValue,
+  makeRowProxy,
+  StaticComponentProps,
+  RowProxy,
+  Worktable,
+} from '@edsheet/core'
 import { VueComponent, FocusAble, Options, Context } from '@/types'
 import { isString, isFunction, cloneDeep } from 'lodash-es'
 import { getInnerComponent, InnerText } from './InnerComponent'
@@ -28,28 +36,15 @@ export const TableCell = observer(
     },
     setup(props) {
       const { worktable } = inject(innerDefaultKey) as Context
-      const colDef = props.colDef as Column
-      const cell = props.cell as Cell
-      const row = worktable.getRowByRid(cell.position.rid)
-      if (!row && process.env.NODE_ENV === 'development') {
-        console.warn(`not a validable row with rid ${cell.position.rid}`)
-      }
-      const rowProxy = makeRowProxy(row!)
-      function runWithContext<T extends (...args: any[]) => any>(run: T) {
-        return run(rowProxy)
-      }
 
-      function convertListener(listeners: { [key: string]: (...args: any[]) => void }) {
-        const converted: { [key: string]: (...args: any[]) => void } = {}
-        for (const event in listeners) {
-          converted[event] = (...args: any[]) => listeners[event](...args, rowProxy)
-        }
-        return converted
-      }
       return () => {
+        const colDef = props.colDef as Column
+        const cell = props.cell as Cell
+        const rowProxy = getRowProxy(cell, worktable)
+
         let colDefComponent = colDef.component
         if (isFnComponent(colDefComponent)) {
-          colDefComponent = runWithContext(colDefComponent)
+          colDefComponent = runWithContext(colDefComponent, rowProxy)
         }
         // 表单组件
         let component = getComponent(colDefComponent, getInnerComponent)
@@ -65,25 +60,10 @@ export const TableCell = observer(
 
         component = mergePreview(component || InnerText /* preview */)
 
-        let componentProps: StaticComponentProps = { ...cell.staticComponentProps }
-        // FIXME: remove dynamic compoentProps, conficted with setComponentProps
-        if (isFunction(colDef.componentProps)) {
-          const dynamicComponentProps = runWithContext(colDef.componentProps)
-          Object.assign(componentProps, dynamicComponentProps)
-        }
-
-        // dynamic disabled
-        let disabled = !!colDef.disabled
-        if (isFunction(colDef.disabled)) {
-          disabled = runWithContext(colDef.disabled)
-        }
-
-        componentProps = Object.assign({ disabled }, componentProps)
-
-        // enum
-        const mergeProps = mergePropsFromColumn(colDef)
-
-        const componentListener: VNodeData['on'] = convertListener(colDef.componentListeners || {})
+        const componentListener: VNodeData['on'] = convertListener(
+          colDef.componentListeners || {},
+          rowProxy
+        )
         if (component) {
           const originInput = componentListener.input
           bindValueUpdateListener(componentListener, (val: CellValue) => {
@@ -100,9 +80,10 @@ export const TableCell = observer(
         if (props.colIndex > 0) {
           style.width = '100%'
         }
+
         return h(component, {
           style, // FIXME: not 100% width
-          attrs: Object.assign({}, mergeProps, componentProps || {}, props),
+          attrs: Object.assign({}, props),
           on: componentListener,
         })
       }
@@ -115,7 +96,7 @@ function getComponent(com: any, getInner: (key: any) => VueComponent) {
 }
 
 function mergePropsFromColumn(col: Column) {
-  const options = col.enum || []
+  const options = col.enum
   return {
     options,
   }
@@ -143,6 +124,25 @@ export function mergePreview(component: VueComponent, Preview?: VueComponent) {
         return () => {
           const cell = props.cell as Cell
           const colDef = props.colDef as Column
+          const rowProxy = getRowProxy(cell, worktable)
+
+          let componentProps: StaticComponentProps = { ...cell.staticComponentProps }
+          if (isFunction(colDef.componentProps)) {
+            const dynamicComponentProps = runWithContext(colDef.componentProps, rowProxy)
+            Object.assign(componentProps, dynamicComponentProps)
+          }
+
+          // dynamic disabled
+          let disabled = !!colDef.disabled
+          if (isFunction(colDef.disabled)) {
+            disabled = runWithContext(colDef.disabled, rowProxy)
+          }
+
+          componentProps = Object.assign({ disabled }, componentProps)
+
+          // enum
+          const mergeProps = mergePropsFromColumn(colDef)
+
           function renderFormItemInner(): VNode {
             const value = cell.value
             const mergeAttrs = Object.assign({ size: layout.size }, attrs, props)
@@ -164,7 +164,7 @@ export function mergePreview(component: VueComponent, Preview?: VueComponent) {
             } else {
               return h(component, {
                 ref: FORM_INPUT,
-                attrs: Object.assign(mergeAttrs, { value }),
+                attrs: Object.assign(mergeAttrs, mergeProps, componentProps, { value }),
                 on: Object.assign({}, listeners as any),
               })
             }
@@ -197,4 +197,24 @@ function getTextFromOptions(options: Options, val: any) {
 
 function isFnComponent(fn: any) {
   return isFunction(fn) && !(fn as any).cid
+}
+
+function convertListener(listeners: { [key: string]: (...args: any[]) => void }, row: RowProxy) {
+  const converted: { [key: string]: (...args: any[]) => void } = {}
+  for (const event in listeners) {
+    converted[event] = (...args: any[]) => listeners[event](...args, row)
+  }
+  return converted
+}
+
+function runWithContext<T extends (...args: any[]) => any>(run: T, row: RowProxy) {
+  return run(row)
+}
+
+function getRowProxy(cell: Cell, worktable: Worktable) {
+  const row = worktable.getRowByRid(cell.position.rid)
+  if (!row && process.env.NODE_ENV === 'development') {
+    console.warn(`not a validable row with rid ${cell.position.rid}`)
+  }
+  return makeRowProxy(row!)
 }
