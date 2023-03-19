@@ -15,6 +15,7 @@ export const InnerAsyncSelect = defineComponent({
       type: Boolean,
       default: true,
     },
+    fresh: Boolean,
     search: Boolean,
     searchImmediate: {
       type: Boolean,
@@ -67,7 +68,7 @@ export const InnerAsyncSelect = defineComponent({
       const onFocus = on['focus']
       on.focus = (...args: any[]) => {
         if (!props.search || (props.search && props.searchImmediate)) {
-          if (!fetched && !loading.value) {
+          if ((props.fresh || !fetched) && !loading.value) {
             fetch()
           }
         }

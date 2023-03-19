@@ -228,8 +228,12 @@ export class Worktable extends BaseWorktable {
     this.removeAllFieldEffects()
     runInAction(() => (this.columns = cols))
 
-    // init effect event listener of every field
     cols.forEach((colDef) => {
+      // format enum
+      if (!Array.isArray(colDef.enum)) {
+        colDef.enum = []
+      }
+      // init effect event listener of every field
       if (isObject(colDef.effects)) {
         Object.entries(colDef.effects).forEach(([eventName, listener]) =>
           this.on(colDef.field, eventName, listener)

@@ -68,7 +68,11 @@ export class Row {
         raw[k] = this.data[k].cellValue
       }
     }
-    raw = Object.assign(omit(this.initialData || {}, 'children'), raw)
+    const virtualKeys = [
+      'children',
+      ...this.columns.filter((colDef) => colDef.virtual).map((colDef) => colDef.field),
+    ]
+    raw = Object.assign(omit(this.initialData || {}, virtualKeys), raw)
     return raw
   }
 

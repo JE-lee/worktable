@@ -41,6 +41,7 @@ export const TableCell = observer(
         const colDef = props.colDef as Column
         const cell = props.cell as Cell
         const rowProxy = getRowProxy(cell, worktable)
+        if (!rowProxy) return
 
         let colDefComponent = colDef.component
         if (isFnComponent(colDefComponent)) {
@@ -125,6 +126,7 @@ export function mergePreview(component: VueComponent, Preview?: VueComponent) {
           const cell = props.cell as Cell
           const colDef = props.colDef as Column
           const rowProxy = getRowProxy(cell, worktable)
+          if (!rowProxy) return
 
           let componentProps: StaticComponentProps = { ...cell.staticComponentProps }
           if (isFunction(colDef.componentProps)) {
@@ -213,8 +215,11 @@ function runWithContext<T extends (...args: any[]) => any>(run: T, row: RowProxy
 
 function getRowProxy(cell: Cell, worktable: Worktable) {
   const row = worktable.getRowByRid(cell.position.rid)
-  if (!row && process.env.NODE_ENV === 'development') {
-    console.warn(`not a validable row with rid ${cell.position.rid}`)
+  if (!row) {
+    // if (process.env.NODE_ENV === 'development') {
+    //   console.warn(`not a validable row with rid ${cell.position.rid}`)
+    // }
+    return null
   }
   return makeRowProxy(row!)
 }
