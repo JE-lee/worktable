@@ -1,5 +1,11 @@
 # @edsheet/core
 
+## 1.2.2
+
+### Patch Changes
+
+- cdd4b48: only validate when the value of Cell is modified
+
 ## 1.2.1
 
 ### Patch Changes
