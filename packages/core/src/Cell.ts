@@ -22,7 +22,15 @@ export class Cell {
   deconstructedCells: Record<string, Cell> = {} // deconstructed fields
 
   get cellValue() {
-    return this.colDef.type === 'number' ? Number(this.value) : this.value
+    if (this.colDef.type === 'number') {
+      if (typeof this.value === 'string' && this.value.length > 0) {
+        return Number(this.value)
+      } else {
+        return this.value // ''
+      }
+    } else {
+      return this.value
+    }
   }
 
   static generateBaseCell(ctx: CellFactoryContext) {
