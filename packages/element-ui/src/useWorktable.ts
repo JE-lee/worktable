@@ -2,7 +2,7 @@ import { Context, RowData, UIColumn, useWorkTableOpt } from '@/types'
 import { computed as mcomputed } from 'mobx'
 import { Column, makeRowProxy, Row, RowProxy, Worktable } from '@edsheet/core'
 import { provide, shallowRef } from 'vue-demi'
-import { getWorktableInjectKey, mergePosKey, ROWID, walk } from '@/shared'
+import { bindWorktable, getWorktableInjectKey, mergePosKey, ROWID, walk } from '@/shared'
 import { InnerRender } from '@/components/InnerComponent'
 
 export function useWorktable(opt: useWorkTableOpt) {
@@ -49,26 +49,10 @@ export function useWorktable(opt: useWorkTableOpt) {
   }
 
   return {
-    ...worktable,
-    pauseEffects: worktable.pause.bind(worktable),
-    resumeEffects: worktable.resume.bind(worktable),
-    addEffect: worktable.addEffect.bind(worktable),
-    addFieldEffect: worktable.addFieldEffect.bind(worktable),
-    removeEffect: worktable.removeEffect.bind(worktable),
-    setColumns: worktable.setColumns.bind(worktable),
-    setComponentProps: worktable.setComponentProps.bind(worktable),
-    validate: worktable.validate.bind(worktable),
-    remove: worktable.remove.bind(worktable),
-    removeAll: worktable.removeAll.bind(worktable),
-    add: worktable.add.bind(worktable),
-    getData: worktable.getData.bind(worktable),
-    getValues: worktable.getData.bind(worktable),
-    setValuesInEach: worktable.setValuesInEach.bind(worktable),
+    ...worktable, // TOOD: remove this
     toggleRowExpansion,
-    sort: worktable.sort.bind(worktable),
-    sortChildInEach: worktable.sortChildInEach.bind(worktable),
-    walk: worktable.walk.bind(worktable),
     removeSelectedRows,
+    ...bindWorktable(worktable),
   }
 }
 

@@ -2,6 +2,7 @@ import { Column, Row, Worktable } from '@edsheet/core'
 import type { RowProxy, RowRaw, RowRaws } from '@edsheet/core'
 import { Component, ShallowRef } from 'vue-demi'
 import { IComputedValue } from 'mobx'
+import { bindWorktable } from './shared'
 
 export type Feedbacklayout = 'terse' | 'popover'
 export interface TableLayout {
@@ -67,6 +68,7 @@ export type UIColumn = Column & {
     colIndex: number
     add: Worktable['add']
     rows: RowRaw[]
+    worktable: ReturnType<typeof bindWorktable>
   }) => void
 }
 

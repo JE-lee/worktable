@@ -1,5 +1,5 @@
 import { defineComponent, inject, h } from 'vue-demi'
-import { innerDefaultKey } from '@/shared'
+import { bindWorktable, innerDefaultKey } from '@/shared'
 import { Cell, makeRowProxy } from '@edsheet/core'
 import { Context } from '@/types'
 import { observer } from 'mobx-vue'
@@ -41,7 +41,7 @@ export const InnerRender = observer(
         try {
           const render = props.render
           if (isFunction(render)) {
-            const vnode = render(renderRowProxy)
+            const vnode = render(renderRowProxy, bindWorktable(worktable))
             return isPrimitive(vnode) ? h('div', String(vnode)) : vnode
           }
         } catch (err) {

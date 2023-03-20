@@ -10,7 +10,13 @@ import {
   getCurrentInstance,
 } from 'vue-demi'
 import { Table as ElTable, TableColumn as ElTableColumn } from 'element-ui'
-import { getWorktableInjectKey, innerDefaultKey, ROWID, useFlashingValue } from '@/shared'
+import {
+  bindWorktable,
+  getWorktableInjectKey,
+  innerDefaultKey,
+  ROWID,
+  useFlashingValue,
+} from '@/shared'
 import { makeRowProxy, TABLE_EVENT_NAME } from '@edsheet/core'
 import { TableCell } from '@/components/TableCell'
 import { splitPosKey } from '@/shared/pos-key'
@@ -100,6 +106,7 @@ const InnerWorktable = defineComponent({
                 colIndex: colIndex,
                 rows: worktable.getData(),
                 add: worktable.add.bind(worktable),
+                worktable: bindWorktable(worktable),
               }) as any
             } else {
               const required = col.required
