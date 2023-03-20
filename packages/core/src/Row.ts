@@ -142,10 +142,10 @@ export class Row {
     this.disposers = []
   }
 
-  validate(isFirstTrack = false) {
+  validate(force = false) {
     const validators: Promise<boolean>[] = []
     for (const field in this.data) {
-      validators.push(this.validateCell(this.data[field], isFirstTrack))
+      validators.push(this.validateCell(this.data[field], false, force))
     }
     return Promise.all(validators)
   }
@@ -207,13 +207,14 @@ export class Row {
     return disposer
   }
 
-  private validateCell(cell: Cell, isFirstTrack = false) {
+  private validateCell(cell: Cell, isFirstTrack = false, force = false) {
+    const needEmitError = (!isFirstTrack && cell.modified) || force
     const colDef = cell.colDef
     const descriptor = this.makeCellVaidateDescriptor(colDef)
     const target = { [colDef.field]: cell.cellValue }
     cell.setState('validating', true)
     const validator = new ValidateSchema(descriptor)
-    if (!isFirstTrack) {
+    if (needEmitError) {
       this.wt?.notify(
         colDef.field,
         FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START,
@@ -227,7 +228,7 @@ export class Row {
         if (cell.errors.length > 0) {
           cell.setState('errors', [])
         }
-        if (!isFirstTrack) {
+        if (needEmitError) {
           this.wt?.notify(
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_SUCCESS,
@@ -238,7 +239,7 @@ export class Row {
         return true
       })
       .catch((err) => {
-        if (!isFirstTrack) {
+        if (needEmitError) {
           const errors = [err.errors[0]?.message]
           cell.setState('errors', errors)
           this.wt?.notify(
@@ -253,7 +254,7 @@ export class Row {
       })
       .finally(() => {
         cell.setState('validating', false)
-        if (!isFirstTrack) {
+        if (needEmitError) {
           this.wt?.notify(
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH,

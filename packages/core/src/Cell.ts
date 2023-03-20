@@ -13,6 +13,7 @@ export class Cell {
   value: CellValue
   previewing = true
   validating = false
+  modified = false
   errors: string[] = []
   position: CellPosition
   colDef: Column
@@ -63,6 +64,7 @@ export class Cell {
     const prev = this[state]
     this[state] = val
     if (state === 'value' && !isEqual(prev, val)) {
+      this.modified = true
       // FIXME: set deconstruacted value
       this.deconstructValue()
       this.notifyValueFieldEvent(FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
