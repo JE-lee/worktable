@@ -1,5 +1,13 @@
 # @edsheet/element-ui
 
+## 1.2.1
+
+### Patch Changes
+
+- 2f8bc60: export worktable in render and render header function
+- Updated dependencies [eee1c61]
+  - @edsheet/core@1.2.1
+
 ## 1.2.0
 
 ### Minor Changes
