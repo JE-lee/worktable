@@ -114,6 +114,16 @@ export class Worktable extends BaseWorktable {
     return flatten(this.rows).find((r) => r.rid === pos.rid)?.data[pos.field]
   }
 
+  add(raw: RowRaw): RowProxy
+  add(raw: RowRaw[]): RowProxy[]
+  add(raw: RowRaw | RowRaw[]): RowProxy | RowProxy[] {
+    if (Array.isArray(raw)) {
+      return this.addRows(raw)
+    } else {
+      return this.addRow(raw)
+    }
+  }
+
   addRow(raw: RowRaw = {}): RowProxy {
     const row = new Row(this.columns, raw, undefined, this.rows.length, this)
     this.rows.push(row)

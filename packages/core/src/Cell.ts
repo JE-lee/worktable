@@ -5,7 +5,7 @@ import { isUndefined, isEqual, cloneDeep, isFunction, get, set } from 'lodash-es
 import { action, makeObservable, observable, Reaction } from 'mobx'
 import { EventEmitter } from './EventEmitter'
 import { Row } from './Row'
-import { makeRowProxy, getDefault } from './share'
+import { makeRowProxy, getDefaultByValueType } from './share'
 
 // TODO: getter of previweing and validating
 export class Cell {
@@ -36,7 +36,9 @@ export class Cell {
 
   static generateBaseCell(ctx: CellFactoryContext) {
     const { value, colDef, parent, evProxy } = ctx
-    const formatedValue = isUndefined(value) ? getDefault(colDef.type || 'string') : value // TODO: infer default value from it's type
+    const formatedValue = isUndefined(value)
+      ? getDefaultByValueType(colDef.type || 'string')
+      : value // TODO: infer default value from it's type
     return new Cell(parent, colDef, formatedValue, evProxy)
   }
 

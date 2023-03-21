@@ -13,7 +13,7 @@ import {
 } from './types'
 import { Cell } from './Cell'
 import { Worktable } from './Worktable'
-import { makeRowProxy, noThrow, walk, getDefault } from './share'
+import { makeRowProxy, noThrow, walk, getDefaultByValueType, getDefaultValue } from './share'
 import { RuleItem } from 'async-validator'
 import ValidateSchema from 'async-validator'
 import { FIELD_EVENT_NAME, TABLE_EVENT_NAME } from './event'
@@ -166,8 +166,8 @@ export class Row {
       cell?.setState(
         'value',
         cell.colDef.default
-          ? this.getDefaultValue(cell.colDef.default)
-          : getDefault(cell.colDef.type)
+          ? getDefaultValue(cell.colDef.default)
+          : getDefaultByValueType(cell.colDef.type)
       )
     }
   }
@@ -281,7 +281,7 @@ export class Row {
       const cell = Cell.generateBaseCell({
         parent: this,
         colDef: col,
-        value: isUndefined(val) ? this.getDefaultValue(col.default) : val,
+        value: isUndefined(val) ? getDefaultValue(col.default) : val,
         evProxy: this.wt,
       })
       cell.position.field = col.field
@@ -303,10 +303,6 @@ export class Row {
     if (Array.isArray(raw?.children)) {
       this.children = Row.generateRows(this.columns, raw!.children!, this, this.wt)
     }
-  }
-
-  private getDefaultValue<T>(_default: T | (() => T)) {
-    return isFunction(_default) ? _default() : _default
   }
 
   private makeCellVaidateDescriptor(colDef: Column) {

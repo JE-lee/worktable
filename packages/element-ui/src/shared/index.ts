@@ -20,7 +20,7 @@ export function bindWorktable(worktable: Worktable) {
     validate: worktable.validate.bind(worktable),
     remove: worktable.remove.bind(worktable),
     removeAll: worktable.removeAll.bind(worktable),
-    add: worktable.addRow.bind(worktable),
+    add: worktable.add.bind(worktable),
     addRow: worktable.addRow.bind(worktable),
     addRows: worktable.addRows.bind(worktable),
     getData: worktable.getData.bind(worktable),

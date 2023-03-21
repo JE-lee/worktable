@@ -1,9 +1,9 @@
 import { RowAction, RowProxy, ValueType } from './types/schema'
-import { isObject } from 'lodash-es'
+import { isObject, isFunction } from 'lodash-es'
 import { RowRaw } from './types'
 import { Row } from './Row'
 
-export function getDefault(type: ValueType = 'string') {
+export function getDefaultByValueType(type: ValueType = 'string') {
   if (type === 'boolean') {
     return false
   } else if (type === 'string') {
@@ -133,4 +133,8 @@ function makeRowDataProxy(row: Row, immutable = false) {
     }
   }
   return new Proxy(row, handler) as unknown as RowRaw
+}
+
+export function getDefaultValue<T>(_default: T | (() => T)) {
+  return isFunction(_default) ? _default() : _default
 }
