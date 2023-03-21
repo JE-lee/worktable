@@ -1,5 +1,15 @@
 # @edsheet/element-ui
 
+## 1.2.2
+
+### Patch Changes
+
+- c4955f9: code optimize
+- Updated dependencies [cdd4b48]
+- Updated dependencies [c783361]
+- Updated dependencies [c4955f9]
+  - @edsheet/core@1.2.2
+
 ## 1.2.1
 
 ### Patch Changes

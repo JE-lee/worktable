@@ -1,5 +1,13 @@
 # @edsheet/core
 
+## 1.2.2
+
+### Patch Changes
+
+- cdd4b48: only validate when the value of Cell is modified
+- c783361: modify return type of Worktable.addRow
+- c4955f9: code optimize
+
 ## 1.2.1
 
 ### Patch Changes

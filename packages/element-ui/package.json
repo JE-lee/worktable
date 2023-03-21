@@ -1,6 +1,6 @@
 {
   "name": "@edsheet/element-ui",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "",
   "main": "esm",
   "module": "esm",
@@ -22,7 +22,7 @@
   "author": "jelee",
   "license": "MIT",
   "dependencies": {
-    "@edsheet/core": "workspace:^1.2.1",
+    "@edsheet/core": "workspace:^1.2.2",
     "dayjs": "^1.11.7",
     "lodash-es": "^4.17.21",
     "mobx": "^6.7.0",
