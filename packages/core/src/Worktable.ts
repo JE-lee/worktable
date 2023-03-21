@@ -76,16 +76,6 @@ export class Worktable extends BaseWorktable {
     })
   }
 
-  add(raw: RowRaw | RowRaw[], filter?: Filter) {
-    const raws = Array.isArray(raw) ? raw : [raw]
-    if (!filter) {
-      this.addRows(raws)
-    } else {
-      const parents = this.findAllRows(filter)
-      parents.forEach((parent) => parent.addRows(raws))
-    }
-  }
-
   remove(rid: number): void
   remove(filter: Filter): void
   remove(filter: any): void {
@@ -124,14 +114,18 @@ export class Worktable extends BaseWorktable {
     return flatten(this.rows).find((r) => r.rid === pos.rid)?.data[pos.field]
   }
 
-  addRow(raw: RowRaw = {}) {
+  addRow(raw: RowRaw = {}): RowProxy {
     const row = new Row(this.columns, raw, undefined, this.rows.length, this)
     this.rows.push(row)
-    return row
+    return makeRowProxy(row)
   }
 
-  addRows(raws: RowRaws) {
-    raws.forEach((raw) => this.addRow(raw))
+  addRows(raws: RowRaws): RowProxy[] {
+    const rows: RowProxy[] = []
+    raws.forEach((raw) => {
+      rows.push(this.addRow(raw))
+    })
+    return rows
   }
 
   removeAll() {
@@ -268,7 +262,7 @@ export class Worktable extends BaseWorktable {
       setColumns: action,
       addRow: action,
       addRows: action,
-      add: action,
+      // add: action,
       removeAll: action,
       removeRow: action,
       // updateColumn: action,

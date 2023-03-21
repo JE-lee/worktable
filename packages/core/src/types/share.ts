@@ -24,3 +24,5 @@ export type FieldDeconstructMeta = {
   type: 'array' | 'object'
   keyMaps: Array<[string, string]>
 }
+
+export type RowErrors = Record<string, string[]>

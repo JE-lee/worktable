@@ -105,7 +105,7 @@ const InnerWorktable = defineComponent({
                 field,
                 colIndex: colIndex,
                 rows: worktable.getData(),
-                add: worktable.add.bind(worktable),
+                add: worktable.addRow.bind(worktable),
                 worktable: bindWorktable(worktable),
               }) as any
             } else {

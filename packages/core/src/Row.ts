@@ -1,4 +1,4 @@
-import { isBoolean, isFunction, isUndefined, omit } from 'lodash-es'
+import { isBoolean, isFunction, isUndefined, mapValues, omit } from 'lodash-es'
 import { observable, makeObservable, action, Reaction } from 'mobx'
 import {
   Column,
@@ -9,6 +9,7 @@ import {
   Filter,
   StaticComponentProps,
   RowProxy,
+  RowErrors,
 } from './types'
 import { Cell } from './Cell'
 import { Worktable } from './Worktable'
@@ -94,14 +95,19 @@ export class Row {
     })
   }
 
-  addRow(raw?: RowRaw) {
+  addRow(raw?: RowRaw): RowProxy {
     const row = new Row(this.columns, raw, this, 0, this.wt)
     row.rIndex = this.children.length
     this.children.push(row)
+    return makeRowProxy(row)
   }
 
-  addRows(raws: RowRaw[] = []) {
-    raws.forEach((raw) => this.addRow(raw))
+  addRows(raws: RowRaw[] = []): RowProxy[] {
+    const rows: RowProxy[] = []
+    raws.forEach((raw) => {
+      rows.push(this.addRow(raw))
+    })
+    return rows
   }
 
   remove(rid: number): void
@@ -164,6 +170,10 @@ export class Row {
           : getDefault(cell.colDef.type)
       )
     }
+  }
+
+  get errors(): RowErrors {
+    return mapValues(this.data, (cell) => cell.errors)
   }
 
   // private notifyCellValueEvent() {

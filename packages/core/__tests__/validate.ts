@@ -158,7 +158,7 @@ describe('validate', () => {
     // TODO:
     await delay(20)
     expect(mockValidator.mock.calls.length).toBe(5)
-    expect(row.data['code'].errors[0]).toEqual(message)
+    expect(row.errors['code'][0]).toEqual(message)
   })
 
   test('stop watching validation', async () => {
@@ -194,12 +194,12 @@ describe('validate', () => {
     const worktable = new Worktable(columns)
     const row = worktable.addRow()
     await worktable.validate().catch(() => ({}))
-    expect(row.data['code'].errors.length).toBeGreaterThan(0)
-    expect(row.data['name'].errors.length).toBeGreaterThan(0)
+    expect(row.errors['code'].length).toBeGreaterThan(0)
+    expect(row.errors['name'].length).toBeGreaterThan(0)
 
     worktable.inputValue({ rid: row.rid, field: 'code' }, 'c1')
     await delay(10)
-    expect(row.data['code'].errors.length).toBe(0)
-    expect(row.data['name'].errors.length).toBeGreaterThan(0)
+    expect(row.errors['code'].length).toBe(0)
+    expect(row.errors['name'].length).toBeGreaterThan(0)
   })
 })

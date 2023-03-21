@@ -66,7 +66,7 @@ export type UIColumn = Column & {
   renderHeader?: (ctx: {
     field: string
     colIndex: number
-    add: Worktable['add']
+    add: Worktable['addRow']
     rows: RowRaw[]
     worktable: ReturnType<typeof bindWorktable>
   }) => void

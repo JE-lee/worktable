@@ -157,7 +157,7 @@ describe('Worktable', () => {
     const times = mockValidator.mock.calls.length
     const row2 = wt.addRow({ code: 9 })
     wt.remove(row2.rid)
-    row2.data['code'].value = 10
+    row2.data['code'] = 10
     expect(mockValidator.mock.calls.length).toBe(times + 1)
   })
 })

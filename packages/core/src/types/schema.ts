@@ -1,6 +1,6 @@
 import { RuleItem } from 'async-validator'
 import type { Row } from '../Row'
-import { StaticComponentProps } from './share'
+import { RowErrors, StaticComponentProps } from './share'
 
 export type Options = Array<{ label: string; value: any }>
 
@@ -27,18 +27,20 @@ export type RowRaw = {
 
 export type RowAction = Pick<
   Row,
-  'reset' | 'addRow' | 'addRows' | 'removeRow' | 'removeSelf' | 'setComponentProps' | 'setValues'
+  'reset' | 'addRow' | 'addRows' | 'removeSelf' | 'setComponentProps' | 'setValues'
 > & {
+  removeRow: Row['remove']
   removeAllRow: Row['removeAll']
   getValue: Row['getRaw']
 }
 
 export type RowProxy = {
   parent?: RowProxy
-  children?: RowProxy[]
+  children: RowProxy[]
   index: number
   rid: number
   data: RowRaw
+  errors: RowErrors
 } & RowAction
 
 export type RowRaws = Array<RowRaw>

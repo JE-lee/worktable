@@ -1,4 +1,4 @@
-import { RowProxy, ValueType } from './types/schema'
+import { RowAction, RowProxy, ValueType } from './types/schema'
 import { isObject } from 'lodash-es'
 import { RowRaw } from './types'
 import { Row } from './Row'
@@ -69,6 +69,8 @@ export function makeRowProxy(row: Row, immutable = false) {
           return target.rid
         } else if (prop === 'data') {
           return rowDataProxy
+        } else if (prop === 'errors') {
+          return target.errors
         } else {
           return Reflect.get(rowAction, prop)
         }
@@ -80,7 +82,7 @@ export function makeRowProxy(row: Row, immutable = false) {
   return new Proxy(row, handler) as unknown as RowProxy
 }
 
-export function makeRowAction(row: Row) {
+export function makeRowAction(row: Row): RowAction {
   const addRow = row.addRow.bind(row)
   const addRows = row.addRows.bind(row)
   const removeRow = row.remove.bind(row)
