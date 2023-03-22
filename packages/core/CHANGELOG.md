@@ -1,5 +1,11 @@
 # @edsheet/core
 
+## 1.2.3
+
+### Patch Changes
+
+- 6fb14be: reset the value of Cell
+
 ## 1.2.2
 
 ### Patch Changes
