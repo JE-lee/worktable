@@ -5,7 +5,7 @@ import { isUndefined, isEqual, cloneDeep, isFunction, get, set } from 'lodash-es
 import { action, makeObservable, observable, Reaction } from 'mobx'
 import { EventEmitter } from './EventEmitter'
 import { Row } from './Row'
-import { makeRowProxy, getDefaultByValueType } from './share'
+import { makeRowProxy, getDefaultByValueType, getDefaultValue } from './share'
 
 // TODO: getter of previweing and validating
 export class Cell {
@@ -116,6 +116,18 @@ export class Cell {
       set(merged, from, cell.value)
     })
     return merged as CellValue
+  }
+
+  reset() {
+    if (!this.deconstructedType) {
+      const defaultValue = this.colDef.default
+        ? getDefaultValue(this.colDef.default)
+        : getDefaultByValueType(this.colDef.type)
+      this.setState('value', defaultValue)
+    } else {
+      Object.values(this.deconstructedCells).forEach((cell) => cell.reset())
+      this.setState('value', this.mergeValue())
+    }
   }
 
   private track(reactor: (row: RowProxy) => void) {

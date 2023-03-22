@@ -162,13 +162,10 @@ export class Row {
 
   reset(field?: string) {
     if (field) {
-      const cell = this.data[field]
-      cell?.setState(
-        'value',
-        cell.colDef.default
-          ? getDefaultValue(cell.colDef.default)
-          : getDefaultByValueType(cell.colDef.type)
-      )
+      this.data[field]?.reset()
+    } else {
+      // reset all
+      Object.values(this.data).forEach((cell) => cell.reset())
     }
   }
 
