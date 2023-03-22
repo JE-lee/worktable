@@ -17,7 +17,7 @@ const config = {
     }),
     nodeResolve(),
   ],
-  external: ['vue', 'vue-demi', 'element-ui'],
+  external: ['vue', 'vue-demi', 'element-ui', '@edsheet/core'],
 }
 
 export default config
