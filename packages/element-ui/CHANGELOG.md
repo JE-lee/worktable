@@ -1,5 +1,11 @@
 # @edsheet/element-ui
 
+## 1.2.4
+
+### Patch Changes
+
+- 8835ad0: persist inner state of AsyncSelect
+
 ## 1.2.2
 
 ### Patch Changes
