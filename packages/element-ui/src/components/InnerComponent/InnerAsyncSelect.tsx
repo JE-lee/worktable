@@ -25,6 +25,10 @@ export const InnerAsyncSelect = defineComponent({
       type: Array,
       default: () => [],
     },
+    persist: {
+      type: Function,
+      required: true,
+    },
   },
   setup(props, { attrs, listeners }) {
     const options: Ref<any[]> = shallowRef([])
@@ -50,6 +54,8 @@ export const InnerAsyncSelect = defineComponent({
             // timing control
             if (anchor === mark) {
               options.value = optionList
+              // persist
+              props.persist({ options: options.value })
               fetched = true
               searched = searched || props.search // set searched true in search mode
             }

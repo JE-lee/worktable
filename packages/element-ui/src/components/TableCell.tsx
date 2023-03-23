@@ -1,6 +1,6 @@
 import { defineComponent, inject, h, getCurrentInstance, nextTick } from 'vue-demi'
 import { VNodeData, VNode } from 'vue'
-import { innerDefaultKey } from '@/shared'
+import { innerDefaultKey, persistInnerState } from '@/shared'
 import {
   Column,
   Cell,
@@ -140,7 +140,9 @@ export function mergePreview(component: VueComponent, Preview?: VueComponent) {
             disabled = runWithContext(colDef.disabled, rowProxy)
           }
 
-          componentProps = Object.assign({ disabled }, componentProps)
+          componentProps = Object.assign({ disabled }, componentProps, {
+            persist: (props: any) => persistInnerState(cell, props),
+          })
 
           // enum
           const mergeProps = mergePropsFromColumn(colDef)
