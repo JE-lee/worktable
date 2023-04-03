@@ -1,7 +1,5 @@
-## worktable element-ui
+# worktable element-ui
 
-<basic-worktable></basic-worktable>
+## 基本用法
 
-
-
-
+<code-previewer demoPath="base/index" />

@@ -14,7 +14,7 @@ export type useWorkTableOpt = {
   key?: string
   columns: Array<Column>
   initialData?: RowRaws
-  layout: TableLayout
+  layout?: TableLayout
 }
 
 export type VueComponent = Component

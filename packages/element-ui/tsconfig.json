@@ -1,10 +1,10 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "preserve",
     "sourceMap": false,
-    "declaration": true,
     "allowSyntheticDefaultImports": true,
+    "allowJs": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
@@ -13,12 +13,11 @@
       "@/*": [
         "src/*"
       ],
-      "@edsheet/*": [
-        "../../packages/*/src"
-      ]
+      "@edsheet/*": ["../../packages/*/src"] 
     }
   },
   "include": [
-    "src/**/*"
-  ]
+    "src/**/*",
+    "docs/**/*"
+  ],
 }

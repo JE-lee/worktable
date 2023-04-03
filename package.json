@@ -28,12 +28,15 @@
   "author": "jelee",
   "license": "MIT",
   "dependencies": {
+    "@babel/eslint-parser": "^7.21.3",
     "@changesets/cli": "^2.26.0",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
     "concurrently": "^7.6.0",
     "eslint": "^8.28.0",
+    "eslint-plugin-vue": "^9.9.0",
+    "tsc-alias": "^1.8.5",
     "typescript": "^4.9.3"
   },
   "devDependencies": {

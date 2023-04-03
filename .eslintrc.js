@@ -8,6 +8,7 @@ module.exports = {
     "no-debugger": "warn"
   },
   globals: {
-      process: "readonly"
-  }
+    process: "readonly"
+  },
+  
 };

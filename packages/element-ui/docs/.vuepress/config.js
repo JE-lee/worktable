@@ -3,6 +3,10 @@ const path = require('path')
 module.exports = {
   title: 'Worktable',
   description: 'editbale table, supported vue and react',
+  theme: '@vuepress-dumi/dumi',
+  plugins: [
+    '@vuepress-dumi/dumi-previewer'
+  ],
   configureWebpack: {
     resolve: {
       extensions: ['.tsx', '.ts', '.js'],
