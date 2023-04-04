@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "nx run-many --target=build",
+    "docs:build": "nx run-many --target=docs:build",
     "clean": "pnpm --stream -r clean",
     "test": "pnpm --stream -r test",
     "build:core": "nx build @edsheet/core",

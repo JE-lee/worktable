@@ -1,0 +1,32 @@
+name: Docs
+on:
+  push:
+    branches:
+      - doc
+env:
+  CI: true
+  PNPM_CACHE_FOLDER: .pnpm-store
+jobs:
+  deploy-docsite:
+    runs-on: ubuntu-latest
+    environment: npm publish
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: install pnpm
+      run: npm i pnpm@latest -g
+    - name: setup pnpm config
+      run: pnpm config set store-dir $PNPM_CACHE_FOLDER
+    - name: install dependencies
+      run: pnpm install --fix-lockfile
+    - name: build
+      run: npm run build
+    - name: build docs
+      run: npm run docs:build
+    - name: vuepress-deploy
+      uses: jenkey2011/vuepress-deploy@master
+      env:
+        ACCESS_TOKEN: ${{ secrets.GTOKEN }}
+        TARGET_BRANCH: gh-pages
+        BUILD_SCRIPT: echo 'build docs finish'
+        BUILD_DIR: docs-site

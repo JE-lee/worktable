@@ -1,13 +1,38 @@
 const path = require('path')
+const utils = require('./util')
+
+const base = '/worktable/element-ui/'
+
+const features = utils
+.getFiles(path.resolve(__dirname, '../feature'))
+.map((item) => item.replace(/(\.md)/g, ''))
+.filter((item) => item !== 'index')
+.sort((a,b) => parseInt(a) - parseInt(b))
 
 module.exports = {
+  base,
   title: 'Worktable',
   description: 'editbale table, supported vue and react',
   theme: '@vuepress-dumi/dumi',
+  themeConfig: {
+    repo: 'https://github.com/JE-lee/worktable',
+    nav: [
+      { text: 'Home', link: '/' },
+      { text: '指南', link: '/guide/' },
+      { text: '特性', link: '/feature/0inner-component' },
+    ],
+    sidebar: {
+      '/guide/': ['', 'install', 'base-concept', 'base-usage'],
+      '/feature/': ['', ...features],
+    }
+  },
   plugins: [
     '@vuepress-dumi/dumi-previewer'
   ],
   configureWebpack: {
+    output: {
+      publicPath: base,
+    },
     resolve: {
       extensions: ['.tsx', '.ts', '.js'],
       alias: {
@@ -27,6 +52,7 @@ module.exports = {
         ]
       }]
     }
-  }
+  },
+  dest: path.resolve(__dirname, '../../../../docs-site/element-ui')
 
 }

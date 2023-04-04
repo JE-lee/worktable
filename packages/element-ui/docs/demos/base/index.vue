@@ -1,16 +1,21 @@
 <template>
-  <worktable border />
+  <div>
+    <div>
+      <el-button type="primary" size="mini">校验</el-button>
+      <el-button type="primary" size="mini">提交</el-button>
+    </div>
+    <worktable border />
+  </div>
 </template>
 
 <script>
+import { defineComponent, h, nextTick } from 'vue-demi'
 import { useWorktable, Worktable } from '@edsheet/element-ui'
-import { defineComponent, h } from 'vue-demi'
 
 export default defineComponent({
   components: { Worktable },
   setup() {
     const columns = [
-      { type: 'selection', width: 80 },
       {
         title: '序号',
         field: 'seq',
@@ -23,75 +28,74 @@ export default defineComponent({
             seqs.unshift(parent.index + 1)
             parent = parent.parent
           }
-          return h('span', seqs.join('-'))
+          return seqs.join('-')
         },
       },
       {
         title: '名称',
         field: 'name',
         type: 'string',
-        component: 'input',
+        component: 'Input',
       },
       {
         title: '年龄',
         field: 'age',
-        width: 160,
+
         type: 'number',
-        component: 'input',
+        component: 'Input',
         componentProps: {
           type: 'number',
         },
         default: '',
       },
       {
+        title: '性别',
+        field: 'gender',
+        type: 'string',
+        width: 200,
+        component: 'Select',
+        enum: [
+          { label: '男孩', value: 'boy' },
+          { label: '女孩', value: 'girl' },
+        ],
+      },
+      {
         title: '操作',
         field: 'action',
         vitrual: true,
-        width: 200,
-        renderHeader({ add }) {
-          return h(
-            'el-button',
-            {
-              props: {
-                type: 'primary',
-                size: 'mini',
-              },
-              on: {
-                click() {
-                  add()
-                },
-              },
+        width: 120,
+        renderHeader({ worktable }) {
+          return h('el-button', {
+            props: {
+              type: 'primary',
+              size: 'mini',
+              circle: true,
+              icon: 'el-icon-plus',
             },
-            '添加'
-          )
+            on: { click: worktable.add },
+          })
         },
         render: (row) => {
           return h('div', [
             h(
               'el-button',
               {
-                props: {
-                  type: 'primary',
-                  size: 'mini',
-                },
+                props: { type: 'text', size: 'mini' },
                 on: {
                   click: () => {
                     row.addRow()
+                    nextTick(() => row.toggleExpansion(true))
                   },
                 },
               },
-              '添加'
+              '添加组员'
             ),
             h(
               'el-button',
               {
-                props: {
-                  type: 'danger',
-                  size: 'mini',
-                },
-                on: {
-                  click: () => row.removeSelf(),
-                },
+                style: { color: 'red' },
+                props: { type: 'text', size: 'mini' },
+                on: { click: () => row.removeSelf() },
               },
               '删除'
             ),
@@ -99,10 +103,11 @@ export default defineComponent({
         },
       },
     ]
-    useWorktable({
+    const worktable = useWorktable({
+      initialData: [{ name: '琪琪', gender: 'girl' }],
       columns,
     })
-
+    console.log('worktable', worktable)
     return {}
   },
 })
