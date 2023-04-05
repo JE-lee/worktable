@@ -1,9 +1,10 @@
+@import '~element-ui/packages/theme-chalk/src/common/var.scss';
 .worktable {
   .required {
     &::before {
       content: '*';
       display: 'inline';
-      color: #fa4b51;
+      color: $--color-danger;
     }
   }
 }

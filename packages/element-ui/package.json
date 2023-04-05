@@ -48,6 +48,7 @@
     "mobx": "^6.7.0",
     "prismjs": "^1.29.0",
     "raw-loader": "^4.0.2",
+    "sass-loader": "^10",
     "ts-loader": "~8.2.0",
     "vue": "^2.7.14",
     "vue-demi": "^0.13.11",

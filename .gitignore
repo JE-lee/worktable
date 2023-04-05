@@ -5,3 +5,4 @@
 **/esm
 **/docs-site
 .pnpm-store
+**/lib

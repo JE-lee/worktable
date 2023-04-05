@@ -1,12 +1,14 @@
 import typescript from '@rollup/plugin-typescript'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import scss from 'rollup-plugin-scss'
+import copy from 'rollup-plugin-copy'
 
-// TODO: pack style.scss
+const outDir = 'esm'
 const config = {
   input: 'src/index.ts',
   output: {
-    dir: 'esm',
+    dir: outDir,
     format: 'es',
     sourcemap: true,
   },
@@ -16,6 +18,10 @@ const config = {
       tsconfig: './tsconfig.rollup.build.json',
     }),
     nodeResolve(),
+    scss({ fileName: 'style.css' }),
+    copy({
+      targets: [{ src: 'src/styles', dest: `${outDir}/theme` }],
+    }),
   ],
   external: ['vue', 'vue-demi', 'element-ui', '@edsheet/core'],
 }

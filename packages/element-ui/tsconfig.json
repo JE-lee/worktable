@@ -14,10 +14,9 @@
         "src/*"
       ],
       "@edsheet/*": ["../../packages/*/src"] 
-    }
+    },
   },
   "include": [
-    "src/**/*",
-    "docs/**/*"
+    "src"
   ],
 }
