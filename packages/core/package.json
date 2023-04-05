@@ -8,7 +8,7 @@
     "type": "git",
     "url": "https://github.com/JE-lee/worktable.git"
   },
-  "types": "esm/types/index.d.ts",
+  "types": "esm/index.d.ts",
   "scripts": {
     "test": "jest",
     "build": "npm run clean && npm run rollup-build && npm run rollup-ts-alias",
