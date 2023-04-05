@@ -305,10 +305,16 @@ export class Row {
   private makeCellVaidateDescriptor(colDef: Column) {
     const descriptor: Record<string, RuleItem> = {}
     const rawRow = makeRowProxy(this)
+    if (colDef.required) {
+      descriptor[colDef.field] = { type: colDef.type }
+      descriptor[colDef.field].required = true
+      descriptor[colDef.field].message = colDef.requiredMessage
+    }
     if (colDef.rule) {
+      descriptor[colDef.field] = descriptor[colDef.field] || { type: colDef.type }
       const rule = this.getRule(colDef.rule)
       rule.type = rule.type || colDef.type
-      descriptor[colDef.field] = rule
+      Object.assign(descriptor[colDef.field], rule)
       // validator
       if (isFunction(colDef.rule.validator)) {
         Object.assign(descriptor[colDef.field], {

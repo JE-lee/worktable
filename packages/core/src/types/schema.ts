@@ -54,7 +54,7 @@ type ColumnComponentProps = StaticComponentProps | ((row: RowProxy) => StaticCom
 type ColumnConponentListeners = Record<string, (...args: any[]) => void>
 
 export type Rule = Omit<RuleItem, 'transform' | 'asyncValidator' | 'validator'> & {
-  validator?: (value: CellValue, row: RowRaw) => Promise<any> | any
+  validator?: (value: CellValue, row: RowProxy) => Promise<any> | any
 }
 
 export type EffectListener = (...args: EventContext) => void
@@ -64,6 +64,7 @@ export interface Column {
   field: string
   type?: ValueType
   required?: boolean
+  requiredMessage?: string
   disabled?: boolean | ((row: RowProxy) => boolean)
   component?: ColumnComponent
   preview?: ColumnComponent
