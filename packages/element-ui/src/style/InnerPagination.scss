@@ -1,0 +1,17 @@
+@import './var.scss';
+.#{$CLASS-PREFIX}-pagination {
+  &__jumper {
+    width: 80px;
+    &.is-error {
+      border-color: $--color-danger;
+    }
+  }
+  &__selector{
+    &__option {
+      &.is-error {
+        color: $--color-danger;
+      }
+    }
+  }
+  
+}

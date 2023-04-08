@@ -12,6 +12,7 @@ import {
 import { Table as ElTable, TableColumn as ElTableColumn } from 'element-ui'
 import {
   bindWorktable,
+  CLASS_PREFIX,
   getWorktableInjectKey,
   innerDefaultKey,
   ROWID,
@@ -154,7 +155,7 @@ const InnerWorktable = defineComponent({
       return h(
         ElTable,
         {
-          staticClass: 'worktable',
+          staticClass: CLASS_PREFIX,
           ref: 'tableRef',
           attrs: Object.assign({}, attrs, {
             data: visibleDatas.get(),

@@ -5,3 +5,5 @@ export const getWorktableInjectKey = (key = defaultWorktableInjectKey) => `injec
 export const innerDefaultKey = '__inner_default'
 
 export const ROWID = '_rowid'
+
+export const CLASS_PREFIX = 'worktable'

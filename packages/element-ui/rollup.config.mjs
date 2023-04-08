@@ -20,7 +20,7 @@ const config = {
     nodeResolve(),
     scss({ fileName: 'style.css' }),
     copy({
-      targets: [{ src: 'src/styles', dest: `${outDir}/theme` }],
+      targets: [{ src: 'src/style', dest: `${outDir}/theme` }],
     }),
   ],
   external: ['vue', 'vue-demi', 'element-ui', '@edsheet/core'],

@@ -2,7 +2,7 @@ import { defineComponent, h, inject } from 'vue-demi'
 import { observer } from 'mobx-vue'
 import { computed as mcomputed } from 'mobx'
 import { Pagination, Select, Option } from 'element-ui'
-import { flatten, innerDefaultKey } from '@/shared'
+import { CLASS_PREFIX, flatten, innerDefaultKey } from '@/shared'
 import { Context } from '@/types'
 
 function makePages(max: number) {
@@ -54,10 +54,9 @@ export const InnerPagination = observer(
         const jumper = h(
           Select,
           {
-            style: {
-              width: '80px',
-              // FIXME: follow theme color
-              borderColor: hasError ? '#F56C6C' : 'none',
+            class: {
+              [`${CLASS_PREFIX}-pagination__jumper`]: true,
+              'is-error': hasError,
             },
             props: {
               value: props.currentPage,
@@ -81,8 +80,9 @@ export const InnerPagination = observer(
                 h(
                   'span',
                   {
-                    style: {
-                      color: `${errorMap[pageNum] ? 'red' : 'black'}`,
+                    class: {
+                      [`${CLASS_PREFIX}-pagination__selector__option`]: true,
+                      'is-error': errorMap[pageNum],
                     },
                   },
                   [`${pageNum}`]

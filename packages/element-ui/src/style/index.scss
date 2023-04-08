@@ -1,5 +1,8 @@
-@import '~element-ui/packages/theme-chalk/src/common/var.scss';
-.worktable {
+
+@import './var.scss';
+@import './InnerPagination.scss';
+
+.#{$CLASS-PREFIX} {
   .required {
     &::before {
       content: '*';
