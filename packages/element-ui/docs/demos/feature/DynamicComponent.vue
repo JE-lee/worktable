@@ -47,11 +47,11 @@ export default defineComponent({
         title: '喜欢的玩具',
         field: 'toy',
         width: 200,
-        // 组件是动态的
+        // 渲染的组件是动态的，根据性别的不同来渲染不同的组件
         component: (row) => (row.data.gender === 'boy' ? 'Select' : 'Input'),
+        // 组件属性也是动态的
         componentProps: (row) => {
           return {
-            // plachoder 是动态的
             placeholder: row.data.gender === 'boy' ? '请选择' : '请输入',
           }
         },

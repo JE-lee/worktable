@@ -1,10 +1,10 @@
 <template>
   <div>
     <div>
-      <el-button type="primary" size="mini">校验</el-button>
-      <el-button type="primary" size="mini">提交</el-button>
+      <el-button type="primary" size="mini" @click="doValidate">校验</el-button>
+      <el-button type="primary" size="mini" @click="doSubmit">提交</el-button>
     </div>
-    <worktable border />
+    <worktable class="mt-10" border />
   </div>
 </template>
 
@@ -20,7 +20,7 @@ export default defineComponent({
         title: '序号',
         field: 'seq',
         virtual: true,
-        width: 140,
+        width: 80,
         render(row) {
           const seqs = []
           let parent = row
@@ -36,11 +36,12 @@ export default defineComponent({
         field: 'name',
         type: 'string',
         component: 'Input',
+        required: true,
+        requiredMessage: '缺少名称',
       },
       {
         title: '年龄',
         field: 'age',
-
         type: 'number',
         component: 'Input',
         componentProps: {
@@ -62,7 +63,7 @@ export default defineComponent({
       {
         title: '操作',
         field: 'action',
-        vitrual: true,
+        virtual: true,
         width: 120,
         renderHeader({ worktable }) {
           return h('el-button', {
@@ -107,8 +108,25 @@ export default defineComponent({
       initialData: [{ name: '琪琪', gender: 'girl' }],
       columns,
     })
-    console.log('worktable', worktable)
-    return {}
+    function doValidate() {
+      worktable
+        .validate()
+        .then(() => {
+          console.log('validate successed')
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    }
+    async function doSubmit() {
+      await worktable.validate()
+      const data = worktable.getData()
+      console.log('data', data)
+    }
+    return {
+      doValidate,
+      doSubmit,
+    }
   },
 })
 </script>

@@ -12,18 +12,18 @@ const features = utils
 module.exports = {
   base,
   title: 'Worktable',
-  description: 'editbale table, supported vue and react',
+  description: 'Editable table, Supported vue and react',
   theme: '@vuepress-dumi/dumi',
   themeConfig: {
     repo: 'https://github.com/JE-lee/worktable',
     nav: [
       { text: 'Home', link: '/' },
-      { text: '指南', link: '/guide/' },
+      { text: '指南', link: '/guide/install' },
       { text: '特性', link: '/feature/0inner-component' },
     ],
     sidebar: {
-      '/guide/': ['', 'install', 'base-concept', 'base-usage'],
-      '/feature/': ['', ...features],
+      '/guide/': ['install', 'base-usage', 'base-concept'],
+      '/feature/': [...features],
     }
   },
   plugins: [
