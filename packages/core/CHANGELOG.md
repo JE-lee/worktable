@@ -1,5 +1,11 @@
 # @edsheet/core
 
+## 1.3.0
+
+### Patch Changes
+
+- 65b6c43: add requiredMessage of field
+
 ## 1.2.3
 
 ### Patch Changes

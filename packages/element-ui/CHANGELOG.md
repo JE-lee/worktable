@@ -1,5 +1,16 @@
 # @edsheet/element-ui
 
+## 1.3.0
+
+### Minor Changes
+
+- 2ca8fd0: style of worktable
+
+### Patch Changes
+
+- Updated dependencies [65b6c43]
+  - @edsheet/core@1.3.0
+
 ## 1.2.4
 
 ### Patch Changes
