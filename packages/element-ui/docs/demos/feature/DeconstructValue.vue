@@ -3,7 +3,7 @@
     <div>
       <el-button type="primary" size="mini" @click="doSubmit">提交</el-button>
     </div>
-    <worktable border />
+    <worktable class="mt-10" border />
   </div>
 </template>
 

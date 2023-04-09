@@ -11,46 +11,42 @@
 <script>
 import { defineComponent } from 'vue-demi'
 import { useWorktable, Worktable } from '@edsheet/element-ui'
-import { toys } from '../const'
 
 export default defineComponent({
   components: { Worktable },
   setup() {
     const columns = [
       {
-        title: '名称',
-        field: 'name',
-        type: 'string',
-        component: 'Input',
-      },
-      {
         title: '性别',
         field: 'gender',
-        type: 'string',
-        width: 200,
-        component: 'Select',
+        component: 'select',
         enum: [
-          { label: '男孩', value: 'boy' },
-          { label: '女孩', value: 'girl' },
+          { label: '男', value: 'man' },
+          { label: '女', value: 'woman' },
         ],
       },
       {
-        title: '喜欢的玩具',
-        field: 'toy',
-        width: 200,
-        // 渲染的组件是动态的，根据性别的不同来渲染不同的组件
-        component: (row) => (row.data.gender === 'boy' ? 'Select' : 'Input'),
-        // 组件属性也是动态的
-        componentProps: (row) => {
-          return {
-            placeholder: row.data.gender === 'boy' ? '请选择' : '请输入',
-          }
+        title: '年龄',
+        field: 'age',
+        component: 'input',
+        type: 'number',
+        reuqired: true,
+        requiredMessage: '该字段必填',
+        componentProps: { type: 'number' },
+        rule: {
+          validator(val, row) {
+            const gender = row.data.gender
+            if (gender === 'man' && val > 20) {
+              throw '男性要求小于20岁'
+            } else if (gender === 'woman' && val < 20) {
+              throw '女性要求大于20岁'
+            }
+          },
         },
-        enum: toys,
       },
     ]
     const worktable = useWorktable({
-      initialData: [{ name: '琪琪', gender: 'girl' }],
+      initialData: [{ name: '琪琪', gender: 'woman', age: 18 }],
       columns,
     })
     function doValidate() {

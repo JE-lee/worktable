@@ -1,10 +1,10 @@
 <template>
   <div>
     <div>
-      <el-button type="primary" size="mini">校验</el-button>
-      <el-button type="primary" size="mini">提交</el-button>
+      <el-button type="primary" size="mini" @click="doValidate">校验</el-button>
+      <el-button type="primary" size="mini" @click="doSubmit">提交</el-button>
     </div>
-    <worktable border />
+    <worktable class="mt-10" border />
   </div>
 </template>
 
@@ -17,15 +17,6 @@ export default defineComponent({
   components: { Worktable },
   setup() {
     const columns = [
-      {
-        title: '序号',
-        field: 'seq',
-        virtual: true,
-        width: 140,
-        render(row) {
-          return row.index + 1
-        },
-      },
       {
         title: '名称',
         field: 'name',
@@ -47,8 +38,14 @@ export default defineComponent({
         title: '喜欢的玩具',
         field: 'toy',
         width: 200,
-        // plachoder 是动态的
+        // 渲染的组件是动态的，根据性别的不同来渲染不同的组件
         component: (row) => (row.data.gender === 'boy' ? 'Select' : 'Input'),
+        // 组件属性也可以是动态的
+        componentProps: (row) => {
+          return {
+            placeholder: row.data.gender === 'boy' ? '请选择一个玩具' : '请输入玩具名称',
+          }
+        },
         enum: toys,
       },
     ]
@@ -56,8 +53,26 @@ export default defineComponent({
       initialData: [{ name: '琪琪', gender: 'girl' }],
       columns,
     })
-    console.log('worktable', worktable)
-    return {}
+    function doValidate() {
+      worktable
+        .validate()
+        .then(() => {
+          console.log('validate successed')
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    }
+    async function doSubmit() {
+      await worktable.validate()
+      const data = worktable.getData()
+      console.log('data', data)
+    }
+
+    return {
+      doValidate,
+      doSubmit,
+    }
   },
 })
 </script>

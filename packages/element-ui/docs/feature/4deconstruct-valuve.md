@@ -1,6 +1,8 @@
 # 值解构
 
-一种比较常见的情况是，我们需要使用 `Select` 组件选择某个用户或者某个商品，但是接口要求不仅要保存 code, 还需要保存对应的名称。在这种情况下面，我们可以让 `Select` 组件的`value`是一个对象，包含`Option`的所有内容
+一种比较常见的情况是，我们需要使用 `Select` 组件选择某个用户或者某个商品，但是接口要求不仅要保存 code, 还需要保存对应的名称。在这种情况下面，我们可以让 `Select` 组件的`value`是一个对象，包含`Option`的所有内容。此时对应 `field` 的 `value` 类型是 `object`。对于值类型 是`object` 或者 `array` 字段，声明 `field` 的时候可以用 ESMAScript 的结构语法来描述最后真正的字段。
+
+**非解构的写法**
 ```javascript
 import { defineComponent } from 'vue-demi'
 import { useWorktable, Worktable } from '@edsheet/element-ui'
@@ -50,15 +52,20 @@ const columns = [
 ]
 ```
 完整的例子参考如下：
-<code-previewer demoPath="base/DeconstructValue" />
+<code-previewer demoPath="feature/DeconstructValue" />
 
 **此外，我们还可以解构 type 为 array 的值**
 ```javascript
 const columns = [
   {
-    title: '用户',
-    field: '[userCode, userName]',
+    title: '期间',
+    field: '[startDate, endDate]',
     type: 'array',
+    component: 'DatePicker',
+    componnetProps: {
+      type: 'daterange',
+      valueFormat: 'yyyy-MM-dd'
+    }
   },
 ]
 ```
