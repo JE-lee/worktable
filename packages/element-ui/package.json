@@ -8,6 +8,7 @@
     "type": "git",
     "url": "https://github.com/JE-lee/worktable.git"
   },
+  "homepage": "https://je-lee.github.io/worktable/element-ui/",
   "types": "esm/index.d.ts",
   "scripts": {
     "docs:dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress dev docs",
