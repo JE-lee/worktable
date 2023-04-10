@@ -1,5 +1,13 @@
 # @edsheet/element-ui
 
+## 1.3.1
+
+### Patch Changes
+
+- change build target version to es5
+- Updated dependencies
+  - @edsheet/core@1.3.1
+
 ## 1.3.0
 
 ### Minor Changes

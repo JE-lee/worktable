@@ -3,7 +3,6 @@
   "compilerOptions": {
     "sourceMap": false,
     "declaration": true,
-    "target": "es2015",
   },
   "include": ["src/**/*"]
 }
