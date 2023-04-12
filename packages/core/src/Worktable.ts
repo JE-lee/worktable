@@ -119,6 +119,7 @@ export class Worktable extends BaseWorktable {
     return flatten(this.rows).find((r) => r.rid === pos.rid)?.data[pos.field]
   }
 
+  add(raw: void): RowProxy
   add(raw: RowRaw): RowProxy
   add(raw: RowRaw[]): RowProxy[]
   add(raw: RowRaw | RowRaw[]): RowProxy | RowProxy[]

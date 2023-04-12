@@ -83,21 +83,24 @@ const InnerWorktable = defineComponent({
         .filter((col) => !col.hidden)
         .map((col, colIndex) => {
           const scopedSlots: VNodeData['scopedSlots'] = {}
+          // normal column except which type is 'selection' or 'index'
+          if (col.field) {
+            // 在 table-row 渲染函数上执行, 当 cell 的 value 改变时，整行重新渲染
+            scopedSlots.default = (scope) => {
+              const row = scope.row as Record<string, string>
+              const [rid, field] = splitPosKey(row[col.field])
+              const pos = { rid, field }
+              const cell = worktable.getCell(pos)
+              if (!cell && process.env.NODE_ENV === 'development') {
+                console.warn(`not a validable cell in postion ${pos}`)
+              }
 
-          // 在 table-row 渲染函数上执行, 当 cell 的 value 改变时，整行重新渲染
-          scopedSlots.default = (scope) => {
-            const row = scope.row as Record<string, string>
-            const [rid, field] = splitPosKey(row[col.field])
-            const pos = { rid, field }
-            const cell = worktable.getCell(pos)
-            if (!cell && process.env.NODE_ENV === 'development') {
-              console.warn(`not a validable cell in postion ${pos}`)
+              return h(TableCell, {
+                attrs: { cell, colDef: col, colIndex },
+              })
             }
-
-            return h(TableCell, {
-              attrs: { cell, colDef: col, colIndex },
-            })
           }
+
           // column header
           scopedSlots.header = ({ column }) => {
             const field = column.property
@@ -116,6 +119,7 @@ const InnerWorktable = defineComponent({
           }
           return h(ElTableColumn, {
             props: {
+              type: col.type,
               prop: col.field,
               width: col.width,
               fixed: col.fixed,
@@ -123,14 +127,6 @@ const InnerWorktable = defineComponent({
             scopedSlots,
           })
         })
-      // 可多选
-      if (ctx.selectionCtx.selectable) {
-        _columns.unshift(
-          h(ElTableColumn, {
-            props: ctx.selectionCtx.selectedAbleColDef,
-          })
-        )
-      }
 
       return _columns
     }

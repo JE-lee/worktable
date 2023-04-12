@@ -48,9 +48,7 @@ export type Context = {
   toggleRowExpansion: (filter: (row: RowProxy) => boolean, expanded: boolean) => void
   opt: useWorkTableOpt
   selectionCtx: {
-    selectedAbleColDef?: Record<string, any>
     selections: RowProxy[]
-    selectable?: boolean
   }
 }
 

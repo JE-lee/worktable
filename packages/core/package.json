@@ -29,8 +29,7 @@
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
     "await-to-js": "^3.0.0",
-    "mobx": "^6.7.0",
-    "tslib": "^2.5.0"
+    "mobx": "^6.7.0"
   },
   "peerDependencies": {
     "mobx": "^6.7.0"

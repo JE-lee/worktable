@@ -149,7 +149,7 @@ describe('Worktable', () => {
     wt.addRow({ id: 1, code: 9 })
     wt.addRow({ id: 2, code: 9 })
     wt.addRow({ id: 3, code: 9 })
-    wt.remove((row) => row.data.id < 3)
+    wt.remove((row) => (row.data.id as number) < 3)
     expect(wt.rows.length).toBe(1)
 
     wt.removeAll()
@@ -159,5 +159,44 @@ describe('Worktable', () => {
     wt.remove(row2.rid)
     row2.data['code'] = 10
     expect(mockValidator.mock.calls.length).toBe(times + 1)
+  })
+
+  test('Row.index', async () => {
+    const columns = [{ field: 'code' }]
+    const wt = new Worktable(columns)
+    const row1 = wt.add()
+    expect(row1.index).toBe(0)
+    const row2 = wt.add()
+    expect(row2.index).toBe(1)
+
+    wt.remove(row1.rid)
+    expect(row2.index).toBe(0)
+  })
+
+  test('Row.index in children', async () => {
+    const columns = [{ field: 'code' }]
+    const wt = new Worktable(columns)
+    const row = wt.add()
+    const child1 = row.addRow()
+    expect(child1.index).toBe(0)
+    const child2 = row.addRow()
+    expect(child2.index).toBe(1)
+
+    wt.remove(child1.rid)
+    expect(child2.index).toBe(0)
+  })
+
+  test('Row.index is Observable', async () => {
+    const columns = [{ field: 'code' }]
+    const wt = new Worktable(columns)
+    const row1 = wt.add()
+    const row2 = wt.add()
+    const consumer = jest.fn(() => row2.index)
+    reaction(() => wt.rows.slice(0), consumer)
+
+    wt.add()
+    expect(consumer.mock.results[0].value).toBe(1)
+    wt.remove(row1.rid)
+    expect(consumer.mock.results[1].value).toBe(0)
   })
 })

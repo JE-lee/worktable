@@ -32,6 +32,7 @@ importers:
       sass: ^1.60.0
       ts-node: ^10.9.1
       tsc-alias: ^1.8.5
+      tslib: ^2.5.0
       typescript: ^4.9.3
     dependencies:
       '@babel/eslint-parser': 7.21.3_ajivmgign6qnltueqq3ekylg5a
@@ -50,7 +51,7 @@ importers:
       '@babel/preset-typescript': registry.npmmirror.com/@babel/preset-typescript/7.18.6_@babel+core@7.20.5
       '@rollup/plugin-babel': registry.npmmirror.com/@rollup/plugin-babel/6.0.3_w72uq6tdmlatpawplpcdf6gq6e
       '@rollup/plugin-node-resolve': registry.npmmirror.com/@rollup/plugin-node-resolve/15.0.1_rollup@3.6.0
-      '@rollup/plugin-typescript': registry.npmmirror.com/@rollup/plugin-typescript/10.0.1_wkjuozmonqfylkb53r73w7wimu
+      '@rollup/plugin-typescript': registry.npmmirror.com/@rollup/plugin-typescript/10.0.1_iqzjnj45mghvuyj4a3eryghbda
       '@types/jest': registry.npmmirror.com/@types/jest/29.2.3
       babel-jest: registry.npmmirror.com/babel-jest/29.3.1_@babel+core@7.20.5
       eslint-config-prettier: registry.npmmirror.com/eslint-config-prettier/8.5.0_eslint@8.28.0
@@ -64,6 +65,7 @@ importers:
       rollup-plugin-scss: 4.0.0
       sass: 1.60.0
       ts-node: 10.9.1_typescript@4.9.5
+      tslib: 2.5.0
 
   packages/core:
     specifiers:
@@ -72,7 +74,6 @@ importers:
       await-to-js: ^3.0.0
       lodash-es: ^4.17.21
       mobx: ^6.7.0
-      tslib: ^2.5.0
     dependencies:
       async-validator: 4.2.5
       lodash-es: registry.npmmirror.com/lodash-es/4.17.21
@@ -80,7 +81,6 @@ importers:
       '@types/lodash-es': 4.17.6
       await-to-js: 3.0.0
       mobx: registry.npmmirror.com/mobx/6.7.0
-      tslib: 2.5.0
 
   packages/element-ui:
     specifiers:
@@ -1451,7 +1451,7 @@ packages:
     engines: {node: '>=14.15.0'}
     dependencies:
       js-yaml: 3.14.1
-      tslib: registry.npmmirror.com/tslib/2.4.1
+      tslib: 2.5.0
     dev: true
 
   /@zkochan/js-yaml/0.0.6:
@@ -5463,7 +5463,7 @@ packages:
       tar-stream: 2.2.0
       tmp: 0.2.1
       tsconfig-paths: 3.14.1
-      tslib: 2.4.1
+      tslib: 2.5.0
       v8-compile-cache: 2.3.0
       yargs: 17.6.2
       yargs-parser: 21.1.1
@@ -6927,15 +6927,9 @@ packages:
 
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
-    dev: true
-
-  /tslib/2.4.1:
-    resolution: {integrity: sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==}
-    dev: true
 
   /tslib/2.5.0:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
-    dev: true
 
   /tty-table/4.1.6:
     resolution: {integrity: sha512-kRj5CBzOrakV4VRRY5kUWbNYvo/FpOsz65DzI5op9P+cHov3+IqPbo1JE1ZnQGkHdZgNFDsrEjrfqqy/Ply9fw==}
@@ -9230,7 +9224,7 @@ packages:
       rollup: registry.npmmirror.com/rollup/3.6.0
     dev: true
 
-  registry.npmmirror.com/@rollup/plugin-typescript/10.0.1_wkjuozmonqfylkb53r73w7wimu:
+  registry.npmmirror.com/@rollup/plugin-typescript/10.0.1_iqzjnj45mghvuyj4a3eryghbda:
     resolution: {integrity: sha512-wBykxRLlX7EzL8BmUqMqk5zpx2onnmRMSw/l9M1sVfkJvdwfxogZQVNUM9gVMJbjRLDR5H6U0OMOrlDGmIV45A==, registry: https://registry.nlark.com/, tarball: https://registry.npmmirror.com/@rollup/plugin-typescript/-/plugin-typescript-10.0.1.tgz}
     id: registry.npmmirror.com/@rollup/plugin-typescript/10.0.1
     name: '@rollup/plugin-typescript'
@@ -9249,6 +9243,7 @@ packages:
       '@rollup/pluginutils': registry.npmmirror.com/@rollup/pluginutils/5.0.2_rollup@3.6.0
       resolve: registry.npmmirror.com/resolve/1.22.1
       rollup: registry.npmmirror.com/rollup/3.6.0
+      tslib: 2.5.0
       typescript: 4.9.5
     dev: true
 
@@ -18663,7 +18658,7 @@ packages:
     name: rxjs
     version: 7.8.0
     dependencies:
-      tslib: registry.npmmirror.com/tslib/2.4.1
+      tslib: 2.5.0
     dev: false
 
   registry.npmmirror.com/safe-buffer/5.1.2:
@@ -19780,17 +19775,6 @@ packages:
       semver: registry.npmmirror.com/semver/7.3.8
     dev: true
 
-  registry.npmmirror.com/tslib/1.14.1:
-    resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==, registry: https://registry.nlark.com/, tarball: https://registry.npmmirror.com/tslib/-/tslib-1.14.1.tgz}
-    name: tslib
-    version: 1.14.1
-    dev: false
-
-  registry.npmmirror.com/tslib/2.4.1:
-    resolution: {integrity: sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==, registry: https://registry.nlark.com/, tarball: https://registry.npmmirror.com/tslib/-/tslib-2.4.1.tgz}
-    name: tslib
-    version: 2.4.1
-
   registry.npmmirror.com/tsutils/3.21.0_typescript@4.9.5:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==, registry: https://registry.nlark.com/, tarball: https://registry.npmmirror.com/tsutils/-/tsutils-3.21.0.tgz}
     id: registry.npmmirror.com/tsutils/3.21.0
@@ -19800,7 +19784,7 @@ packages:
     peerDependencies:
       typescript: '>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta'
     dependencies:
-      tslib: registry.npmmirror.com/tslib/1.14.1
+      tslib: 1.14.1
       typescript: 4.9.5
     dev: false
 

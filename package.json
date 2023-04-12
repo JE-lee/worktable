@@ -59,7 +59,8 @@
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-scss": "^4.0.0",
     "sass": "^1.60.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "tslib": "^2.5.0"
   },
   "engines": {
     "node": ">17.0"

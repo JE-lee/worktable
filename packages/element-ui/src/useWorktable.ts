@@ -9,10 +9,6 @@ export function useWorktable(opt: useWorkTableOpt) {
   const _opt = { ...opt }
   const columns = [...opt.columns]
   const selectionCtx: Context['selectionCtx'] = { selections: [] }
-  if ((columns[0].type as any) === 'selection') {
-    selectionCtx.selectable = true
-    selectionCtx.selectedAbleColDef = columns.shift()
-  }
   _opt.columns = formatColumns(columns)
   const worktable = new Worktable(_opt)
   const injectKey = getWorktableInjectKey(opt.key)

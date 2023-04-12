@@ -25,7 +25,7 @@ export class Row {
   data: Record<string, Cell> = {}
   children: Row[] = []
   parent?: Row
-  rIndex?: number
+  rIndex = 0
   columns: Column[]
   disposers: Array<() => void> = []
   initialData: Record<string, any> = {}
@@ -38,8 +38,9 @@ export class Row {
     })
   }
 
-  constructor(columns: Column[], raw: RowRaw = {}, parent?: Row, rIndex?: number, wt?: Worktable) {
+  constructor(columns: Column[], raw: RowRaw = {}, parent?: Row, rIndex = 0, wt?: Worktable) {
     makeObservable(this, {
+      rIndex: observable.ref,
       children: observable.shallow,
       addRow: action,
       addRows: action,
@@ -274,6 +275,7 @@ export class Row {
 
   private generate(raw: RowRaw) {
     this.columns.forEach((col) => {
+      if (!col.field) return
       const val = raw?.[col.field] as CellValue
       const cell = Cell.generateBaseCell({
         parent: this,

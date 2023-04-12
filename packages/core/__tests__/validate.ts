@@ -36,7 +36,7 @@ describe('validate', () => {
         field: 'code',
         rule: {
           message: 'must be greater than 10',
-          validator: (value) => {
+          validator: (value: any) => {
             return value > 10
           },
         },
@@ -57,7 +57,7 @@ describe('validate', () => {
       {
         field: 'code',
         rule: {
-          validator: (value) => {
+          validator: (value: any) => {
             return new Promise((resolve, reject) =>
               setTimeout(() => {
                 if (value > 10) resolve('')
