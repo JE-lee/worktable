@@ -63,6 +63,11 @@ export class Worktable extends BaseWorktable {
     return this.getRaws()
   }
 
+  setData(rows: RowRaw | RowRaw[]) {
+    this.removeAll()
+    this.add(rows)
+  }
+
   setValuesInEach(raw: (row: RowProxy) => Record<string, any>, filter: Filter): void
   setValuesInEach(raw: Record<string, any>, filter: Filter): void
   setValuesInEach(raw: any, filter: Filter): void {
@@ -116,7 +121,8 @@ export class Worktable extends BaseWorktable {
 
   add(raw: RowRaw): RowProxy
   add(raw: RowRaw[]): RowProxy[]
-  add(raw: RowRaw | RowRaw[]): RowProxy | RowProxy[] {
+  add(raw: RowRaw | RowRaw[]): RowProxy | RowProxy[]
+  add(raw: any) {
     if (Array.isArray(raw)) {
       return this.addRows(raw)
     } else {

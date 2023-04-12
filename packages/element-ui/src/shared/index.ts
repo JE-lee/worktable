@@ -30,6 +30,7 @@ export function bindWorktable(worktable: Worktable) {
     add: worktable.add.bind(worktable),
     addRow: worktable.addRow.bind(worktable),
     addRows: worktable.addRows.bind(worktable),
+    setData: worktable.setData.bind(worktable),
     getData: worktable.getData.bind(worktable),
     getValues: worktable.getData.bind(worktable),
     setValuesInEach: worktable.setValuesInEach.bind(worktable),

@@ -86,7 +86,7 @@ importers:
     specifiers:
       '@babel/plugin-proposal-nullish-coalescing-operator': ^7.18.6
       '@babel/plugin-proposal-optional-chaining': ^7.20.7
-      '@edsheet/core': workspace:^1.2.3
+      '@edsheet/core': workspace:^1.3.1
       '@types/lodash-es': ^4.17.6
       '@vue/test-utils': '1'
       '@vuepress-dumi/vuepress-plugin-dumi-previewer': ^0.3.11
