@@ -1,5 +1,17 @@
 # @edsheet/element-ui
 
+## 1.4.0
+
+### Minor Changes
+
+- 1a505c7: support 'selection' and 'index' of type of element-ui
+- b4b072f: export setData func
+
+### Patch Changes
+
+- Updated dependencies [1a505c7]
+  - @edsheet/core@1.4.0
+
 ## 1.3.1
 
 ### Patch Changes

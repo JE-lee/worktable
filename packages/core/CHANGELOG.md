@@ -1,5 +1,11 @@
 # @edsheet/core
 
+## 1.4.0
+
+### Minor Changes
+
+- 1a505c7: support 'selection' and 'index' of type of element-ui
+
 ## 1.3.1
 
 ### Patch Changes
