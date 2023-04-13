@@ -1,4 +1,4 @@
-import { Worktable } from '../src'
+import { Column, Worktable } from '../src'
 import { deconstruct } from '../src/field-parser'
 
 describe('field parser', () => {
@@ -56,7 +56,7 @@ describe('field parser', () => {
     expect(row.getValue().productCode).toBe('s2')
   })
 
-  test('value of deconstructed array field', () => {
+  test('value of deconstructed array field #1', () => {
     const field = '[{code:productCode}, price]'
     const columns = [{ field }]
     const wt = new Worktable({ columns })
@@ -74,5 +74,29 @@ describe('field parser', () => {
     expect(raw[field]).toBeUndefined()
     expect(raw.productCode).toBe('s2')
     expect(raw.price).toBe(100)
+  })
+
+  test('value of deconstructed array field #2', () => {
+    const field = '[{code:productCode, name:productName}]'
+    const columns: Column[] = [{ field, type: 'array' }]
+    const wt = new Worktable({ columns })
+
+    const row = wt.addRow({ productCode: 's1', price: 12 })
+
+    let raw = row.getValue()
+    expect(raw[field]).toBeUndefined()
+    expect(raw.productCode).toBe('s1')
+    expect(raw.price).toBe(12)
+
+    wt.inputValue({ rid: row.rid, field }, [
+      { code: 's2', name: '65 inch tv' },
+      { code: 's3', name: '75 inch tv' },
+      { code: 's4', name: '86 inch tv' },
+    ])
+
+    raw = row.getValue()
+    expect(raw[field]).toBeUndefined()
+    expect(raw.productCode).toBe('s2')
+    expect(raw.productName).toBe('65 inch tv')
   })
 })
