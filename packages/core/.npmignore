@@ -4,6 +4,9 @@ scripts
 babel.config.js
 jest.config.ts
 rollup.config.mjs
+tsconfig.json
 tsconfig.**.json
-__test__
+__tests__
 docs
+.eslintrc.**
+coverage
