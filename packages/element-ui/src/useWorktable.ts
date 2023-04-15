@@ -5,7 +5,7 @@ import { provide, shallowRef } from 'vue-demi'
 import { bindWorktable, getWorktableInjectKey, mergePosKey, ROWID, walk } from '@/shared'
 import { InnerRender } from '@/components/InnerComponent'
 
-export function useWorktable(opt: useWorkTableOpt) {
+export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
   const _opt = { ...opt }
   const columns = [...opt.columns]
   const selectionCtx: Context['selectionCtx'] = { selections: [] }
@@ -49,6 +49,10 @@ export function useWorktable(opt: useWorkTableOpt) {
     toggleRowExpansion,
     removeSelectedRows,
     ...bindWorktable(worktable),
+    setColumns: (cols: UIColumn[]) => {
+      const columns = formatColumns(cols)
+      return worktable.setColumns(columns)
+    },
   }
 }
 
