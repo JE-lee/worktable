@@ -1,6 +1,6 @@
 import { RuleItem } from 'async-validator'
 import type { Row } from '../Row'
-import { RowErrors, StaticComponentProps } from './share'
+import { StaticComponentProps } from './share'
 
 export type Options = Array<{ label: string; value: any }>
 
@@ -20,6 +20,11 @@ export interface CellPosition {
   field: string // colomn field
 }
 
+export type CellErrors = string[]
+export type TableErrors = Array<Record<string, CellErrors>>
+
+export type RowErrors = Record<string, CellErrors>
+
 // TODO: recursive type
 export type RowRaw = {
   [field: string]: CellValue | RowRaw[]
@@ -32,6 +37,7 @@ export type RowAction = Pick<
   removeRow: Row['remove']
   removeAllRow: Row['removeAll']
   getValue: Row['getRaw']
+  getValues: Row['getRaw']
 }
 
 export type RowProxy = {
@@ -45,7 +51,7 @@ export type RowProxy = {
 
 export type RowRaws = Array<RowRaw>
 
-export type EventContext = any[]
+export type EventContext = [CellValue, RowProxy]
 
 type ColumnComponent = any
 
@@ -57,8 +63,8 @@ export type Rule = Omit<RuleItem, 'transform' | 'asyncValidator' | 'validator'> 
   validator?: (value: CellValue, row: RowProxy) => Promise<any> | any
 }
 
-export type EffectListener = (...args: EventContext) => void
-
+export type FieldEffectListener = (val: CellValue, row: RowProxy, errors?: CellErrors) => void
+export type TableEffectListener = (errors?: TableErrors) => void
 export interface Column {
   title?: string
   field: string
@@ -77,7 +83,7 @@ export interface Column {
   hidden?: boolean
   virtual?: boolean
   effects?: {
-    [eventName: string]: EffectListener
+    [eventName: string]: FieldEffectListener
   }
   width?: number
 }

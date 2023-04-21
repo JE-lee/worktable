@@ -6,9 +6,10 @@ import {
   RowRaws,
   Filter,
   RowRaw,
-  EffectListener,
+  FieldEffectListener,
   StaticComponentProps,
   RowProxy,
+  TableEffectListener,
 } from './types'
 import { cloneDeep, isObject, isFunction, isEmpty } from 'lodash-es'
 import { BaseWorktable } from './BaseWorktable'
@@ -17,6 +18,11 @@ import { Row } from './Row'
 import { flatten, makeRowProxy, walk } from './share'
 import { FIELD_EVENT_NAME, TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME } from './event'
 import { deconstruct } from './field-parser'
+
+type TableEventForCell =
+  | TABLE_EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE
+  | TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE
+
 export class Worktable extends BaseWorktable {
   constructor(opt: WorktableConstructorOpt)
   constructor(columns: Column[])
@@ -194,15 +200,18 @@ export class Worktable extends BaseWorktable {
     }
   }
 
-  addEffect(eventName: TABLE_EVENT_NAME, listener: EffectListener) {
+  addEffect<T extends TABLE_EVENT_NAME>(
+    eventName: T,
+    listener: T extends TableEventForCell ? FieldEffectListener : TableEffectListener
+  ) {
     return this.on(TABLE_EFFECT_NAMESPACE, eventName, listener)
   }
 
-  addFieldEffect(feild: string, eventName: FIELD_EVENT_NAME, listener: EffectListener) {
+  addFieldEffect(feild: string, eventName: FIELD_EVENT_NAME, listener: FieldEffectListener) {
     return this.on(feild, eventName, listener)
   }
 
-  removeEffect(eventName: TABLE_EVENT_NAME, listener?: EffectListener) {
+  removeEffect(eventName: TABLE_EVENT_NAME, listener?: FieldEffectListener) {
     return this.off(TABLE_EFFECT_NAMESPACE, eventName, listener)
   }
 

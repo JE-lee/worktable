@@ -224,7 +224,7 @@ export class Row {
     cell.setState('validating', true)
     const validator = new ValidateSchema(descriptor)
     if (needEmitError) {
-      this.wt?.notify(
+      this.wt?.notifyFieldEvent(
         colDef.field,
         FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START,
         cell.cellValue,
@@ -238,7 +238,7 @@ export class Row {
           cell.setState('errors', [])
         }
         if (needEmitError) {
-          this.wt?.notify(
+          this.wt?.notifyFieldEvent(
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_SUCCESS,
             cell.cellValue,
@@ -251,7 +251,7 @@ export class Row {
         if (needEmitError) {
           const errors = err.errors.map((err: any) => err.message)
           cell.setState('errors', errors)
-          this.wt?.notify(
+          this.wt?.notifyFieldEvent(
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FAIL,
             cell.cellValue,
@@ -264,7 +264,7 @@ export class Row {
       .finally(() => {
         cell.setState('validating', false)
         if (needEmitError) {
-          this.wt?.notify(
+          this.wt?.notifyFieldEvent(
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH,
             cell.cellValue,

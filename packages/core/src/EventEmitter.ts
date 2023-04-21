@@ -1,6 +1,13 @@
-import { EffectListener } from './types'
+import {
+  CellErrors,
+  CellValue,
+  FieldEffectListener,
+  RowProxy,
+  TableEffectListener,
+  TableErrors,
+} from './types'
 
-type EventMap = Record<string, EffectListener[]>
+type EventMap = Record<string, (FieldEffectListener | TableEffectListener)[]>
 type Events = Record<string, EventMap>
 export class EventEmitter {
   constructor(private events: Events = {}, private isPaused = false) {}
@@ -13,23 +20,39 @@ export class EventEmitter {
     this.isPaused = false
   }
 
-  on(namespace: string, eventName: string, cb: EffectListener) {
+  on(namespace: string, eventName: string, cb: FieldEffectListener | TableEffectListener) {
     this.events[namespace] = this.events[namespace] || {}
     this.events[namespace][eventName] = this.events[namespace][eventName] || []
     this.events[namespace][eventName].push(cb)
   }
 
-  notify(namespace: string, eventName: string, ...args: any[]) {
+  notifyFieldEvent(
+    namespace: string,
+    eventName: string,
+    val: CellValue,
+    row: RowProxy,
+    errors?: CellErrors
+  ) {
     if (this.events[namespace] && this.events[namespace][eventName]) {
       this.events[namespace][eventName].forEach((cb) => {
         if (!this.isPaused) {
-          cb(...args)
+          ;(cb as FieldEffectListener)(val, row, errors)
         }
       })
     }
   }
 
-  off(namespace: string, eventName: string, listener?: EffectListener) {
+  notifyTableEvent(namespace: string, eventName: string, errors?: TableErrors) {
+    if (this.events[namespace] && this.events[namespace][eventName]) {
+      this.events[namespace][eventName].forEach((cb) => {
+        if (!this.isPaused) {
+          ;(cb as TableEffectListener)(errors)
+        }
+      })
+    }
+  }
+
+  off(namespace: string, eventName: string, listener?: FieldEffectListener | TableEffectListener) {
     if (this.events[namespace] && this.events[namespace][eventName]) {
       if (!listener) {
         this.events[namespace][eventName] = []

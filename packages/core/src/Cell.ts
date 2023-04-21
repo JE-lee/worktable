@@ -85,15 +85,16 @@ export class Cell {
   }
 
   notifyValueFieldEvent(eventName: FIELD_EVENT_NAME) {
+    // FIXME: 对于数组，这里不是不可变的
     const val = cloneDeep(this.cellValue)
     const rowProxy = makeRowProxy(this.parent)
-    this.evProxy?.notify(this.colDef.field, eventName, val, rowProxy)
+    this.evProxy?.notifyFieldEvent(this.colDef.field, eventName, val, rowProxy)
   }
 
   notifyValueTableEvent(eventName: TABLE_EVENT_NAME) {
     const val = cloneDeep(this.cellValue)
     const rowProxy = makeRowProxy(this.parent)
-    this.evProxy?.notify(TABLE_EFFECT_NAMESPACE, eventName, val, rowProxy)
+    this.evProxy?.notifyFieldEvent(TABLE_EFFECT_NAMESPACE, eventName, val, rowProxy)
   }
 
   deconstructValue() {

@@ -2,6 +2,7 @@ import { mapValues } from 'lodash-es'
 import { flatten } from './share'
 import { Row } from './Row'
 import { EventEmitter } from './EventEmitter'
+import type { TableErrors } from './types'
 export class Validator extends EventEmitter {
   rows: Row[] = []
 
@@ -26,7 +27,7 @@ export class Validator extends EventEmitter {
     flatten(this.rows).forEach((row) => row.stopWatchValidation())
   }
 
-  getValidateErrors() {
+  getValidateErrors(): TableErrors {
     return flatten(this.rows).map((row) => mapValues(row.data, (cell) => [...cell.errors]))
   }
 }

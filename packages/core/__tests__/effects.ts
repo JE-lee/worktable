@@ -1,4 +1,8 @@
-import { Worktable, Column, FIELD_EVENT_NAME } from '../src'
+import { Worktable, FIELD_EVENT_NAME, TABLE_EVENT_NAME } from '../src'
+import type { FieldEffectListener, TableEffectListener, Column } from '../src'
+
+type ParamsFeidlEffectListener = Parameters<FieldEffectListener>
+type ParamsTableEffectListener = Parameters<TableEffectListener>
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -59,7 +63,7 @@ describe('effects', () => {
     const start = jest.fn((value, row) => [value, row.data.code])
     const finish = jest.fn((value, row) => [value, row.data.code])
     const success = jest.fn((value, row) => [value, row.data.code])
-    const fail = jest.fn((errors, value, row) => [errors, value, row.data.code])
+    const fail = jest.fn((value, row, errors) => [value, row.data.code, errors])
     const wt = generateWorktable({
       [FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START]: start,
       [FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH]: finish,
@@ -99,6 +103,77 @@ describe('effects', () => {
     expect(success.mock.calls.length).toBe(1)
     expect(fail.mock.calls.length).toBe(2)
 
-    expect(fail.mock.results[1].value).toEqual([[message], NaN, NaN])
+    expect(fail.mock.results[1].value).toEqual([NaN, NaN, [message]])
+  })
+
+  test('event of table', async () => {
+    const onFieldInputValueChange = jest.fn<
+      ParamsFeidlEffectListener[0],
+      ParamsFeidlEffectListener
+    >((val) => val)
+    const onFieldValueChange = jest.fn<ParamsFeidlEffectListener[0], ParamsFeidlEffectListener>(
+      (val) => val
+    )
+    const validateStart = jest.fn(() => 'called')
+    const validateFinish = jest.fn(() => 'called')
+    const validateSuccess = jest.fn(() => 'called')
+    const validateFail = jest.fn<ParamsTableEffectListener[0], ParamsTableEffectListener>(
+      (errors) => errors
+    )
+
+    const msg = "can't large than 10"
+    const columns: Column[] = [
+      {
+        field: 'code',
+        type: 'number',
+        rule: {
+          validator(value) {
+            if ((value as number) > 10) throw msg
+          },
+        },
+      },
+    ]
+
+    const wt = new Worktable(columns)
+    wt.addEffect(TABLE_EVENT_NAME.ON_FIELD_INPUT_VALUE_CHANGE, onFieldInputValueChange)
+    wt.addEffect(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE, onFieldValueChange)
+    wt.addEffect(TABLE_EVENT_NAME.ON_VALIDATE_START, validateStart)
+    wt.addEffect(TABLE_EVENT_NAME.ON_VALIDATE_FINISH, validateFinish)
+    wt.addEffect(TABLE_EVENT_NAME.ON_VALIDATE_SUCCESS, validateSuccess)
+    wt.addEffect(TABLE_EVENT_NAME.ON_VALIDATE_FAIL, validateFail)
+
+    const row = wt.add()
+
+    wt.inputValue({ rid: row.rid, field: 'code' }, 8)
+
+    await delay(0)
+    expect(onFieldInputValueChange).toBeCalledTimes(1)
+    expect(onFieldValueChange).toBeCalledTimes(1)
+    expect(validateStart).toBeCalledTimes(0)
+    expect(validateFinish).toBeCalledTimes(0)
+    expect(validateSuccess).toBeCalledTimes(0)
+    expect(validateFail).toBeCalledTimes(0)
+
+    await wt.validate()
+    expect(validateStart).toBeCalledTimes(1)
+    expect(validateFinish).toBeCalledTimes(1)
+    expect(validateSuccess).toBeCalledTimes(1)
+    expect(validateFail).toBeCalledTimes(0)
+
+    row.data.code = 12
+    await delay(0)
+    expect(onFieldInputValueChange).toBeCalledTimes(1)
+    expect(onFieldValueChange).toBeCalledTimes(2)
+
+    try {
+      await wt.validate()
+    } catch {
+      // not empty
+    }
+    expect(validateStart).toBeCalledTimes(2)
+    expect(validateFinish).toBeCalledTimes(2)
+    expect(validateSuccess).toBeCalledTimes(1)
+    expect(validateFail).toBeCalledTimes(1)
+    expect(validateFail).lastReturnedWith([{ code: [msg] }])
   })
 })
