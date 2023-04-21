@@ -161,9 +161,10 @@ export class Row {
     return this.data[field]?.setComponentProps(extralProps)
   }
 
-  reset(field?: string) {
+  reset(field?: string | string[]) {
     if (field) {
-      this.data[field]?.reset()
+      const fields = Array.isArray(field) ? field : [field]
+      fields.forEach((field) => this.data[field]?.reset())
     } else {
       // reset all
       Object.values(this.data).forEach((cell) => cell.reset())
@@ -248,14 +249,14 @@ export class Row {
       })
       .catch((err) => {
         if (needEmitError) {
-          const errors = [err.errors[0]?.message]
+          const errors = err.errors.map((err: any) => err.message)
           cell.setState('errors', errors)
           this.wt?.notify(
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FAIL,
-            errors,
             cell.cellValue,
-            makeRowProxy(this)
+            makeRowProxy(this),
+            errors
           )
         }
         throw err

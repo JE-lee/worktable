@@ -68,9 +68,12 @@ export class Worktable extends BaseWorktable {
     this.add(rows)
   }
 
-  setValuesInEach(raw: (row: RowProxy) => Record<string, any>, filter: Filter): void
-  setValuesInEach(raw: Record<string, any>, filter: Filter): void
-  setValuesInEach(raw: any, filter: Filter): void {
+  setValuesInEach(raw: (row: RowProxy) => Record<string, any>, filter?: Filter): void
+  setValuesInEach(raw: Record<string, any>, filter?: Filter): void
+  setValuesInEach(raw: any, filter?: Filter): void {
+    if (!filter) {
+      filter = () => true
+    }
     const rows = this.findAllRows(filter)
     rows.forEach((row) => {
       if (isFunction(raw)) {
@@ -150,7 +153,7 @@ export class Worktable extends BaseWorktable {
     this.stopWatchValidation()
   }
 
-  findAll(filter: Filter) {
+  findAll(filter?: Filter) {
     return this.findAllRows(filter).map((row) => makeRowProxy(row))
   }
 
@@ -216,7 +219,11 @@ export class Worktable extends BaseWorktable {
     walk(this.rows, (row) => processor(makeRowProxy(row)))
   }
 
-  private findAllRows(filter: Filter) {
+  submit() {
+    return this.validate()
+  }
+
+  private findAllRows(filter: Filter = () => true) {
     const rows: Row[] = []
     walk(this.rows, (row) => {
       if (filter(makeRowProxy(row, true))) {

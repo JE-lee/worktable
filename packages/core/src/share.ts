@@ -91,8 +91,8 @@ export function makeRowAction(row: Row): RowAction {
   const setComponentProps = row.setComponentProps.bind(row)
   const reset = row.reset.bind(row)
   const setValues = row.setValues.bind(row)
+  const getValues = row.getRaw.bind(row)
   const getValue = row.getRaw.bind(row)
-
   return {
     reset,
     addRow,
@@ -102,6 +102,7 @@ export function makeRowAction(row: Row): RowAction {
     removeAllRow,
     setComponentProps,
     setValues,
+    getValues,
     getValue,
   }
 }
