@@ -86,7 +86,7 @@ importers:
     specifiers:
       '@babel/plugin-proposal-nullish-coalescing-operator': ^7.18.6
       '@babel/plugin-proposal-optional-chaining': ^7.20.7
-      '@edsheet/core': workspace:^1.3.1
+      '@edsheet/core': workspace:^1.5.0
       '@types/lodash-es': ^4.17.6
       '@vue/test-utils': '1'
       '@vuepress-dumi/vuepress-plugin-dumi-previewer': ^0.3.11
@@ -2358,11 +2358,6 @@ packages:
   /core-js/2.6.12:
     resolution: {integrity: sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ==}
     deprecated: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
-    requiresBuild: true
-    dev: true
-
-  /core-js/3.26.1:
-    resolution: {integrity: sha512-21491RRQVzUn0GGM9Z1Jrpr6PNPxPi+Za8OM9q4tksTSnlbXXGKK1nXNg/QvwFYettXvSX6zWKCtHHfjN4puyA==}
     requiresBuild: true
     dev: true
 
@@ -9856,12 +9851,13 @@ packages:
       svg-tags: registry.npmmirror.com/svg-tags/1.0.0
     dev: true
 
-  registry.npmmirror.com/@vue/babel-preset-app/4.5.19_vue@2.7.14:
+  registry.npmmirror.com/@vue/babel-preset-app/4.5.19_core-js@3.26.1+vue@2.7.14:
     resolution: {integrity: sha512-VCNRiAt2P/bLo09rYt3DLe6xXUMlhJwrvU18Ddd/lYJgC7s8+wvhgYs+MTx4OiAXdu58drGwSBO9SPx7C6J82Q==, registry: https://registry.nlark.com/, tarball: https://registry.npmmirror.com/@vue/babel-preset-app/-/babel-preset-app-4.5.19.tgz}
     id: registry.npmmirror.com/@vue/babel-preset-app/4.5.19
     name: '@vue/babel-preset-app'
     version: 4.5.19
     peerDependencies:
+      core-js: ^3
       vue: ^2 || ^3.0.0-0
     peerDependenciesMeta:
       core-js:
@@ -9882,7 +9878,7 @@ packages:
       '@vue/babel-plugin-jsx': registry.npmmirror.com/@vue/babel-plugin-jsx/1.1.1_@babel+core@7.20.5
       '@vue/babel-preset-jsx': registry.npmmirror.com/@vue/babel-preset-jsx/1.4.0_irtg5bf5mab3inz6zbdi3hxawe
       babel-plugin-dynamic-import-node: registry.npmmirror.com/babel-plugin-dynamic-import-node/2.3.3
-      core-js: 3.26.1
+      core-js: registry.npmmirror.com/core-js/3.26.1
       core-js-compat: registry.npmmirror.com/core-js-compat/3.26.1
       semver: 6.3.0
       vue: registry.npmmirror.com/vue/2.7.14
@@ -10096,7 +10092,7 @@ packages:
     engines: {node: '>=8.6'}
     dependencies:
       '@babel/core': registry.npmmirror.com/@babel/core/7.20.5
-      '@vue/babel-preset-app': registry.npmmirror.com/@vue/babel-preset-app/4.5.19_vue@2.7.14
+      '@vue/babel-preset-app': registry.npmmirror.com/@vue/babel-preset-app/4.5.19_core-js@3.26.1+vue@2.7.14
       '@vuepress/markdown': registry.npmmirror.com/@vuepress/markdown/1.9.7
       '@vuepress/markdown-loader': registry.npmmirror.com/@vuepress/markdown-loader/1.9.7
       '@vuepress/plugin-last-updated': registry.npmmirror.com/@vuepress/plugin-last-updated/1.9.7
@@ -10126,7 +10122,7 @@ packages:
       url-loader: registry.npmmirror.com/url-loader/1.1.2_webpack@4.46.0
       vue: registry.npmmirror.com/vue/2.7.14
       vue-loader: registry.npmmirror.com/vue-loader/15.10.1_lbhzzmlqoxkdndxnphn2sqq4kq
-      vue-router: registry.npmmirror.com/vue-router/3.6.5
+      vue-router: registry.npmmirror.com/vue-router/3.6.5_vue@2.7.14
       vue-server-renderer: registry.npmmirror.com/vue-server-renderer/2.7.14
       vue-template-compiler: registry.npmmirror.com/vue-template-compiler/2.7.14
       vuepress-html-webpack-plugin: registry.npmmirror.com/vuepress-html-webpack-plugin/3.2.0_webpack@4.46.0
@@ -20321,10 +20317,15 @@ packages:
       - whiskers
     dev: true
 
-  registry.npmmirror.com/vue-router/3.6.5:
+  registry.npmmirror.com/vue-router/3.6.5_vue@2.7.14:
     resolution: {integrity: sha512-VYXZQLtjuvKxxcshuRAwjHnciqZVoXAjTjcqBTz4rKc8qih9g9pI3hbDjmqXaHdgL3v8pV6P8Z335XvHzESxLQ==, registry: https://registry.nlark.com/, tarball: https://registry.npmmirror.com/vue-router/-/vue-router-3.6.5.tgz}
+    id: registry.npmmirror.com/vue-router/3.6.5
     name: vue-router
     version: 3.6.5
+    peerDependencies:
+      vue: ^2
+    dependencies:
+      vue: registry.npmmirror.com/vue/2.7.14
     dev: true
 
   registry.npmmirror.com/vue-server-renderer/2.7.14:

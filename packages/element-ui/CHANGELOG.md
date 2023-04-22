@@ -1,5 +1,21 @@
 # @edsheet/element-ui
 
+## 1.5.0
+
+### Minor Changes
+
+- 7f868c9: support loading state of Cell
+- 774bd2b: expose some useful function
+- d51dd10: persistent inner state of AsyncSelect
+
+### Patch Changes
+
+- f8303cf: not render component when re-setColumns
+- Updated dependencies [7f868c9]
+- Updated dependencies [774bd2b]
+- Updated dependencies [d51dd10]
+  - @edsheet/core@1.5.0
+
 ## 1.4.0
 
 ### Minor Changes

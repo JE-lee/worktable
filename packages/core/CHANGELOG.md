@@ -1,5 +1,13 @@
 # @edsheet/core
 
+## 1.5.0
+
+### Minor Changes
+
+- 7f868c9: support loading state of Cell
+- 774bd2b: expose some useful function
+- d51dd10: persistent inner state of AsyncSelect
+
 ## 1.4.0
 
 ### Minor Changes
