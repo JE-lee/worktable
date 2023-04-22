@@ -1,5 +1,5 @@
 # 内置组件
-基于 Element-ui 组件库，封装了一些内置的表单组件：
+基于 Element-ui 组件库，提供了一些内置的表单组件：
 * Input
 * Select
 * AsyncSelect
@@ -7,6 +7,7 @@
 * Cascader
 * RadioGroup
 * CheckboxGroup
+* Render
 
 ## Input
 ### API
@@ -25,7 +26,11 @@
 |valueProp|string|value 字段在 option 中对应的字段|'label'|
 
 ## AsyncSelect
-支持异步的 options
+
+异步搜索下拉框
+
+<code-previewer demoPath="feature/AddressLinkage" />
+
 ### API
 参考 [Select](#select)
 
@@ -55,5 +60,19 @@
 
 ## RadioGroup
 
+计划中
+
 ## CheckboxGroup
+
+计划中
+
+## Render
+
+自定义渲染组件
+
+### 属性
+|属性|类型|描述|默认值|
+|----|----|----|----|
+|render|(row: RowProxy, wt: WorktableReturn)|渲染函数，返回 VNode |true|
+
 

@@ -9,6 +9,12 @@ const features = utils
 .filter((item) => item !== 'index')
 .sort((a,b) => parseInt(a) - parseInt(b))
 
+const api = utils
+.getFiles(path.resolve(__dirname, '../api'))
+.map((item) => item.replace(/(\.md)/g, ''))
+.filter((item) => item !== 'index')
+.sort((a,b) => parseInt(a) - parseInt(b))
+
 module.exports = {
   base,
   title: 'Worktable',
@@ -20,10 +26,12 @@ module.exports = {
       { text: 'Home', link: '/' },
       { text: '指南', link: '/guide/install' },
       { text: '特性', link: '/feature/0inner-component' },
+      { text: 'API', link: '/api/0Column' },
     ],
     sidebar: {
-      '/guide/': ['install', 'base-usage', 'base-concept'],
+      '/guide/': ['install', 'base-usage'],
       '/feature/': [...features],
+      '/api/': [...api]
     }
   },
   plugins: [
