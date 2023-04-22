@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - doc
+      - release
 env:
   CI: true
   PNPM_CACHE_FOLDER: .pnpm-store
