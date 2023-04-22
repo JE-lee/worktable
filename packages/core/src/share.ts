@@ -93,6 +93,7 @@ export function makeRowAction(row: Row): RowAction {
   const setValues = row.setValues.bind(row)
   const getValues = row.getRaw.bind(row)
   const getValue = row.getRaw.bind(row)
+  const setLoading = row.setLoading.bind(row)
   return {
     reset,
     addRow,
@@ -104,6 +105,7 @@ export function makeRowAction(row: Row): RowAction {
     setValues,
     getValues,
     getValue,
+    setLoading,
   }
 }
 

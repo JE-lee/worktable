@@ -38,6 +38,7 @@ export type RowAction = Pick<
   removeAllRow: Row['removeAll']
   getValue: Row['getRaw']
   getValues: Row['getRaw']
+  setLoading: Row['setLoading']
 }
 
 export type RowProxy = {

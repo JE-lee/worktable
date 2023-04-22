@@ -19,6 +19,7 @@ import ValidateSchema from 'async-validator'
 import { FIELD_EVENT_NAME, TABLE_EVENT_NAME } from './event'
 import { deconstruct } from './field-parser'
 
+type CellBoolState = 'previewing' | 'loading' | 'validating'
 export class Row {
   static rid = 1
   rid: number
@@ -171,6 +172,17 @@ export class Row {
     }
   }
 
+  setLoading(loading: boolean): void
+  setLoading(field: string | string[], loading: boolean): void
+  setLoading(field?: any, loading?: boolean) {
+    if (typeof field === 'boolean') {
+      loading = field
+      field = Object.keys(this.data)
+    }
+
+    this.setBoolState(field, 'loading', !!loading)
+  }
+
   get errors(): RowErrors {
     return mapValues(this.data, (cell) => cell.errors)
   }
@@ -181,6 +193,16 @@ export class Row {
   //     cell.notifyValueTableEvent(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
   //   })
   // }
+
+  private setBoolState(field: string | string[], state: CellBoolState, val: boolean) {
+    if (field) {
+      const fields = Array.isArray(field) ? field : [field]
+      fields.forEach((field) => this.data[field]?.setState(state, val))
+    } else {
+      // set all cells loading
+      Object.values(this.data).forEach((cell) => cell.setState(state, val))
+    }
+  }
 
   private notifyCellInitializationEvent() {
     Object.values(this.data).forEach((cell) => {

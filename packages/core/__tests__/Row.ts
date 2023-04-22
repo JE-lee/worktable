@@ -94,4 +94,20 @@ describe('Row', () => {
     const row5 = new Row(columns3)
     expect(row5.data['code'].value).toEqual({ c: 3 })
   })
+
+  test('setLoading', () => {
+    const columns: Column[] = [{ field: 'code' }]
+    const row = new Row(columns, { code: '1' })
+
+    row.setLoading('code', true)
+    expect(row.data['code'].loading).toBe(true)
+    row.data['code'].loading = false
+
+    row.setLoading(['code'], true)
+    expect(row.data['code'].loading).toBe(true)
+    row.data['code'].loading = false
+
+    row.setLoading(true)
+    expect(row.data['code'].loading).toBe(true)
+  })
 })

@@ -16,6 +16,7 @@ import { getInnerComponent, InnerText } from './InnerComponent'
 import { getInnerPreview } from './InnerPreview'
 import { Feedback } from './Feedback'
 import { observer } from 'mobx-vue'
+import { Loading } from './Loading'
 
 export const TableCell = observer(
   defineComponent({
@@ -144,6 +145,10 @@ export function mergePreview(component: VueComponent, Preview?: VueComponent) {
             persist: (props: any) => persistInnerState(cell, props),
           })
 
+          if (cell.loading) {
+            componentProps.disabled = true
+          }
+
           // enum
           const mergeProps = mergePropsFromColumn(colDef)
 
@@ -166,10 +171,16 @@ export function mergePreview(component: VueComponent, Preview?: VueComponent) {
                 nativeOn: { click: onDomClick },
               })
             } else {
-              return h(component, {
-                ref: FORM_INPUT,
-                attrs: Object.assign(mergeAttrs, mergeProps, componentProps, { value }),
-                on: Object.assign({}, listeners as any),
+              return h(Loading, {
+                props: { loading: cell.loading },
+                scopedSlots: {
+                  default: () =>
+                    h(component, {
+                      ref: FORM_INPUT,
+                      attrs: Object.assign(mergeAttrs, mergeProps, componentProps, { value }),
+                      on: Object.assign({}, listeners as any),
+                    }),
+                },
               })
             }
           }

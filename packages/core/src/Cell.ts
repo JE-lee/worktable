@@ -13,6 +13,7 @@ export class Cell {
   value: CellValue
   previewing = true
   validating = false
+  loading = false
   modified = false
   errors: string[] = []
   position: CellPosition
@@ -54,6 +55,7 @@ export class Cell {
       value: observable.ref,
       previewing: observable.ref,
       validating: observable.ref,
+      loading: observable.ref,
       errors: observable,
       position: observable,
       staticComponentProps: observable.ref,

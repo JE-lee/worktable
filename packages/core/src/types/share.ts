@@ -7,7 +7,7 @@ export interface WorktableConstructorOpt {
   initialData?: RowRaws
 }
 
-export type CellState = 'value' | 'previewing' | 'validating' | 'errors'
+export type CellState = 'value' | 'previewing' | 'validating' | 'errors' | 'loading'
 
 export type Filter = (row: RowProxy) => boolean
 
