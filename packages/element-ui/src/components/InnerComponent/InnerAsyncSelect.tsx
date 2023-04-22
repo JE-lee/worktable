@@ -1,7 +1,8 @@
 import { defineComponent, h, shallowRef, onBeforeMount, Ref, ref, watchEffect } from 'vue-demi'
 import { InnerSelect } from './InnerSelect'
 import { isFunction } from 'lodash-es'
-import { FocusAble } from '@/types'
+import type { FocusAble } from '@/types'
+import { usePersistentContext } from '@/shared'
 
 const SELECT_REF = 'select-ref'
 export const InnerAsyncSelect = defineComponent({
@@ -25,45 +26,41 @@ export const InnerAsyncSelect = defineComponent({
       type: Array,
       default: () => [],
     },
-    persist: {
-      type: Function,
-      required: true,
-    },
   },
   setup(props, { attrs, listeners }) {
-    const options: Ref<any[]> = shallowRef([])
+    const state = usePersistentContext({
+      fetched: false,
+      searched: false,
+      times: 0,
+      anchor: 0,
+      loading: false,
+      options: [] as any[],
+    })
 
-    let fetched = false
-    let searched = false
-    let times = 0
-    let anchor = 0
+    watchEffect(() => {
+      state.options = props.options || []
+    })
 
-    const loading = ref(false)
     const on: Record<string, any> = { ...listeners }
-
-    watchEffect(() => (options.value = props.options || []))
 
     const fetch = (search = '') => {
       if (isFunction(props.remoteMethod)) {
-        const mark = ++times
-        anchor = mark
-        loading.value = true
+        const mark = ++state.times
+        state.anchor = mark
+        state.loading = true
         props
           .remoteMethod(search)
           .then((optionList: any[]) => {
             // timing control
-            if (anchor === mark) {
-              options.value = optionList
+            if (state.anchor === mark) {
+              state.options = optionList
               // persist
-              props.persist({ options: options.value })
-              fetched = true
-              searched = searched || props.search // set searched true in search mode
+              state.fetched = true
+              state.searched = state.searched || props.search // set searched true in search mode
             }
           })
           .finally(() => {
-            if (anchor === mark) {
-              loading.value = false
-            }
+            state.loading = false
           })
       }
     }
@@ -74,7 +71,7 @@ export const InnerAsyncSelect = defineComponent({
       const onFocus = on['focus']
       on.focus = (...args: any[]) => {
         if (!props.search || (props.search && props.searchImmediate)) {
-          if ((props.fresh || !fetched) && !loading.value) {
+          if ((props.fresh || !state.fetched) && !state.loading) {
             fetch()
           }
         }
@@ -88,8 +85,8 @@ export const InnerAsyncSelect = defineComponent({
       return h(InnerSelect, {
         ref: SELECT_REF,
         attrs: Object.assign({}, attrs, props, {
-          options: options.value,
-          loading: loading.value,
+          options: state.options,
+          loading: state.loading,
           remoteMethod,
           remote: !!props.search,
           filterable: !!props.search,

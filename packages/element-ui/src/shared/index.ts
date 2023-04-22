@@ -1,19 +1,13 @@
-import { isObject } from 'lodash-es'
-import { Cell, Worktable } from '@edsheet/core'
+import type { Worktable } from '@edsheet/core'
 
 export * from './const'
 export * from './pos-key'
 export * from './tree'
 export * from './hooks'
+export * from './component'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export function noop() {}
-
-export function persistInnerState(cell: Cell, props: any) {
-  if (isObject(props)) {
-    cell.setComponentProps(props)
-  }
-}
 
 export function bindWorktable(worktable: Worktable) {
   return {

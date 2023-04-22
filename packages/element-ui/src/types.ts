@@ -1,4 +1,4 @@
-import { Column, Row, Worktable } from '@edsheet/core'
+import { Cell, Column, Row, Worktable } from '@edsheet/core'
 import type { RowProxy, RowRaw, RowRaws } from '@edsheet/core'
 import { Component, ShallowRef } from 'vue-demi'
 import { IComputedValue } from 'mobx'
@@ -76,3 +76,8 @@ export type RowData = Record<string, string> & {
 }
 
 export type Listener = (...args: any[]) => void | Array<(...args: any[]) => void>
+
+export type CellContext = {
+  cell: Cell
+  colDef: Column
+}

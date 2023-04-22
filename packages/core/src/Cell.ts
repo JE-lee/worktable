@@ -49,7 +49,7 @@ export class Cell {
     this.colDef = colDef
     this.evProxy = ev
     this.value = value
-    this.staticComponentProps = colDef.componentProps || {}
+    this.staticComponentProps = colDef.componentProps ? { ...colDef.componentProps } : {}
 
     makeObservable(this, {
       value: observable.ref,

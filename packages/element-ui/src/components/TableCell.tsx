@@ -1,6 +1,14 @@
-import { defineComponent, inject, h, getCurrentInstance, nextTick } from 'vue-demi'
-import { VNodeData, VNode } from 'vue'
-import { innerDefaultKey, persistInnerState } from '@/shared'
+import {
+  defineComponent,
+  inject,
+  h,
+  getCurrentInstance,
+  nextTick,
+  computed,
+  provide,
+} from 'vue-demi'
+import type { VNodeData, VNode } from 'vue-demi'
+import { innerDefaultKey, CELL_CONTEXT } from '@/shared'
 import {
   Column,
   Cell,
@@ -10,7 +18,7 @@ import {
   RowProxy,
   Worktable,
 } from '@edsheet/core'
-import { VueComponent, FocusAble, Options, Context } from '@/types'
+import { VueComponent, FocusAble, Options, Context, CellContext } from '@/types'
 import { isString, isFunction, cloneDeep } from 'lodash-es'
 import { getInnerComponent, InnerText } from './InnerComponent'
 import { getInnerPreview } from './InnerPreview'
@@ -37,6 +45,13 @@ export const TableCell = observer(
     },
     setup(props) {
       const { worktable } = inject(innerDefaultKey) as Context
+      const cellCtx = computed<CellContext>(() => {
+        return {
+          cell: props.cell as Cell,
+          colDef: props.colDef as Column,
+        }
+      })
+      provide(CELL_CONTEXT, cellCtx)
 
       return () => {
         const colDef = props.colDef as Column
@@ -141,9 +156,7 @@ export function mergePreview(component: VueComponent, Preview?: VueComponent) {
             disabled = runWithContext(colDef.disabled, rowProxy)
           }
 
-          componentProps = Object.assign({ disabled }, componentProps, {
-            persist: (props: any) => persistInnerState(cell, props),
-          })
+          componentProps = Object.assign({ disabled }, componentProps)
 
           if (cell.loading) {
             componentProps.disabled = true
