@@ -18,6 +18,8 @@
   },
   "include": [
     "src",
-    "docs"
+    "docs",
+    "cypress",
+    "test"
   ],
 }

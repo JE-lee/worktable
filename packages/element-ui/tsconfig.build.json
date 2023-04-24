@@ -8,5 +8,11 @@
         "src/*"
       ],
     }
-  }
+  },
+  "include": [
+    "src",
+    "docs",
+    "cypress",
+    "test"
+  ],
 }

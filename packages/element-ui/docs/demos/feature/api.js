@@ -16,7 +16,6 @@ export async function getProvinces() {
 }
 
 export async function getCities(provinceCode) {
-  console.log('provinceCode', provinceCode)
   const data = await getRegionData()
   await delay(200)
   return data.filter((item) => {

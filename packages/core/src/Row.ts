@@ -13,10 +13,10 @@ import {
 } from './types'
 import { Cell } from './Cell'
 import { Worktable } from './Worktable'
-import { makeRowProxy, noThrow, walk, getDefaultByValueType, getDefaultValue } from './share'
+import { makeRowProxy, noThrow, walk, getDefaultValue } from './share'
 import { RuleItem } from 'async-validator'
 import ValidateSchema from 'async-validator'
-import { FIELD_EVENT_NAME, TABLE_EVENT_NAME } from './event'
+import { FIELD_EVENT_NAME } from './event'
 import { deconstruct } from './field-parser'
 
 type CellBoolState = 'previewing' | 'loading' | 'validating'

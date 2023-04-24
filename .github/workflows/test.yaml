@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - '**'
-      - '!master'
   pull_request:
     branches:
       - 'master'
@@ -25,8 +24,27 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@latest
       
-      - name: Install dependencies
+      - name: Cache dependencies 🛖
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: |
+            **/node_modules
+            ~/.cache
+          key: ${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install dependencies 📥
+        if: steps.cache.outputs.cache-hit != 'true'
         run: pnpm install --fix-lockfile
-      
-      - name: Run tests
+
+      - name: Install Cypress 📥
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npx cypress install
+
+      - name: Build 🚚
+        run: npm run build
+
+      - name: test 🧪
         run: npm test
+
+          
