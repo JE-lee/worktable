@@ -6,9 +6,9 @@ export const InnerText = observer(
     props: {
       value: null,
     },
-    setup(props) {
+    setup(props, { attrs }) {
       return () => {
-        return h('span', props.value as string)
+        return h('span', { attrs }, props.value as string)
       }
     },
   }) as any

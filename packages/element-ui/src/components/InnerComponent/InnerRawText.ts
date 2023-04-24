@@ -4,7 +4,7 @@ export const InnerRawText = defineComponent({
   props: {
     text: null,
   },
-  setup(props) {
-    return () => h('span', String(props.text))
+  setup(props, { attrs }) {
+    return () => h('span', { attrs }, String(props.text))
   },
 })

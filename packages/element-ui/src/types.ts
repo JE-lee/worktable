@@ -12,7 +12,7 @@ export interface TableLayout {
 }
 export type useWorkTableOpt = {
   key?: string
-  columns: Array<Column>
+  columns: Array<UIColumn>
   initialData?: RowRaws
   layout?: TableLayout
 }

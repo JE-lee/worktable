@@ -249,7 +249,12 @@ export class Worktable extends BaseWorktable {
     cols.forEach((colDef) => {
       appendCols.push(...(this.tryDeconstructField(colDef) || []))
     })
-    cols.push(...appendCols)
+    appendCols.forEach((appended) => {
+      if (cols.some((col) => col.field === appended.field)) {
+        return
+      }
+      cols.push(appended)
+    })
 
     // remove all effect event listeners of field
     this.removeAllFieldEffects()
