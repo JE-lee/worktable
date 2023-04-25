@@ -94,6 +94,7 @@ export const InnerPagination = observer(
         return h(
           'div',
           {
+            staticClass: `${CLASS_PREFIX}-pagination`,
             style: {
               display: 'flex',
               'justify-content': 'flex-end',

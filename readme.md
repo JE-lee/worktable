@@ -6,3 +6,10 @@ edsheet(editable sheet) 是一个可编辑的表格的解决方案。基于`mobx
 * @edsheet/ant (coming soon)
 * @edsheet/arco-vue (coming soon)
 * @edsheet/arco-react (coming soon)
+
+## Test [![Test](https://github.com/JE-lee/worktable/actions/workflows/test.yaml/badge.svg?branch=master)](https://github.com/JE-lee/worktable/actions/workflows/test.yaml)
+```bash
+npm run build
+npm test
+```
+

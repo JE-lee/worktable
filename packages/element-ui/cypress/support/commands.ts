@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 /// <reference types="cypress" />
 // ***********************************************
 // This example commands.ts shows you how to
@@ -35,3 +36,17 @@
 //     }
 //   }
 // }
+
+Cypress.Commands.add('getCellBy', (selector: string) => {
+  return cy.get(selector).parents('.cell').eq(0)
+})
+
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      getCellBy(selector: string): Chainable<JQuery<HTMLElement>>
+    }
+  }
+}
+
+export {}

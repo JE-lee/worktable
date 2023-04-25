@@ -54,7 +54,8 @@ export type RowRaws = Array<RowRaw>
 
 export type EventContext = [CellValue, RowProxy]
 
-type ColumnComponent = any
+type BaseColumnComponent = string | (() => any) | object
+type ColumnComponent = BaseColumnComponent | ((row: RowProxy) => BaseColumnComponent)
 
 type ColumnComponentProps = StaticComponentProps | ((row: RowProxy) => StaticComponentProps)
 

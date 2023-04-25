@@ -223,8 +223,8 @@ function getTextFromOptions(options: Options, val: any) {
   return option ? option.label : ''
 }
 
-function isFnComponent(fn: any) {
-  return isFunction(fn) && !(fn as any).cid
+function isFnComponent(fn: any): fn is (...arg: any) => any {
+  return isFunction(fn) && !(fn as any).cid // is not a vue component
 }
 
 function convertListener(listeners: { [key: string]: (...args: any[]) => void }, row: RowProxy) {

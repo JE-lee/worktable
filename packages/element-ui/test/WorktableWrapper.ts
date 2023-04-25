@@ -1,8 +1,9 @@
-import { defineComponent, h } from 'vue-demi'
+import { defineComponent, h, nextTick } from 'vue-demi'
 import { Worktable, useWorktable } from '../src'
 import type { UIColumn } from '../src'
 import { getProducts, getProvinces, getCities, getAreas, save } from './api'
-import { Button as ElButton } from 'element-ui'
+import { Button as ElButton, Checkbox as ElCheckbox } from 'element-ui'
+import type { RowProxy } from '@edsheet/core'
 
 const PRODUCT_CODE = 'productCode'
 const PRODUCT = `{${PRODUCT_CODE}, productName}`
@@ -40,6 +41,11 @@ export default defineComponent({
           popperClass: 'data-product-dropdown',
         },
         required: true,
+        rule: {
+          validator(val: any) {
+            if (!val.productCode) throw '请选择商品'
+          },
+        },
       },
       {
         field: PRODUCT_CODE,
@@ -49,9 +55,25 @@ export default defineComponent({
         },
       },
       {
+        field: 'isGroup',
+        type: 'boolean',
+        title: '是否组合商品',
+        component: (row) => (row.parent ? 'render' : ElCheckbox),
+        componentProps: {
+          'data-isgroup': true,
+          render: (row: RowProxy) => {
+            if (row.parent) {
+              return '-'
+            }
+          },
+        },
+        default: false,
+      },
+      {
         field: 'count',
         type: 'number',
         title: '数量',
+        width: 140,
         component: 'Input',
         componentProps: {
           type: 'number',
@@ -60,8 +82,11 @@ export default defineComponent({
         },
         required: true,
         rule: {
-          max: 100,
-          message: 'can not greater than 100',
+          validator(val: any, row) {
+            if (!Number.isFinite(val)) throw '缺少数量'
+            if (val <= 0) throw '要求是正数'
+            if (row.data.isGroup && val > 1) throw '组合商品数量不能大于1'
+          },
         },
         default: 10,
       },
@@ -146,18 +171,53 @@ export default defineComponent({
         component: 'Input',
         componentProps: { placeholder: '请输入', clearable: true, ['data-creator']: true },
       },
+      {
+        field: 'action',
+        virtual: true,
+        title: '操作',
+        render(row) {
+          const doAdd = () => {
+            row.addRow()
+            nextTick(() => row.toggleExpansion(true))
+          }
+          if (row.data.isGroup) {
+            return h(
+              ElButton,
+              { attrs: { id: 'add-child', type: 'text' }, on: { click: doAdd } },
+              '添加散件'
+            )
+          }
+        },
+      },
     ]
-    const wt = useWorktable({ columns })
+    const wt = useWorktable({ columns, layout: { pagination: true } })
     wt.add()
 
     function doSave() {
       const data = wt.getData()
       save(data)
     }
+
+    function doValidate() {
+      wt.validate().catch(() => {
+        // not empty
+      })
+    }
+
+    function doAdd() {
+      wt.add()
+    }
+
     return () => {
-      const worktable = h(Worktable, { props: { border: true } })
+      const worktable = h(Worktable, { attrs: { border: true } })
       const saveBtn = h(ElButton, { on: { click: doSave }, attrs: { id: 'save' } }, '保存')
-      const btns = h('div', [saveBtn])
+      const validateBtn = h(
+        ElButton,
+        { on: { click: doValidate }, attrs: { id: 'validate' } },
+        '校验'
+      )
+      const addBtn = h(ElButton, { on: { click: doAdd }, attrs: { id: 'add' } }, '添加')
+      const btns = h('div', [saveBtn, validateBtn, addBtn])
       return h('div', [btns, worktable])
     }
   },
