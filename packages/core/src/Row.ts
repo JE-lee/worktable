@@ -150,10 +150,10 @@ export class Row {
     this.disposers = []
   }
 
-  validate(force = false) {
+  validate() {
     const validators: Promise<boolean>[] = []
     for (const field in this.data) {
-      validators.push(this.validateCell(this.data[field], false, force))
+      validators.push(this.validateCell(this.data[field], true))
     }
     return Promise.all(validators)
   }
@@ -228,18 +228,17 @@ export class Row {
   }
 
   private trackCellValidateHandle(cell: Cell) {
-    const validator = noThrow((isFirstTrack: boolean) => this.validateCell(cell, isFirstTrack))
+    const validator = noThrow(() => this.validateCell(cell))
     const reaction: Reaction = new Reaction(`${this.rid}-${cell.colDef.field}-validator`, () =>
-      reaction.track(() => validator(false))
+      reaction.track(() => validator())
     )
-    // FIXME: not call validator when first track
-    reaction.track(() => validator(true))
+    reaction.track(() => this.trackCellValidatorDep(cell))
     const disposer = () => reaction.dispose()
     return disposer
   }
 
-  private validateCell(cell: Cell, isFirstTrack = false, force = false) {
-    const needEmitError = (!isFirstTrack && cell.modified) || force
+  private validateCell(cell: Cell, force = false) {
+    const needEmitError = cell.modified || force
     const colDef = cell.colDef
     const descriptor = this.makeCellVaidateDescriptor(colDef)
     const target = { [colDef.field]: cell.cellValue }
@@ -294,6 +293,20 @@ export class Row {
           )
         }
       })
+  }
+
+  private trackCellValidatorDep(cell: Cell) {
+    if (cell.colDef.rule?.validator) {
+      const exec = async () => {
+        try {
+          await cell.colDef.rule?.validator!(cell.cellValue, makeRowProxy(this, true))
+        } catch {
+          /* empty */
+        }
+      }
+      return [exec()]
+    }
+    return [cell.cellValue]
   }
 
   private generate(raw: RowRaw) {

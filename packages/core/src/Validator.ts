@@ -11,7 +11,7 @@ export class Validator extends EventEmitter {
     let isValid = true
     await Promise.all(
       flatRows.map((row) =>
-        row.validate(true).catch((err) => {
+        row.validate().catch((err) => {
           isValid = false
         })
       )
