@@ -1,5 +1,13 @@
 # @edsheet/element-ui
 
+## 1.6.1
+
+### Patch Changes
+
+- 7f5fd45: fix wrong feedback text
+- Updated dependencies [7f5fd45]
+  - @edsheet/core@1.6.1
+
 ## 1.6.0
 
 ### Patch Changes
