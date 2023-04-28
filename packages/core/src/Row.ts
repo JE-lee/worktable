@@ -14,7 +14,7 @@ import {
 import { Cell } from './Cell'
 import { Worktable } from './Worktable'
 import { makeRowProxy, noThrow, walk, getDefaultValue } from './share'
-import { RuleItem } from 'async-validator'
+import type { RuleItem } from 'async-validator'
 import ValidateSchema from 'async-validator'
 import { FIELD_EVENT_NAME } from './event'
 import { deconstruct } from './field-parser'
@@ -59,8 +59,6 @@ export class Row {
     Object.values(this.data).forEach((cell) => cell.trackDynamicValue())
     // notify value initialization event
     this.notifyCellInitializationEvent()
-    // notify value change event
-    // this.notifyCellValueEvent()
     this.trackRowValidateHandle()
   }
 
@@ -341,24 +339,27 @@ export class Row {
   }
 
   private makeCellVaidateDescriptor(colDef: Column) {
-    const descriptor: Record<string, RuleItem> = {}
+    const descriptor: Record<string, RuleItem[]> = {
+      [colDef.field]: [],
+    }
     const rawRow = makeRowProxy(this)
     if (colDef.required) {
-      descriptor[colDef.field] = { type: colDef.type }
-      descriptor[colDef.field].required = true
-      descriptor[colDef.field].message = colDef.requiredMessage
+      descriptor[colDef.field].push({
+        type: colDef.type,
+        required: true,
+        message: colDef.requiredMessage,
+      })
     }
     if (colDef.rule) {
-      descriptor[colDef.field] = descriptor[colDef.field] || { type: colDef.type }
       const rule = this.getRule(colDef.rule)
       rule.type = rule.type || colDef.type
-      Object.assign(descriptor[colDef.field], rule)
       // validator
       if (isFunction(colDef.rule.validator)) {
-        Object.assign(descriptor[colDef.field], {
+        Object.assign(rule, {
           asyncValidator: this.makeCellAsyncVaidatorFn(colDef, rawRow),
         })
       }
+      descriptor[colDef.field].push(rule)
     }
     return descriptor
   }

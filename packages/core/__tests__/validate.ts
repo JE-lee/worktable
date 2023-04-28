@@ -202,4 +202,39 @@ describe('validate', () => {
     expect(row.errors['code'].length).toBe(0)
     expect(row.errors['name'].length).toBeGreaterThan(0)
   })
+
+  test('should respect colomn.required and rule.validator', async () => {
+    const msg1 = 'code is required'
+    const msg2 = "can't great than 20"
+    const columns: Column[] = [
+      {
+        field: 'code',
+        type: 'number',
+        required: true,
+        requiredMessage: msg1,
+        rule: {
+          validator: (val) => {
+            val = val as number
+            if (val > 20) throw msg2
+          },
+        },
+      },
+    ]
+
+    const wt = new Worktable(columns)
+    const row = wt.add({ code: '' })
+    await to(wt.validate())
+    const errors1 = wt.getValidateErrors()
+    expect(errors1[0].code).toEqual([msg1])
+
+    row.data.code = 21
+    await to(wt.validate())
+    const errors2 = wt.getValidateErrors()
+    expect(errors2[0].code).toEqual([msg2])
+
+    row.data.code = 19
+    await to(wt.validate())
+    const errors3 = wt.getValidateErrors()
+    expect(errors3[0].code).toEqual([])
+  })
 })
