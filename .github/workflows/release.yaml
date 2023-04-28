@@ -20,12 +20,19 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 17
+
       - name: install pnpm
         run: npm i pnpm@latest -g
+
       - name: setup pnpm config
         run: pnpm config set store-dir $PNPM_CACHE_FOLDER
+
       - name: install dependencies
         run: pnpm install --fix-lockfile
+
+      - name: Install Cypress 📥
+        run: npx cypress install
+
       - name: test
         run: npm test
       - name: build
@@ -41,4 +48,4 @@ jobs:
         if: steps.changesets.outputs.published == 'true'
         # You can do something when a publish happens.
         run: echo "published"
-        
+

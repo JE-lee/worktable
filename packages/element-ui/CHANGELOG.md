@@ -1,5 +1,16 @@
 # @edsheet/element-ui
 
+## 1.6.0
+
+### Patch Changes
+
+- eacd8db: fix some bug
+- Updated dependencies [eacd8db]
+- Updated dependencies [ba07857]
+- Updated dependencies [6581981]
+- Updated dependencies [0b22629]
+  - @edsheet/core@1.6.0
+
 ## 1.5.0
 
 ### Minor Changes

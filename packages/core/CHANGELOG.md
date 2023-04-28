@@ -1,5 +1,17 @@
 # @edsheet/core
 
+## 1.6.0
+
+### Minor Changes
+
+- 0b22629: support multiple validation for a single field
+
+### Patch Changes
+
+- eacd8db: fix some bug
+- ba07857: avoid external warning of validator when field is inited
+- 6581981: resolve confict of Column.required and Column.rule.validator
+
 ## 1.5.0
 
 ### Minor Changes
