@@ -81,7 +81,7 @@ export interface Column {
   default?: CellValue | (() => CellValue)
   value?: (row: RowProxy) => CellValue // dynamic value
   enum?: Options
-  rule?: Rule
+  rule?: Rule | Rule[]
   hidden?: boolean
   virtual?: boolean
   effects?: {

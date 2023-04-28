@@ -237,4 +237,56 @@ describe('validate', () => {
     const errors3 = wt.getValidateErrors()
     expect(errors3[0].code).toEqual([])
   })
+
+  test('should support multiple validation for a single field', async () => {
+    const msg1 = 'code is required'
+    const msg2 = "can't great than 20"
+    const msg3 = "can't less than 0"
+    const columns: Column[] = [
+      {
+        field: 'code',
+        type: 'number',
+        rule: [
+          {
+            required: true,
+            message: msg1,
+          },
+          {
+            validator: (val) => {
+              val = val as number
+              if (val > 20) throw msg2
+            },
+          },
+          {
+            validator: async (val) => {
+              val = val as number
+              await delay(100)
+              if (val < 0) throw msg3
+            },
+          },
+        ],
+      },
+    ]
+
+    const wt = new Worktable(columns)
+    const row = wt.add({ code: '' })
+    await to(wt.validate())
+    const errors1 = wt.getValidateErrors()
+    expect(errors1[0].code).toEqual([msg1])
+
+    row.data.code = 21
+    await to(wt.validate())
+    const errors2 = wt.getValidateErrors()
+    expect(errors2[0].code).toEqual([msg2])
+
+    row.data.code = -1
+    await to(wt.validate())
+    const errors3 = wt.getValidateErrors()
+    expect(errors3[0].code).toEqual([msg3])
+
+    row.data.code = 19
+    await to(wt.validate())
+    const errors4 = wt.getValidateErrors()
+    expect(errors4[0].code).toEqual([])
+  })
 })

@@ -294,10 +294,21 @@ export class Row {
   }
 
   private trackCellValidatorDep(cell: Cell) {
-    if (cell.colDef.rule?.validator) {
+    const rules = this.getRules(cell.colDef).filter((rule) => isFunction(rule.asyncValidator))
+    if (rules.length > 0) {
       const exec = async () => {
         try {
-          await cell.colDef.rule?.validator!(cell.cellValue, makeRowProxy(this, true))
+          await Promise.all(
+            rules.map((rule) => {
+              return rule.asyncValidator!(
+                null as any,
+                cell.cellValue,
+                () => [],
+                null as any,
+                null as any
+              )
+            })
+          )
         } catch {
           /* empty */
         }
@@ -342,7 +353,6 @@ export class Row {
     const descriptor: Record<string, RuleItem[]> = {
       [colDef.field]: [],
     }
-    const rawRow = makeRowProxy(this)
     if (colDef.required) {
       descriptor[colDef.field].push({
         type: colDef.type,
@@ -350,32 +360,37 @@ export class Row {
         message: colDef.requiredMessage,
       })
     }
-    if (colDef.rule) {
-      const rule = this.getRule(colDef.rule)
-      rule.type = rule.type || colDef.type
-      // validator
-      if (isFunction(colDef.rule.validator)) {
-        Object.assign(rule, {
-          asyncValidator: this.makeCellAsyncVaidatorFn(colDef, rawRow),
-        })
-      }
-      descriptor[colDef.field].push(rule)
-    }
+    const rules = this.getRules(colDef)
+    descriptor[colDef.field].push(...rules)
     return descriptor
   }
 
-  private makeCellAsyncVaidatorFn(colDef: Column, rawRow: RowProxy) {
-    return async (rule: any, value: any) => {
-      if (isFunction(colDef?.rule?.validator)) {
-        const success = await colDef?.rule?.validator(value, rawRow)
-        if (isBoolean(success) && !success) {
-          return Promise.reject(colDef?.rule?.message || 'validate error')
-        }
+  private makeCellAsyncVaidatorFn(rule: Rule) {
+    const rowProxy = makeRowProxy(this)
+    return async (_: any, value: any) => {
+      const success = await rule.validator?.(value, rowProxy)
+      if (isBoolean(success) && !success) {
+        return Promise.reject(rule.message || 'validate error')
       }
     }
   }
 
-  private getRule(rule: Rule): Omit<Rule, 'transform' | 'asyncValidator' | 'validator'> {
-    return omit(rule, ['transform', 'asyncValidator', 'validator'])
+  private getRules(colDef: Column): Array<Omit<RuleItem, 'transform' | 'validator'>> {
+    let rules = colDef.rule
+    if (!rules) return []
+    if (!Array.isArray(rules)) {
+      rules = [rules]
+    }
+
+    return rules.map((rule) => {
+      const ruleItem = omit(rule, ['transform', 'asyncValidator', 'validator'])
+      ruleItem.type = rule.type || colDef.type
+      if (isFunction(rule.validator)) {
+        Object.assign(ruleItem, {
+          asyncValidator: this.makeCellAsyncVaidatorFn(rule),
+        })
+      }
+      return ruleItem
+    })
   }
 }
