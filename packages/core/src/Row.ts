@@ -357,7 +357,7 @@ export class Row {
       descriptor[colDef.field].push({
         type: colDef.type,
         required: true,
-        message: colDef.requiredMessage,
+        message: colDef.requiredMessage || '',
       })
     }
     const rules = this.getRules(colDef)

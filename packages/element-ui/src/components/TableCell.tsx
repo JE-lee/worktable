@@ -200,9 +200,11 @@ export function mergePreview(component: VueComponent, Preview?: VueComponent) {
           const errors = cell.errors
           const isError = errors.length > 0
           // if (isError) {
-          return h(Feedback, { props: { feedback: errors.join(','), isError: isError } }, [
-            renderFormItemInner(),
-          ])
+          return h(
+            Feedback,
+            { props: { feedback: getVisualErrorText(errors), isError: isError } },
+            [renderFormItemInner()]
+          )
           // } else {
           //   return renderFormItemInner()
           // }
@@ -248,4 +250,8 @@ function getRowProxy(cell: Cell, worktable: Worktable) {
     return null
   }
   return makeRowProxy(row!)
+}
+
+function getVisualErrorText(errors: string[]) {
+  return errors.filter((str) => !!str)[0] ?? ''
 }

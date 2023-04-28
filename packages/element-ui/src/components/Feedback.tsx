@@ -1,5 +1,5 @@
 import { defineComponent, h, inject } from 'vue-demi'
-import { innerDefaultKey } from '@/shared'
+import { innerDefaultKey, CLASS_PREFIX } from '@/shared'
 import { Context } from '@/types'
 
 export const Feedback = defineComponent({
@@ -13,7 +13,10 @@ export const Feedback = defineComponent({
         return h(
           'div',
           {
-            staticClass: props.isError ? 'el-form-item is-error' : '',
+            class: {
+              [`${CLASS_PREFIX}-feedback`]: true,
+              ['el-form-item is-error']: props.isError,
+            },
           },
           [
             h('div', { staticClass: props.isError ? 'el-form-item__content' : '' }, [

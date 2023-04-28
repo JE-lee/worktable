@@ -1,0 +1,11 @@
+@import './var.scss';
+
+.#{$CLASS-PREFIX}-feedback {
+  &.el-form-item {
+    margin-bottom: 0;
+  }
+  .el-form-item__error {
+    position: static;
+    top: initial;
+  }
+}
