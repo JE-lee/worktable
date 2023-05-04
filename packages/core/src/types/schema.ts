@@ -71,6 +71,7 @@ export interface Column {
   title?: string
   field: string
   type?: ValueType
+  asterisk?: boolean
   required?: boolean
   requiredMessage?: string
   disabled?: boolean | ((row: RowProxy) => boolean)

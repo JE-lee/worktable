@@ -113,7 +113,7 @@ const InnerWorktable = defineComponent({
                 worktable: bindWorktable(worktable),
               }) as any
             } else {
-              const required = col.required
+              const required = col.required || col.asterisk
               return h('span', { class: { required } }, col.title)
             }
           }
