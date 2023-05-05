@@ -3,10 +3,7 @@
 * Input
 * Select
 * AsyncSelect
-* DatePicker
 * Cascader
-* RadioGroup
-* CheckboxGroup
 * Render
 
 ## Input
@@ -43,9 +40,6 @@
 |searchImmediate|boolean|搜索模式下是否立即搜索|false|
 |remoteMethod|(searchText: string) => Promise<Record<string, any>[]>|异步搜索函数|false|
 
-## DatePicker
-### API
-参考 [https://element.eleme.io/#/zh-CN/component/date-picker](https://element.eleme.io/#/zh-CN/component/date-picker)
 
 ## Cascader
 ### API
@@ -58,13 +52,6 @@
 |labelProp|string|label 字段在 option 中对应的字段|'value'|
 |valueProp|string|value 字段在 option 中对应的字段|'label'|
 
-## RadioGroup
-
-计划中
-
-## CheckboxGroup
-
-计划中
 
 ## Render
 

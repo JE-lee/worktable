@@ -2,7 +2,7 @@ import { defineComponent, h, nextTick } from 'vue-demi'
 import { Worktable, useWorktable } from '../src'
 import type { UIColumn } from '../src'
 import { getProducts, getProvinces, getCities, getAreas, save } from './api'
-import { Button as ElButton, Checkbox as ElCheckbox } from 'element-ui'
+import { Button as ElButton, Checkbox as ElCheckbox, DatePicker as ElDatePicker } from 'element-ui'
 import type { RowProxy } from '@edsheet/core'
 
 const PRODUCT_CODE = 'productCode'
@@ -29,7 +29,7 @@ export default defineComponent({
         type: 'object',
         title: '商品',
         component: 'async-select',
-        width: 140,
+        width: 180,
         componentProps: {
           optionInValue: true,
           labelProp: 'productName',
@@ -50,6 +50,7 @@ export default defineComponent({
       {
         field: PRODUCT_CODE,
         title: '商品编码',
+        width: 140,
         componentProps: {
           'data-productcode': true,
         },
@@ -58,6 +59,7 @@ export default defineComponent({
         field: 'isGroup',
         type: 'boolean',
         title: '是否组合商品',
+        width: 120,
         component: (row) => (row.parent ? 'render' : ElCheckbox),
         componentProps: {
           'data-isgroup': true,
@@ -81,9 +83,9 @@ export default defineComponent({
           'data-count': true,
         },
         required: true,
+        requiredMessage: '缺少数量',
         rule: {
           validator(val: any, row) {
-            if (!Number.isFinite(val)) throw '缺少数量'
             if (val <= 0) throw '要求是正数'
             if (row.data.isGroup && val > 1) throw '组合商品数量不能大于1'
           },
@@ -166,8 +168,29 @@ export default defineComponent({
         },
       },
       {
+        field: '[startDate, endDate]',
+        title: '保质期',
+        type: 'array',
+        width: 220,
+        asterisk: true,
+        component: ElDatePicker,
+        componentProps: {
+          style: 'width: 200px',
+          type: 'daterange',
+          size: 'mini',
+          clearable: true,
+        },
+        rule: {
+          required: true,
+          len: 2,
+          validator: (val: any) => !!(val && val[0] && val[1]),
+          message: '该字段必填',
+        },
+      },
+      {
         field: 'creator',
         title: '创建人',
+        width: 120,
         component: 'Input',
         componentProps: { placeholder: '请输入', clearable: true, ['data-creator']: true },
       },
@@ -175,6 +198,7 @@ export default defineComponent({
         field: 'action',
         virtual: true,
         title: '操作',
+        width: 120,
         render(row) {
           const doAdd = () => {
             row.addRow()
@@ -183,7 +207,7 @@ export default defineComponent({
           if (row.data.isGroup) {
             return h(
               ElButton,
-              { attrs: { id: 'add-child', type: 'text' }, on: { click: doAdd } },
+              { attrs: { id: 'add-child', type: 'text', size: 'mini' }, on: { click: doAdd } },
               '添加散件'
             )
           }
@@ -209,14 +233,22 @@ export default defineComponent({
     }
 
     return () => {
-      const worktable = h(Worktable, { attrs: { border: true } })
-      const saveBtn = h(ElButton, { on: { click: doSave }, attrs: { id: 'save' } }, '保存')
+      const worktable = h(Worktable, { attrs: { border: true }, style: { marginTop: '20px' } })
+      const saveBtn = h(
+        ElButton,
+        { on: { click: doSave }, attrs: { id: 'save', size: 'small', type: 'primary' } },
+        '保存'
+      )
       const validateBtn = h(
         ElButton,
-        { on: { click: doValidate }, attrs: { id: 'validate' } },
+        { on: { click: doValidate }, attrs: { id: 'validate', size: 'small', type: 'primary' } },
         '校验'
       )
-      const addBtn = h(ElButton, { on: { click: doAdd }, attrs: { id: 'add' } }, '添加')
+      const addBtn = h(
+        ElButton,
+        { on: { click: doAdd }, attrs: { id: 'add', size: 'small' } },
+        '添加'
+      )
       const btns = h('div', [saveBtn, validateBtn, addBtn])
       return h('div', [btns, worktable])
     }

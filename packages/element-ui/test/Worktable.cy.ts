@@ -79,21 +79,19 @@ describe('<Worktable/>', () => {
     cy.get(`${firstRow} [data-creator]`).click().type('lucas')
 
     // view data
-    const expectBody = [
-      {
-        isGroup: false,
-        count: 10,
-        creator: 'lucas',
-        productCode: 'toothpaste',
-        productName: '牙膏',
-        productionArea: '02',
-        productionCity: '01',
-        productionProvince: '13',
-        seq: 1,
-      },
-    ]
+    const expectBody = {
+      isGroup: false,
+      count: 10,
+      creator: 'lucas',
+      productCode: 'toothpaste',
+      productName: '牙膏',
+      productionArea: '02',
+      productionCity: '01',
+      productionProvince: '13',
+      seq: 1,
+    }
     cy.intercept('/api/save', (req) => {
-      expect(JSON.parse(req.body)).to.deep.equal(expectBody)
+      expect(JSON.parse(req.body)[0]).to.include(expectBody)
       req.reply('ok')
     })
     cy.get('#save').click()

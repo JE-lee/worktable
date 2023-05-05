@@ -69,7 +69,6 @@ export class Cell {
     this[state] = val
     if (state === 'value' && !isEqual(prev, val)) {
       this.modified = true
-      // FIXME: set deconstruacted value
       this.deconstructValue()
       this.notifyValueFieldEvent(FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
       this.notifyValueTableEvent(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
@@ -87,7 +86,6 @@ export class Cell {
   }
 
   notifyValueFieldEvent(eventName: FIELD_EVENT_NAME) {
-    // FIXME: 对于数组，这里不是不可变的
     const val = cloneDeep(this.cellValue)
     const rowProxy = makeRowProxy(this.parent)
     this.evProxy?.notifyFieldEvent(this.colDef.field, eventName, val, rowProxy)
