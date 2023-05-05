@@ -3,7 +3,7 @@ import { Worktable, useWorktable } from '../src'
 import type { UIColumn } from '../src'
 import { getProducts, getProvinces, getCities, getAreas, save } from './api'
 import { Button as ElButton, Checkbox as ElCheckbox, DatePicker as ElDatePicker } from 'element-ui'
-import type { RowProxy } from '@edsheet/core'
+import { FIELD_EVENT_NAME, RowProxy } from '@edsheet/core'
 
 const PRODUCT_CODE = 'productCode'
 const PRODUCT = `{${PRODUCT_CODE}, productName}`
@@ -18,7 +18,9 @@ export default defineComponent({
       {
         field: 'seq',
         title: '序号',
-        value: (row: any) => row.index + 1,
+        value: (row) => {
+          return row.parent ? `${row.parent.index + 1}-${row.index + 1}` : row.index + 1
+        },
         width: 80,
         componentProps: {
           ['data-seq']: true,
@@ -66,6 +68,14 @@ export default defineComponent({
           render: (row: RowProxy) => {
             if (row.parent) {
               return '-'
+            }
+          },
+        },
+        effects: {
+          [FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE]: (val, row) => {
+            val = val as boolean
+            if (!val) {
+              row.removeAllRow()
             }
           },
         },
@@ -179,6 +189,7 @@ export default defineComponent({
           type: 'daterange',
           size: 'mini',
           clearable: true,
+          ['data-expire']: true,
         },
         rule: {
           required: true,
@@ -204,18 +215,30 @@ export default defineComponent({
             row.addRow()
             nextTick(() => row.toggleExpansion(true))
           }
-          if (row.data.isGroup) {
-            return h(
-              ElButton,
-              { attrs: { id: 'add-child', type: 'text', size: 'mini' }, on: { click: doAdd } },
-              '添加散件'
-            )
-          }
+          const doRemove = () => row.removeSelf()
+          const addBtn = h(
+            ElButton,
+            { attrs: { id: 'add-child', type: 'text', size: 'mini' }, on: { click: doAdd } },
+            '添加散件'
+          )
+          const removeBtn = h(
+            ElButton,
+            {
+              attrs: { id: 'remove-row', type: 'text', size: 'mini' },
+              style: { color: 'red' },
+              on: { click: doRemove },
+            },
+            '删除'
+          )
+          return [row.data.isGroup && addBtn, removeBtn]
         },
       },
     ]
-    const wt = useWorktable({ columns, layout: { pagination: true } })
-    wt.add()
+    const wt = useWorktable({
+      columns,
+      layout: { pagination: true },
+      initialData: [{}],
+    })
 
     function doSave() {
       const data = wt.getData()
@@ -230,6 +253,7 @@ export default defineComponent({
 
     function doAdd() {
       wt.add()
+      wt.gotoLastPage()
     }
 
     return () => {
@@ -247,7 +271,7 @@ export default defineComponent({
       const addBtn = h(
         ElButton,
         { on: { click: doAdd }, attrs: { id: 'add', size: 'small' } },
-        '添加'
+        '添加商品'
       )
       const btns = h('div', [saveBtn, validateBtn, addBtn])
       return h('div', [btns, worktable])

@@ -123,6 +123,10 @@ describe('<Worktable/>', () => {
     cy.get('.el-table__row').should('be.visible').should('have.length', 2)
     cy.get(`.el-table__row`).eq(1).find('.cell').last().should('not.have.text')
     cy.get(`.el-table__row`).eq(1).find('[data-isgroup]').contains('-')
+
+    // remove
+    cy.get(`${firstRow} [data-isgroup]`).click()
+    cy.get('.el-table__row').should('be.visible').should('have.length', 1)
   })
 })
 
