@@ -4,6 +4,7 @@ import { Column, makeRowProxy, Row, RowProxy, Worktable } from '@edsheet/core'
 import { provide, shallowRef } from 'vue-demi'
 import { bindWorktable, getWorktableInjectKey, mergePosKey, ROWID, walk } from '@/shared'
 import { InnerRender } from '@/components/InnerComponent'
+import { usePagination, PAGE_SIZE } from '@/components/InnerPagination'
 
 export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
   const _opt = { ...opt }
@@ -26,6 +27,9 @@ export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
     targets.forEach((row) => tableRef.value?.toggleRowExpansion(row, expanded))
   }
 
+  // pagination
+  const paginationCtx = usePagination()
+
   const ctx: Context = {
     worktable,
     layout: Object.assign({ pagination: false, size: 'mini', feedback: 'terse' }, opt.layout),
@@ -34,6 +38,7 @@ export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
     toggleRowExpansion,
     opt: _opt,
     selectionCtx,
+    paginationCtx,
   }
   provide(injectKey, ctx)
 
@@ -44,8 +49,21 @@ export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
     selectionCtx.selections = []
   }
 
+  function gotoPage(index: number) {
+    paginationCtx.refresh(index)
+  }
+
+  function gotoLastPage() {
+    const length = rowDatas.get().length
+    gotoPage(Math.ceil(length / PAGE_SIZE))
+  }
+
+  function gotoFirstPage() {
+    gotoPage(1)
+  }
+
   return {
-    ...worktable, // TOOD: remove this
+    ...worktable, // TODO: remove this
     toggleRowExpansion,
     removeSelectedRows,
     ...bindWorktable(worktable),
@@ -53,6 +71,9 @@ export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
       const columns = formatColumns(cols)
       return worktable.setColumns(columns)
     },
+    gotoFirstPage,
+    gotoLastPage,
+    gotoPage,
   }
 }
 

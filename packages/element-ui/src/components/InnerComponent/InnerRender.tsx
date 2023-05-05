@@ -36,13 +36,12 @@ export const InnerRender = observer(
         },
       })
 
-      // FIXME: the runtime error of  render function was catched silently
       return () => {
         try {
           const render = props.render
           if (isFunction(render)) {
             const vnode = render(renderRowProxy, bindWorktable(worktable))
-            return isPrimitive(vnode) ? h('div', String(vnode)) : vnode
+            return h('div', isPrimitive(vnode) ? String(vnode) : [vnode])
           }
         } catch (err) {
           if (process.env.NODE_ENV === 'development') {

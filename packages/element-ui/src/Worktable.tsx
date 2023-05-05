@@ -24,7 +24,7 @@ import { splitPosKey } from '@/shared/pos-key'
 import { computed as mcomputed } from 'mobx'
 import { observer } from 'mobx-vue'
 import { Context, RowData, UIColumn } from './types'
-import { usePagination, InnerPagination } from '@/components/InnerPagination'
+import { InnerPagination, PAGE_SIZE } from '@/components/InnerPagination'
 import { isFunction } from 'lodash-es'
 
 const InnerWorktable = defineComponent({
@@ -42,7 +42,7 @@ const InnerWorktable = defineComponent({
     provide(innerDefaultKey, ctx)
 
     const datas = ctx.rowDatas
-    const { attr: paginationAttrs, on: paginationListeners, pagination } = usePagination()
+    const { attr: paginationAttrs, on: paginationListeners, pagination } = ctx.paginationCtx
     const visibleDatas = mcomputed(() => {
       if (ctx.layout.pagination) {
         const { current, size } = pagination.get()
@@ -167,7 +167,8 @@ const InnerWorktable = defineComponent({
       )
     }
     return () => {
-      return h('div', [renderTable(), ctx.layout.pagination && renderPagination()])
+      const paginationVisible = ctx.layout.pagination && datas.get().length > PAGE_SIZE
+      return h('div', [renderTable(), paginationVisible && renderPagination()])
     }
   },
 })

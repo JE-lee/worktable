@@ -1,10 +1,11 @@
 import { observable, computed, makeObservable, runInAction } from 'mobx'
 import { isFunction, debounce } from 'lodash-es'
 
-export function usePagination(reaction?: (pagination: { size: number; current: number }) => void) {
+export const PAGE_SIZE = 10
+export function usePagination(reaction?: (pagination: { size: number; current: number }) => any) {
   const attr = observable({
-    pageSize: 10,
-    pageSizes: [10, 20, 50, 100],
+    pageSize: PAGE_SIZE,
+    pageSizes: [PAGE_SIZE, 20, 50, 100].sort(),
     layout: 'total, sizes, prev, pager, next',
     currentPage: 1,
   })
@@ -48,7 +49,9 @@ export function usePagination(reaction?: (pagination: { size: number; current: n
 
   const refresh = (current?: number) => {
     if (current) {
-      attr.currentPage = current
+      runInAction(() => {
+        attr.currentPage = current
+      })
     }
     query()
   }

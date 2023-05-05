@@ -249,5 +249,36 @@ interface submit {
 }
 ```
 
+### gotoPage
+
+跳转到指定页面（从 1 开始算起）
+
+```typescript
+interface gotoPage {
+  (index: number): void
+}
+```
+
+
+### gotoFirstPage
+
+跳转到第一页
+
+```typescript
+interface gotoFirstPage {
+  (): void
+}
+```
+
+### gotoLastPage
+
+跳转到最后一页
+
+```typescript
+interface gotoLastPage {
+  (): void
+}
+```
+
 
 

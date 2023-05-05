@@ -3,6 +3,7 @@ import type { RowProxy, RowRaw, RowRaws } from '@edsheet/core'
 import { Component, ShallowRef } from 'vue-demi'
 import { IComputedValue } from 'mobx'
 import { bindWorktable } from './shared'
+import type { usePagination } from '@/components/InnerPagination'
 
 export type Feedbacklayout = 'terse' | 'popover'
 export interface TableLayout {
@@ -50,6 +51,7 @@ export type Context = {
   selectionCtx: {
     selections: RowProxy[]
   }
+  paginationCtx: ReturnType<typeof usePagination>
 }
 
 export type RenderRowProxy = RowProxy & {
