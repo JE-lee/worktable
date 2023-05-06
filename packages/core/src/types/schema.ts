@@ -1,3 +1,4 @@
+import { FIELD_EVENT_NAME } from './../event'
 import { RuleItem } from 'async-validator'
 import type { Row } from '../Row'
 import { StaticComponentProps } from './share'
@@ -66,6 +67,7 @@ export type Rule = Omit<RuleItem, 'transform' | 'asyncValidator' | 'validator'> 
 }
 
 export type FieldEffectListener = (val: CellValue, row: RowProxy, errors?: CellErrors) => void
+export type OnFieldReactEffectListener = (row: RowProxy) => void
 export type TableEffectListener = (errors?: TableErrors) => void
 export interface Column {
   title?: string
@@ -86,7 +88,9 @@ export interface Column {
   hidden?: boolean
   virtual?: boolean
   effects?: {
-    [eventName: string]: FieldEffectListener
+    [k in FIELD_EVENT_NAME]?: k extends FIELD_EVENT_NAME.ON_FIELD_REACT
+      ? OnFieldReactEffectListener
+      : FieldEffectListener
   }
   width?: number
 }

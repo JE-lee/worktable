@@ -55,8 +55,13 @@ export class Row {
     this.rIndex = rIndex
     this.initialData = raw
     this.generate(raw)
-    // track dynamic value
-    Object.values(this.data).forEach((cell) => cell.trackDynamicValue())
+    Object.values(this.data).forEach((cell) => {
+      // track dynamic value
+      cell.trackDynamicValue()
+      // setup onFieldReact effect
+      cell.setupOnFieldReactEffect()
+    })
+
     // notify value initialization event
     this.notifyCellInitializationEvent()
     this.trackRowValidateHandle()

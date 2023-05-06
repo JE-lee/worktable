@@ -81,7 +81,14 @@ export class Cell {
 
   trackDynamicValue() {
     if (isFunction(this.colDef.value)) {
-      this.track((row: RowProxy) => this.setState('value', this.colDef.value!(row)))
+      this.track((row: RowProxy) => this.setState('value', this.colDef.value!(row)), true)
+    }
+  }
+
+  setupOnFieldReactEffect() {
+    const onFieldReact = this.colDef.effects?.[FIELD_EVENT_NAME.ON_FIELD_REACT]
+    if (isFunction(onFieldReact)) {
+      this.track((row: RowProxy) => onFieldReact(row))
     }
   }
 
@@ -131,11 +138,11 @@ export class Cell {
     }
   }
 
-  private track(reactor: (row: RowProxy) => void) {
+  private track(reactor: (row: RowProxy) => void, rowImmutable = false) {
     const row = this.parent
     const colDef = this.colDef
     const reactionName = `${row.rid}-${colDef.field}-value-tracker`
-    const rowProxy = makeRowProxy(row, true)
+    const rowProxy = makeRowProxy(row, rowImmutable)
     const reaction: Reaction = new Reaction(reactionName, () =>
       reaction.track(() => reactor(rowProxy))
     )

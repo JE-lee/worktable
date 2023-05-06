@@ -6,6 +6,7 @@ export enum FIELD_EVENT_NAME {
   ON_FIELD_VALUE_VALIDATE_SUCCESS = 'onFieldValueValidateSuccess',
   ON_FIELD_VALUE_VALIDATE_FAIL = 'onFieldValueValidateFail',
   ON_FIELD_VALUE_VALIDATE_FINISH = 'onFieldValueValidateFinish',
+  ON_FIELD_REACT = 'onFieldReact',
 }
 
 export const TABLE_EFFECT_NAMESPACE = '__table_effects__'

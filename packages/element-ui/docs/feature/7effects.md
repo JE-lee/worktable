@@ -12,6 +12,7 @@
 |onFieldValueValidateSuccess|(val: CellValue, row: RowProxy) => void|当字段校验成功的时候触发|
 |onFieldValueValidateFail|(val: CellValue, row: RowProxy, errors: string[]) => void|当字段校验失败的时候触发|
 |onFieldValueValidateFinish|(val: CellValue, row: RowProxy) => void|当字段校验完成的时候触发|
+|onFieldReact|(row: RowProxy) => void|被动模式副作用，当里面访问的依赖项变化的时候，自动重新执行|
 
 ## TableEffects
 

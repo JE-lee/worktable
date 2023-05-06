@@ -1,4 +1,4 @@
-import { Worktable, FIELD_EVENT_NAME, TABLE_EVENT_NAME } from '../src'
+import { Worktable, FIELD_EVENT_NAME, TABLE_EVENT_NAME, RowProxy } from '../src'
 import type { FieldEffectListener, TableEffectListener, Column } from '../src'
 
 type ParamsFeidlEffectListener = Parameters<FieldEffectListener>
@@ -85,7 +85,7 @@ describe('effects', () => {
 
     const row = wt.rows[0]
     wt.inputValue({ rid: row.rid, field: 'code' }, '')
-    await delay(10)
+    await delay(0)
 
     expect(start.mock.calls.length).toBe(2)
     expect(finish.mock.calls.length).toBe(2)
@@ -97,7 +97,7 @@ describe('effects', () => {
     expect(finish.mock.results[1].value).toEqual(['', ''])
 
     wt.inputValue({ rid: row.rid, field: 'code' }, 'ABC')
-    await delay(10)
+    await delay(0)
     expect(start.mock.calls.length).toBe(3)
     expect(finish.mock.calls.length).toBe(3)
     expect(success.mock.calls.length).toBe(1)
@@ -175,5 +175,59 @@ describe('effects', () => {
     expect(validateSuccess).toBeCalledTimes(1)
     expect(validateFail).toBeCalledTimes(1)
     expect(validateFail).lastReturnedWith([{ code: [msg] }])
+  })
+
+  it('onFieldReact #1', () => {
+    const columns: Column[] = [
+      { field: 'a', type: 'number' },
+      {
+        field: 'b',
+        title: 'double a',
+        type: 'number',
+        effects: {
+          [FIELD_EVENT_NAME.ON_FIELD_REACT]: (row) => {
+            row.data.b = row.data.c ? (row.data.a as number) * 2 : row.data.a
+          },
+        },
+      },
+      { field: 'c', type: 'boolean', default: true },
+    ]
+
+    const wt = new Worktable(columns)
+    const row1 = wt.add({ a: 10 })
+    expect(row1.data.b).toBe(20)
+
+    wt.inputValue({ field: 'a', rid: row1.rid }, 20)
+    expect(row1.data.b).toBe(40)
+
+    wt.inputValue({ field: 'c', rid: row1.rid }, false)
+    expect(row1.data.b).toBe(20)
+  })
+
+  it('onFieldReact#2', () => {
+    const onFieldReact = jest.fn((row: RowProxy) => {
+      row.data.b = (row.data.a as number) * 2
+    })
+    const columns: Column[] = [
+      { field: 'a', type: 'number' },
+      {
+        field: 'b',
+        title: 'double a',
+        type: 'number',
+        effects: {
+          [FIELD_EVENT_NAME.ON_FIELD_REACT]: onFieldReact,
+        },
+      },
+    ]
+
+    const wt = new Worktable(columns)
+    const row = wt.add({ a: 10 })
+    expect(onFieldReact).toBeCalledTimes(1)
+
+    wt.inputValue({ field: 'a', rid: row.rid }, 20)
+    expect(onFieldReact).toBeCalledTimes(2)
+
+    wt.inputValue({ field: 'a', rid: row.rid }, 20)
+    expect(onFieldReact).toBeCalledTimes(2)
   })
 })
