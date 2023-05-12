@@ -1,7 +1,18 @@
 {
-  "extends": "./tsconfig.build.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
+    "declaration": true,
     "declarationDir": "esm",
-    "outDir": "esm"
-  }
+    "outDir": "esm",
+    "baseUrl": ".",
+    "paths": {
+      "mobx": ["./node_modules/mobx"], // resolve confict between @element and @core when emit declaration file
+      "@element-ui/*": [
+        "src/*"
+      ]
+    },
+  },
+  "include": [
+    "src"
+  ]
 }

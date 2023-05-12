@@ -2,8 +2,8 @@ import { defineComponent, h, inject } from 'vue-demi'
 import { observer } from 'mobx-vue'
 import { computed as mcomputed } from 'mobx'
 import { Pagination, Select, Option } from 'element-ui'
-import { CLASS_PREFIX, flatten, innerDefaultKey } from '@/shared'
-import { Context } from '@/types'
+import { CLASS_PREFIX, flatten, innerDefaultKey } from '@element-ui/shared'
+import type { Context, VueComponent } from '@element-ui/types'
 
 function makePages(max: number) {
   const pages: number[] = []
@@ -13,7 +13,7 @@ function makePages(max: number) {
   }
   return pages
 }
-export const InnerPagination = observer(
+export const InnerPagination: VueComponent = observer(
   defineComponent({
     name: 'InnerPagination',
     props: {

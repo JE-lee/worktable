@@ -1,11 +1,11 @@
 import { defineComponent, computed, h } from 'vue-demi'
 import dayjs from 'dayjs'
 import { DatePicker } from 'element-ui'
-import { FocusAble } from '@/types'
+import type { FocusAble, VueComponent } from '@element-ui/types'
 import { observer } from 'mobx-vue'
 
 const DATEPICKER = 'datepicker'
-export const InnerDatePicker = observer(
+export const InnerDatePicker: VueComponent = observer(
   defineComponent({
     name: 'InnerDatePicker',
     props: { value: null },

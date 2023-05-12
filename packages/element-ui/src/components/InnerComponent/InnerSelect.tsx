@@ -1,10 +1,10 @@
 import { defineComponent, h, computed } from 'vue-demi'
 import { Select as ElSelect, Option as ElOption } from 'element-ui'
-import { FocusAble, Listener } from '@/types'
+import type { FocusAble, Listener, VueComponent } from '@element-ui/types'
 import { isFunction } from 'lodash-es'
 
 const SELECT_REF = 'elSelect'
-export const InnerSelect = defineComponent({
+export const InnerSelect: VueComponent = defineComponent({
   name: 'InnerSelect',
   props: {
     options: {

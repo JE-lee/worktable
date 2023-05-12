@@ -1,10 +1,10 @@
-import { Context, RowData, UIColumn, useWorkTableOpt } from '@/types'
+import { Context, RowData, UIColumn, useWorkTableOpt } from '@element-ui/types'
 import { computed as mcomputed } from 'mobx'
 import { Column, makeRowProxy, Row, RowProxy, Worktable } from '@edsheet/core'
 import { provide, shallowRef } from 'vue-demi'
-import { bindWorktable, getWorktableInjectKey, mergePosKey, ROWID, walk } from '@/shared'
-import { InnerRender } from '@/components/InnerComponent'
-import { usePagination, PAGE_SIZE } from '@/components/InnerPagination'
+import { bindWorktable, getWorktableInjectKey, mergePosKey, ROWID, walk } from '@element-ui/shared'
+import { InnerRender } from '@element-ui/components/InnerComponent'
+import { usePagination, PAGE_SIZE } from '@element-ui/components/InnerPagination'
 
 export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
   const _opt = { ...opt }

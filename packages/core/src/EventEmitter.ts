@@ -2,12 +2,14 @@ import {
   CellErrors,
   CellValue,
   FieldEffectListener,
+  OnFieldReactEffectListener,
   RowProxy,
   TableEffectListener,
   TableErrors,
 } from './types'
 
-type EventMap = Record<string, (FieldEffectListener | TableEffectListener)[]>
+type Listener = OnFieldReactEffectListener | FieldEffectListener | TableEffectListener
+type EventMap = Record<string, Listener[]>
 type Events = Record<string, EventMap>
 export class EventEmitter {
   constructor(private events: Events = {}, private isPaused = false) {}
@@ -20,7 +22,7 @@ export class EventEmitter {
     this.isPaused = false
   }
 
-  on(namespace: string, eventName: string, cb: FieldEffectListener | TableEffectListener) {
+  on(namespace: string, eventName: string, cb: Listener) {
     this.events[namespace] = this.events[namespace] || {}
     this.events[namespace][eventName] = this.events[namespace][eventName] || []
     this.events[namespace][eventName].push(cb)
@@ -52,7 +54,7 @@ export class EventEmitter {
     }
   }
 
-  off(namespace: string, eventName: string, listener?: FieldEffectListener | TableEffectListener) {
+  off(namespace: string, eventName: string, listener?: Listener) {
     if (this.events[namespace] && this.events[namespace][eventName]) {
       if (!listener) {
         this.events[namespace][eventName] = []

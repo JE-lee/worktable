@@ -1,5 +1,5 @@
 import { Input, Checkbox } from 'element-ui'
-import { InnerComponent, VueComponent } from '@/types'
+import { InnerComponent, VueComponent } from '@element-ui/types'
 import { InnerSelect } from './InnerSelect'
 import { InnerAsyncSelect } from './InnerAsyncSelect'
 import { InnerDatePicker } from './InnerDatePicker'

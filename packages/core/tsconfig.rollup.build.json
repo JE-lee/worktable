@@ -1,7 +1,9 @@
 {
-  "extends": "./tsconfig.build.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
+    "declaration": true,
     "declarationDir": "esm",
     "outDir": "esm"
-  }
+  },
+  "include": ["src"]
 }

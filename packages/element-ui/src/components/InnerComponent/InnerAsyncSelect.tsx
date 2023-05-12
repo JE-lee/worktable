@@ -1,11 +1,11 @@
-import { defineComponent, h, shallowRef, onBeforeMount, Ref, ref, watchEffect } from 'vue-demi'
+import { defineComponent, h, onBeforeMount, watchEffect } from 'vue-demi'
 import { InnerSelect } from './InnerSelect'
 import { isFunction } from 'lodash-es'
-import type { FocusAble } from '@/types'
-import { usePersistentContext } from '@/shared'
+import type { FocusAble, VueComponent } from '@element-ui/types'
+import { usePersistentContext } from '@element-ui/shared'
 
 const SELECT_REF = 'select-ref'
-export const InnerAsyncSelect = defineComponent({
+export const InnerAsyncSelect: VueComponent = defineComponent({
   name: 'InnerAsyncSelect',
   props: {
     remoteMethod: {

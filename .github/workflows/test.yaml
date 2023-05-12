@@ -41,8 +41,8 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npx cypress install
 
-      - name: Build 🚚
-        run: npm run build
+      - name: lint
+        run: npm run lint
 
       - name: test 🧪
         run: npm test

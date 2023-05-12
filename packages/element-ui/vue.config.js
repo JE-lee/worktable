@@ -1,7 +1,13 @@
+const path = require('path')
 module.exports = {
   configureWebpack: {
     resolve: {
-      extensions: ['.ts', '.tsx', '.js', '.jsx']
+      extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      alias: {
+        '@edsheet/core': path.resolve(__dirname, '../core/src'),
+        '@edsheet/element-ui': path.resolve(__dirname, './src'),
+        '@element-ui': path.resolve(__dirname, './src'),
+      },
     }
   },
   chainWebpack: (config) => {

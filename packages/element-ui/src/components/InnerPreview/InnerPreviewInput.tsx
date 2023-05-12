@@ -1,5 +1,6 @@
 import { defineComponent, h } from 'vue-demi'
-export const InnerPreviewInput = defineComponent({
+import type { VueComponent } from '@element-ui/types'
+export const InnerPreviewInput: VueComponent = defineComponent({
   name: 'InnerPreview',
   props: {
     value: [String, Number],

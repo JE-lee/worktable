@@ -1,6 +1,7 @@
 import { defineComponent, h } from 'vue-demi'
+import type { VueComponent } from '@element-ui/types'
 
-export const Loading = defineComponent({
+export const Loading: VueComponent = defineComponent({
   name: 'Loading',
   props: {
     loading: Boolean,

@@ -1,10 +1,10 @@
 import { defineComponent, h, computed } from 'vue-demi'
 import { Cascader as ElCascader } from 'element-ui'
 import { isFunction } from 'lodash-es'
-import { flatten } from '@/shared'
-import { Listener } from '@/types'
+import { flatten } from '@element-ui/shared'
+import type { Listener, VueComponent } from '@element-ui/types'
 
-export const InnerCascader = defineComponent({
+export const InnerCascader: VueComponent = defineComponent({
   name: 'InnerCascader',
   props: {
     options: {

@@ -1,6 +1,7 @@
 import { computed, defineComponent, h } from 'vue-demi'
+import type { VueComponent } from '@element-ui/types'
 
-export const InnerPreviewSelect = defineComponent({
+export const InnerPreviewSelect: VueComponent = defineComponent({
   name: 'InnerPreviewSelect',
   props: {
     value: [String, Number],

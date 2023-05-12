@@ -1,6 +1,7 @@
 import { defineComponent, h } from 'vue-demi'
 import { observer } from 'mobx-vue'
-export const InnerText = observer(
+import type { VueComponent } from '@element-ui/types'
+export const InnerText: VueComponent = observer(
   defineComponent({
     name: 'InnerText',
     props: {

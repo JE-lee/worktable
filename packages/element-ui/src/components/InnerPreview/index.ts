@@ -1,4 +1,4 @@
-import { InnerComponent } from '@/types'
+import { InnerComponent } from '@element-ui/types'
 import { InnerPreviewInput } from './InnerPreviewInput'
 import { InnerPreviewSelect } from './InnerPreviewSelect'
 

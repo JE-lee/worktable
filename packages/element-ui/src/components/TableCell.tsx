@@ -8,7 +8,7 @@ import {
   provide,
 } from 'vue-demi'
 import type { VNodeData, VNode } from 'vue-demi'
-import { innerDefaultKey, CELL_CONTEXT } from '@/shared'
+import { innerDefaultKey, CELL_CONTEXT } from '@element-ui/shared'
 import {
   Column,
   Cell,
@@ -18,7 +18,7 @@ import {
   RowProxy,
   Worktable,
 } from '@edsheet/core'
-import { VueComponent, FocusAble, Options, Context, CellContext } from '@/types'
+import type { VueComponent, FocusAble, Options, Context, CellContext } from '@element-ui/types'
 import { isString, isFunction, cloneDeep } from 'lodash-es'
 import { getInnerComponent, InnerText } from './InnerComponent'
 import { getInnerPreview } from './InnerPreview'
@@ -26,7 +26,7 @@ import { Feedback } from './Feedback'
 import { observer } from 'mobx-vue'
 import { Loading } from './Loading'
 
-export const TableCell = observer(
+export const TableCell: VueComponent = observer(
   defineComponent({
     name: 'TableCell',
     props: {

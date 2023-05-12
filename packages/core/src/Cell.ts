@@ -1,6 +1,13 @@
 import { FIELD_EVENT_NAME, TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME } from './event'
-import { CellPosition, RowProxy, RowRaw } from './types/schema'
-import { CellState, CellValue, Column, CellFactoryContext, StaticComponentProps } from './types'
+import {
+  CellState,
+  CellValue,
+  Column,
+  CellFactoryContext,
+  StaticComponentProps,
+  CellPosition,
+  RowProxy,
+} from './types'
 import { isUndefined, isEqual, cloneDeep, isFunction, get, set } from 'lodash-es'
 import { action, makeObservable, observable, Reaction } from 'mobx'
 import { EventEmitter } from './EventEmitter'

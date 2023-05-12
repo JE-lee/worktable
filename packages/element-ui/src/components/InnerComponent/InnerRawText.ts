@@ -1,5 +1,6 @@
 import { defineComponent, h } from 'vue-demi'
-export const InnerRawText = defineComponent({
+import type { VueComponent } from '@element-ui/types'
+export const InnerRawText: VueComponent = defineComponent({
   name: 'InnerRawText',
   props: {
     text: null,

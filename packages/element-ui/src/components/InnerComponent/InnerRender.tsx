@@ -1,11 +1,11 @@
 import { defineComponent, inject, h } from 'vue-demi'
-import { bindWorktable, innerDefaultKey } from '@/shared'
+import { bindWorktable, innerDefaultKey } from '@element-ui/shared'
 import { Cell, makeRowProxy } from '@edsheet/core'
-import { Context } from '@/types'
+import type { Context, VueComponent } from '@element-ui/types'
 import { observer } from 'mobx-vue'
 import { isFunction, isString, isNumber, isBoolean } from 'lodash-es'
 
-export const InnerRender = observer(
+export const InnerRender: VueComponent = observer(
   defineComponent({
     name: 'InnerRender',
     props: {

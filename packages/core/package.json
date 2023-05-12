@@ -14,7 +14,7 @@
     "build": "npm run clean && npm run rollup-build && npm run rollup-ts-alias",
     "dev:build": "npm run rollup-build -- --watch",
     "clean": "rimraf esm",
-    "ts-build": "tsc --project tsconfig.build.json --module es2015 --outDir esm",
+    "lint": "npx eslint src && npm run ts-lint",
     "ts-lint": "tsc --noEmit",
     "rollup-build": "rollup -c",
     "rollup-ts-alias": "tsc-alias -p tsconfig.rollup.build.json",

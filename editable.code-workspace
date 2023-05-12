@@ -18,8 +18,9 @@
 	],
 	"settings": {
 		"jest.disabledWorkspaceFolders": [
-			"vue",
-			"root"
-		]
+      "vue",
+      "root",
+      "element-ui"
+    ]
 	}
 }

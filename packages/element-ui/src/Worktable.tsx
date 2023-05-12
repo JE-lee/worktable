@@ -17,14 +17,14 @@ import {
   innerDefaultKey,
   ROWID,
   useFlashingValue,
-} from '@/shared'
+} from '@element-ui/shared'
 import { makeRowProxy, TABLE_EVENT_NAME } from '@edsheet/core'
-import { TableCell } from '@/components/TableCell'
-import { splitPosKey } from '@/shared/pos-key'
+import { TableCell } from '@element-ui/components/TableCell'
+import { splitPosKey } from '@element-ui/shared/pos-key'
 import { computed as mcomputed } from 'mobx'
 import { observer } from 'mobx-vue'
-import { Context, RowData, UIColumn } from './types'
-import { InnerPagination, PAGE_SIZE } from '@/components/InnerPagination'
+import type { Context, RowData, UIColumn, VueComponent } from './types'
+import { InnerPagination, PAGE_SIZE } from '@element-ui/components/InnerPagination'
 import { isFunction } from 'lodash-es'
 
 const InnerWorktable = defineComponent({
@@ -151,7 +151,6 @@ const InnerWorktable = defineComponent({
       return h(
         ElTable,
         {
-          staticClass: CLASS_PREFIX,
           ref: 'tableRef',
           attrs: Object.assign({}, attrs, {
             data: visibleDatas.get(),
@@ -168,9 +167,12 @@ const InnerWorktable = defineComponent({
     }
     return () => {
       const paginationVisible = ctx.layout.pagination && datas.get().length > PAGE_SIZE
-      return h('div', [renderTable(), paginationVisible && renderPagination()])
+      return h('div', { staticClass: CLASS_PREFIX }, [
+        renderTable(),
+        paginationVisible && renderPagination(),
+      ])
     }
   },
 })
 
-export default observer(InnerWorktable as any)
+export default observer(InnerWorktable as any) as VueComponent

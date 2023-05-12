@@ -1,8 +1,8 @@
 import { defineComponent, h, inject } from 'vue-demi'
-import { innerDefaultKey, CLASS_PREFIX } from '@/shared'
-import { Context } from '@/types'
+import { innerDefaultKey, CLASS_PREFIX } from '@element-ui/shared'
+import type { Context, VueComponent } from '@element-ui/types'
 
-export const Feedback = defineComponent({
+export const Feedback: VueComponent = defineComponent({
   name: 'Feedback',
   props: { feedback: String, isError: Boolean },
   setup(props, { slots }) {
