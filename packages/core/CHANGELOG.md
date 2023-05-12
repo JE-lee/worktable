@@ -1,5 +1,12 @@
 # @edsheet/core
 
+## 1.7.0
+
+### Minor Changes
+
+- 0655a4e: add Column.asterisk
+- 24351fb: add new feature of onFieldReact
+
 ## 1.6.1
 
 ### Patch Changes

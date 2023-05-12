@@ -1,5 +1,19 @@
 # @edsheet/element-ui
 
+## 1.7.0
+
+### Minor Changes
+
+- 0655a4e: add Column.asterisk
+- 24351fb: add new feature of onFieldReact
+- 7d191ae: add pagination function
+
+### Patch Changes
+
+- Updated dependencies [0655a4e]
+- Updated dependencies [24351fb]
+  - @edsheet/core@1.7.0
+
 ## 1.6.1
 
 ### Patch Changes
