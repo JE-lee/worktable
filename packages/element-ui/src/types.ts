@@ -4,6 +4,7 @@ import { Component, ShallowRef } from 'vue-demi'
 import { IComputedValue } from 'mobx'
 import { bindWorktable } from './shared'
 import type { usePagination } from '@element-ui/components/InnerPagination'
+import { CompositionCache } from './shared/composition-cache'
 
 export type Feedbacklayout = 'terse' | 'popover'
 export interface TableLayout {
@@ -52,6 +53,7 @@ export type Context = {
     selections: RowProxy[]
   }
   paginationCtx: ReturnType<typeof usePagination>
+  componentCache: CompositionCache<VueComponent>
 }
 
 export type RenderRowProxy = RowProxy & {

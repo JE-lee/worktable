@@ -44,7 +44,7 @@ export const TableCell: VueComponent = observer(
       },
     },
     setup(props) {
-      const { worktable } = inject(innerDefaultKey) as Context
+      const { worktable, componentCache } = inject(innerDefaultKey) as Context
       const cellCtx = computed<CellContext>(() => {
         return {
           cell: props.cell as Cell,
@@ -57,6 +57,7 @@ export const TableCell: VueComponent = observer(
         const colDef = props.colDef as Column
         const cell = props.cell as Cell
         const rowProxy = getRowProxy(cell, worktable)
+        // console.log('tablecell render', !!rowProxy, cell.position.rid, colDef.field)
         if (!rowProxy) return
 
         let colDefComponent = colDef.component
@@ -64,7 +65,7 @@ export const TableCell: VueComponent = observer(
           colDefComponent = runWithContext(colDefComponent, rowProxy)
         }
         // 表单组件
-        let component = getComponent(colDefComponent, getInnerComponent)
+        let component = getComponent(colDefComponent, getInnerComponent) || InnerText
         // 预览态组件
         // let preview = colDef.preview as any
         // if (isFnComponent(preview)) {
@@ -75,7 +76,12 @@ export const TableCell: VueComponent = observer(
         //   getInnerPreview
         // )
 
-        component = mergePreview(component || InnerText /* preview */)
+        let merged = componentCache.get([component])
+        if (!merged) {
+          merged = mergePreview(component /* preview */)
+          componentCache.set([component], merged as VueComponent)
+        }
+        component = merged
 
         const componentListener: VNodeData['on'] = convertListener(
           colDef.componentListeners || {},

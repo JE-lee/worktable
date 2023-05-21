@@ -21,7 +21,9 @@
     "pub": "npm publish --access=public",
     "rollup-build": "rollup -c",
     "rollup-ts-alias": "tsc-alias -p tsconfig.rollup.build.json",
-    "test": "npx cypress run --headless --component"
+    "test:jest": "jest",
+    "test:e2e": "npx cypress run --headless --component",
+    "test": "npm run test:jest && npm run test:e2e"
   },
   "author": "jelee",
   "license": "MIT",

@@ -5,6 +5,7 @@ import { provide, shallowRef } from 'vue-demi'
 import { bindWorktable, getWorktableInjectKey, mergePosKey, ROWID, walk } from '@element-ui/shared'
 import { InnerRender } from '@element-ui/components/InnerComponent'
 import { usePagination, PAGE_SIZE } from '@element-ui/components/InnerPagination'
+import { CompositionCache } from './shared/composition-cache'
 
 export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
   const _opt = { ...opt }
@@ -39,6 +40,7 @@ export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
     opt: _opt,
     selectionCtx,
     paginationCtx,
+    componentCache: new CompositionCache(),
   }
   provide(injectKey, ctx)
 
