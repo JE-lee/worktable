@@ -1,5 +1,11 @@
 # @edsheet/element-ui
 
+## 1.7.1
+
+### Patch Changes
+
+- 4fd0cc5: improve performance of re-render and add-one
+
 ## 1.7.0
 
 ### Minor Changes
