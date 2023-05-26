@@ -230,4 +230,26 @@ describe('effects', () => {
     wt.inputValue({ field: 'a', rid: row.rid }, 20)
     expect(onFieldReact).toBeCalledTimes(2)
   })
+
+  it('re-set columns', () => {
+    const onFieldValueChange1 = jest.fn()
+    const onFieldValueChange2 = jest.fn()
+
+    const columns: Column[] = [
+      {
+        field: 'code',
+        effects: {
+          [FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE]: onFieldValueChange1,
+        },
+      },
+    ]
+    const wt = new Worktable({ columns, initialData: [{ code: 1 }] })
+    wt.addFieldEffect('code', FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE, onFieldValueChange2)
+    wt.setColumns([...columns])
+
+    const row = wt.findAll()[0]
+    wt.inputValue({ field: 'code', rid: row.rid }, 2)
+    expect(onFieldValueChange1).toBeCalledTimes(1)
+    expect(onFieldValueChange2).toBeCalledTimes(1)
+  })
 })

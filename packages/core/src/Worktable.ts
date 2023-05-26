@@ -268,7 +268,7 @@ export class Worktable extends BaseWorktable {
     })
 
     // remove all effect event listeners of field
-    this.removeAllFieldEffects()
+    this.removeAllColFieldEffects()
     runInAction(() => (this.columns = cols))
 
     cols.forEach((colDef) => {
@@ -298,9 +298,14 @@ export class Worktable extends BaseWorktable {
     }
   }
 
-  private removeAllFieldEffects() {
-    this.columns.forEach((col) => {
-      this.offNamespace(col.field)
+  // remove all of field effects adding in 'Column'
+  private removeAllColFieldEffects() {
+    this.columns.forEach((colDef) => {
+      if (isObject(colDef.effects)) {
+        Object.entries(colDef.effects).forEach(([eventName, listener]) => {
+          this.off(colDef.field, eventName, listener)
+        })
+      }
     })
   }
 
