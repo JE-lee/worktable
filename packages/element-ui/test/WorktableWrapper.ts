@@ -256,6 +256,11 @@ export default defineComponent({
       wt.gotoLastPage()
     }
 
+    let visible = true
+    function doToggle() {
+      wt.toggleColumnVisibility(['seq', PRODUCT], (visible = !visible))
+    }
+
     return () => {
       const worktable = h(Worktable, { attrs: { border: true }, style: { marginTop: '20px' } })
       const saveBtn = h(
@@ -273,7 +278,12 @@ export default defineComponent({
         { on: { click: doAdd }, attrs: { id: 'add', size: 'small' } },
         '添加商品'
       )
-      const btns = h('div', [saveBtn, validateBtn, addBtn])
+      const toggleColumnVisibilityBtn = h(
+        ElButton,
+        { on: { click: doToggle }, attrs: { id: 'toggleColumnVisibility', size: 'small' } },
+        '添加商品'
+      )
+      const btns = h('div', [saveBtn, validateBtn, addBtn, toggleColumnVisibilityBtn])
       return h('div', [btns, worktable])
     }
   },

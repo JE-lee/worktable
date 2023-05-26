@@ -35,5 +35,6 @@ export function bindWorktable(worktable: Worktable) {
     sort: worktable.sort.bind(worktable),
     sortChildInEach: worktable.sortChildInEach.bind(worktable),
     getLength: () => worktable.rows.length,
+    toggleColumnVisibility: worktable.toggleColumnVisibility.bind(worktable),
   }
 }

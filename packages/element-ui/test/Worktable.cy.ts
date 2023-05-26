@@ -128,6 +128,21 @@ describe('<Worktable/>', () => {
     cy.get(`${firstRow} [data-isgroup]`).click()
     cy.get('.el-table__row').should('be.visible').should('have.length', 1)
   })
+
+  it.only('toggleColumnVisibility', () => {
+    const first = '.worktable .el-table__header tr > .el-table__cell:first-of-type'
+    const second = '.worktable .el-table__header tr > .el-table__cell:nth-of-type(2)'
+    cy.get(`${first} .cell span`).should('have.text', '序号')
+    cy.get(`${second} .cell span`).should('have.text', '商品')
+    // hide the first two columns
+    cy.get('#toggleColumnVisibility').click()
+    cy.get(`${first} .cell span`).should('not.have.text', '序号')
+    cy.get(`${second} .cell span`).should('not.have.text', '商品')
+    // show the first two columns
+    cy.get('#toggleColumnVisibility').click()
+    cy.get(`${first} .cell span`).should('have.text', '序号')
+    cy.get(`${second} .cell span`).should('have.text', '商品')
+  })
 })
 
 function shouldHaveErrorFeedback(selector: string) {

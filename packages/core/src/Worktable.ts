@@ -232,6 +232,17 @@ export class Worktable extends BaseWorktable {
     return this.validate()
   }
 
+  toggleColumnVisibility(fields: string | string[], visible = false) {
+    fields = Array.isArray(fields) ? fields : [fields]
+    const columns = [...this.columns]
+    columns.forEach((colDef) => {
+      if ((fields as string[]).some((field) => field === colDef.field)) {
+        colDef.hidden = !visible
+      }
+    })
+    this.columns = columns
+  }
+
   private findAllRows(filter: Filter = () => true) {
     const rows: Row[] = []
     walk(this.rows, (row) => {
@@ -307,6 +318,7 @@ export class Worktable extends BaseWorktable {
       inputValue: action,
       setComponentProps: action,
       sort: action,
+      toggleColumnVisibility: action,
     })
   }
 }
