@@ -1,5 +1,12 @@
 # @edsheet/core
 
+## 1.7.2
+
+### Patch Changes
+
+- bffeec8: expose `toggleColumnVisibility` func
+- 5f298df: avoid to remove the field effects adding by 'worktable.addFieldEffect' when re-set columns
+
 ## 1.7.0
 
 ### Minor Changes

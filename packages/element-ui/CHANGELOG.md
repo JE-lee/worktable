@@ -1,5 +1,14 @@
 # @edsheet/element-ui
 
+## 1.7.2
+
+### Patch Changes
+
+- bffeec8: expose `toggleColumnVisibility` func
+- Updated dependencies [bffeec8]
+- Updated dependencies [5f298df]
+  - @edsheet/core@1.7.2
+
 ## 1.7.1
 
 ### Patch Changes
