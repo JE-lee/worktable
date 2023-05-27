@@ -241,8 +241,14 @@ export class Row {
   }
 
   private validateCell(cell: Cell, force = false) {
-    const needEmitError = cell.modified || force
     const colDef = cell.colDef
+    // skip the validation of hidden field
+    if (colDef.hidden) {
+      cell.setState('errors', [])
+      return Promise.resolve(true)
+    }
+
+    const needEmitError = cell.modified || force
     const descriptor = this.makeCellVaidateDescriptor(colDef)
     const target = { [colDef.field]: cell.cellValue }
     cell.setState('validating', true)

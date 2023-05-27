@@ -289,4 +289,16 @@ describe('validate', () => {
     const errors4 = wt.getValidateErrors()
     expect(errors4[0].code).toEqual([])
   })
+
+  it('skip the validation of hidden column', async () => {
+    const columns: Column[] = [
+      { field: 'code1', required: true },
+      { field: 'code2', required: true },
+    ]
+    const worktable = new Worktable({ columns, initialData: [{ code1: '1' }] })
+
+    await expect(worktable.validate()).rejects.toThrow()
+    worktable.toggleColumnVisibility('code2', false)
+    await expect(worktable.validate()).resolves.toBeDefined()
+  })
 })
