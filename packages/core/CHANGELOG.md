@@ -1,5 +1,11 @@
 # @edsheet/core
 
+## 1.7.3
+
+### Patch Changes
+
+- 171734d: skip the validation of hidden field
+
 ## 1.7.2
 
 ### Patch Changes
