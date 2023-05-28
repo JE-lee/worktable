@@ -1,6 +1,6 @@
 import { defineComponent, h, nextTick } from 'vue-demi'
-import { Worktable, useWorktable } from '../src'
-import type { UIColumn } from '../src'
+import { Worktable, useWorktable } from '../../src'
+import type { UIColumn } from '../../src'
 import { getProducts, getProvinces, getCities, getAreas, save } from './api'
 import { Button as ElButton, Checkbox as ElCheckbox, DatePicker as ElDatePicker } from 'element-ui'
 import { FIELD_EVENT_NAME, RowProxy } from '@edsheet/core'

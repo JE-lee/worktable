@@ -1,5 +1,5 @@
 import Wrapper from './WorktableWrapper'
-import { CLASS_PREFIX } from '../src/shared'
+import { CLASS_PREFIX } from '../../src/shared'
 
 const firstRow = '.el-table__row:first-of-type'
 
@@ -129,7 +129,7 @@ describe('<Worktable/>', () => {
     cy.get('.el-table__row').should('be.visible').should('have.length', 1)
   })
 
-  it.only('toggleColumnVisibility', () => {
+  it('toggleColumnVisibility', () => {
     const first = '.worktable .el-table__header tr > .el-table__cell:first-of-type'
     const second = '.worktable .el-table__header tr > .el-table__cell:nth-of-type(2)'
     cy.get(`${first} .cell span`).should('have.text', '序号')

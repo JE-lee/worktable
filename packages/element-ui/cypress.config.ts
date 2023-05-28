@@ -9,6 +9,6 @@ export default defineConfig({
       bundler: 'webpack',
     },
     fixturesFolder: 'mock',
-    specPattern: 'test/**/*.cy.{js,jsx,ts,tsx}',
+    specPattern: 'cypress/test/**/*.cy.{js,jsx,ts,tsx}',
   },
 })
