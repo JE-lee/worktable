@@ -104,6 +104,7 @@ export class Row {
     const row = new Row(this.columns, raw, this, 0, this.wt)
     row.rIndex = this.children.length
     this.children.push(row)
+    this.wt?.updateRowsMap()
     return makeRowProxy(row)
   }
 
@@ -130,6 +131,7 @@ export class Row {
     const index = workRows.findIndex((r) => r === row)
     if (index > -1) {
       const [removed] = workRows.splice(index, 1)
+      this.wt?.updateRowsMap()
       removed.stopWatchValidation()
       // reset row.rIndex
       workRows.forEach((row, index) => (row.rIndex = index))
@@ -142,6 +144,7 @@ export class Row {
 
   removeSelf() {
     this.wt?.remove(this.rid)
+    this.wt?.updateRowsMap()
   }
 
   sort(comparator: (a: RowProxy, b: RowProxy) => number) {

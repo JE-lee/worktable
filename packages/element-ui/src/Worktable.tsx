@@ -108,7 +108,6 @@ const InnerWorktable = defineComponent({
               return col.renderHeader({
                 field,
                 colIndex: colIndex,
-                rows: worktable.getData(),
                 add: worktable.addRow.bind(worktable),
                 worktable: bindWorktable(worktable),
               }) as any

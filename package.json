@@ -14,7 +14,7 @@
     "clean": "pnpm --filter \"./packages/*\" --parallel clean",
     "lint": "pnpm --filter \"./packages/*\" --parallel lint",
     "test": "pnpm --filter \"./packages/*\" --parallel  test",
-    "dev:element-ui": "npm run build:core && concurrently \"nx dev:build @edsheet/core\" \"nx docs:dev @edsheet/element-ui\"",
+    "dev:element-ui": "pnpm --filter @edsheet/element-ui run docs:dev",
     "ci:publish": "pnpm publish -r -no-git-checks",
     "version": "npx changeset version",
     "download cypress": "https://registry.npmmirror.com/-/binary/cypress/12.9.0/darwin-x64/cypress.zip",

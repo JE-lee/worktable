@@ -69,7 +69,6 @@ export type UIColumn = Column & {
     field: string
     colIndex: number
     add: Worktable['addRow']
-    rows: RowRaw[]
     worktable: ReturnType<typeof bindWorktable>
   }) => void
 }

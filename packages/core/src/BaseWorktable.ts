@@ -1,5 +1,5 @@
 import { flatten } from './share'
-import { Column } from './types'
+import { CellPosition, Column } from './types'
 import { Validator } from './Validator'
 import type { Row } from './Row'
 import { TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME } from './event'
@@ -7,13 +7,26 @@ export class BaseWorktable extends Validator {
   static rid = 1
   columns: Column[] = []
   rows: Row[] = []
+  rowsMap: Record<string, Row> = {}
 
   protected getRaws() {
     return this.rows.map((row) => row.getRaw())
   }
 
   public getRowByRid(rid: string | number) {
-    return flatten(this.rows).find((row) => row.rid == rid)
+    return this.rowsMap[rid]
+  }
+
+  public getCell(pos: CellPosition) {
+    return this.rowsMap[pos.rid]?.data[pos.field]
+  }
+
+  public updateRowsMap() {
+    const rowsMap: Record<string, Row> = {}
+    flatten(this.rows).forEach((row) => {
+      rowsMap[row.rid] = row
+    })
+    this.rowsMap = rowsMap
   }
 
   validate() {

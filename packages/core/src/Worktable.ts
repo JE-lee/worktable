@@ -90,6 +90,22 @@ export class Worktable extends BaseWorktable {
     })
   }
 
+  removeRow(row: Row) {
+    let workRows = this.rows
+    if (row.parent) {
+      workRows = row.parent.children
+    }
+
+    const index = workRows.findIndex((r) => r === row)
+    if (index > -1) {
+      const [removed] = workRows.splice(index, 1)
+      this.updateRowsMap()
+      removed.stopWatchValidation()
+      // reset row.rIndex
+      workRows.forEach((row, index) => (row.rIndex = index))
+    }
+  }
+
   remove(rid: number): void
   remove(filter: Filter): void
   remove(filter: any): void {
@@ -101,6 +117,12 @@ export class Worktable extends BaseWorktable {
       row && rows.push(row)
     }
     rows.forEach((row) => this.removeRow(row))
+  }
+
+  removeAll() {
+    this.rows = []
+    this.updateRowsMap()
+    this.stopWatchValidation()
   }
 
   sort(comparator: (a: RowProxy, b: RowProxy) => number) {
@@ -124,10 +146,6 @@ export class Worktable extends BaseWorktable {
     return false
   }
 
-  getCell(pos: CellPosition) {
-    return flatten(this.rows).find((r) => r.rid === pos.rid)?.data[pos.field]
-  }
-
   add(raw: void): RowProxy
   add(raw: RowRaw): RowProxy
   add(raw: RowRaw[]): RowProxy[]
@@ -143,6 +161,7 @@ export class Worktable extends BaseWorktable {
   addRow(raw: RowRaw = {}): RowProxy {
     const row = new Row(this.columns, raw, undefined, this.rows.length, this)
     this.rows.push(row)
+    this.updateRowsMap()
     return makeRowProxy(row)
   }
 
@@ -152,11 +171,6 @@ export class Worktable extends BaseWorktable {
       rows.push(this.addRow(raw))
     })
     return rows
-  }
-
-  removeAll() {
-    this.rows = []
-    this.stopWatchValidation()
   }
 
   findAll(filter?: Filter) {
@@ -183,21 +197,6 @@ export class Worktable extends BaseWorktable {
       }
     })
     this.getCell(pos)?.setState('previewing', false)
-  }
-
-  removeRow(row: Row) {
-    let workRows = this.rows
-    if (row.parent) {
-      workRows = row.parent.children
-    }
-
-    const index = workRows.findIndex((r) => r === row)
-    if (index > -1) {
-      const [removed] = workRows.splice(index, 1)
-      removed.stopWatchValidation()
-      // reset row.rIndex
-      workRows.forEach((row, index) => (row.rIndex = index))
-    }
   }
 
   addEffect<T extends TABLE_EVENT_NAME>(
