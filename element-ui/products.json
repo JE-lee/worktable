@@ -1,0 +1,122 @@
+[
+  {
+    "productCode": "toothpaste",
+    "productName": "牙膏"
+  },
+  {
+    "productCode": "shampoo",
+    "productName": "洗发水"
+  },
+  {
+    "productCode": "conditioner",
+    "productName": "护发素"
+  },
+  {
+    "productCode": "soap",
+    "productName": "肥皂"
+  },
+  {
+    "productCode": "toilet-paper",
+    "productName": "卫生纸"
+  },
+  {
+    "productCode": "dental-floss",
+    "productName": "牙线"
+  },
+  {
+    "productCode": "razor",
+    "productName": "剃须刀"
+  },
+  {
+    "productCode": "shaving-cream",
+    "productName": "剃须膏"
+  },
+  {
+    "productCode": "deodorant",
+    "productName": "除臭剂"
+  },
+  {
+    "productCode": "body-wash",
+    "productName": "沐浴露"
+  },
+  {
+    "productCode": "shower-gel",
+    "productName": "沐浴露"
+  },
+  {
+    "productCode": "lotion",
+    "productName": "润肤露"
+  },
+  {
+    "productCode": "sunscreen",
+    "productName": "防晒霜"
+  },
+  {
+    "productCode": "lip-balm",
+    "productName": "润唇膏"
+  },
+  {
+    "productCode": "hand-sanitizer",
+    "productName": "洗手液"
+  },
+  {
+    "productCode": "laundry-detergent",
+    "productName": "洗衣液"
+  },
+  {
+    "productCode": "dish-soap",
+    "productName": "洗碗液"
+  },
+  {
+    "productCode": "bathroom-cleaner",
+    "productName": "浴室清洁剂"
+  },
+  {
+    "productCode": "bleach",
+    "productName": "漂白剂"
+  },
+  {
+    "productCode": "toilet-cleaner",
+    "productName": "马桶清洁剂"
+  },
+  {
+    "productCode": "air-freshener",
+    "productName": "空气清新剂"
+  },
+  {
+    "productCode": "trash-bags",
+    "productName": "垃圾袋"
+  },
+  {
+    "productCode": "paper-towels",
+    "productName": "纸巾"
+  },
+  {
+    "productCode": "tissues",
+    "productName": "面纸"
+  },
+  {
+    "productCode": "batteries",
+    "productName": "电池"
+  },
+  {
+    "productCode": "light-bulbs",
+    "productName": "灯泡"
+  },
+  {
+    "productCode": "flashlight",
+    "productName": "手电筒"
+  },
+  {
+    "productCode": "duct-tape",
+    "productName": "胶带"
+  },
+  {
+    "productCode": "scissors",
+    "productName": "剪刀"
+  },
+  {
+    "productCode": "plastic-wrap",
+    "productName": "保鲜膜"
+  }
+]

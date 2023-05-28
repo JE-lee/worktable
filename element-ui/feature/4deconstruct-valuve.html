@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>值解构 | Worktable</title>
+    <meta name="generator" content="VuePress 1.9.9">
+    
+    <meta name="description" content="Editable table, Supported vue and react">
+    
+    <link rel="preload" href="/worktable/element-ui/assets/css/2.styles.6d36d198.css" as="style"><link rel="preload" href="/worktable/element-ui/assets/js/app.281b86ef.js" as="script"><link rel="preload" href="/worktable/element-ui/assets/js/15.aacd6d33.js" as="script"><link rel="preload" href="/worktable/element-ui/assets/js/34.f9de2c9f.js" as="script"><link rel="preload" href="/worktable/element-ui/assets/js/16.0d078d0d.js" as="script"><link rel="prefetch" href="/worktable/element-ui/assets/js/0.8b53c148.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/1.63f91a6c.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/10.818d2733.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/11.6bbd3b2b.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/12.f77ddb5d.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/13.dadc145e.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/17.da51f141.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/18.99459f99.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/19.142d9ed5.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/20.fb6ac5d0.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/21.ca3ca834.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/22.d0a4b314.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/23.23f606dc.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/24.ce51608e.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/25.77d26d4c.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/26.435dc465.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/27.5e7f7110.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/28.6c8cbef0.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/29.57b500c4.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/3.33fb9b89.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/30.ddc35a7c.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/31.c63dd749.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/32.21639a7c.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/33.6e7cb933.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/35.971df42f.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/36.cf62433a.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/37.3bd72c43.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/38.b2f4d934.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/39.73c53aad.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/4.3151d4dc.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/40.74d8434e.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/41.79999baf.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/42.7f355b25.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/43.81629308.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/44.60b9cbd5.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/45.d36ac53b.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/46.68034bb8.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/47.62441daa.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/48.21c80489.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/49.cc5a17b0.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/5.1ed8525e.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/50.d918ed62.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/51.429f7d18.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/52.5061850c.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/53.674f2ac4.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/54.54c9b083.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/6.885b4264.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/7.bc722ed2.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/8.95696405.js"><link rel="prefetch" href="/worktable/element-ui/assets/js/9.e8d9cc3a.js">
+    <link rel="stylesheet" href="/worktable/element-ui/assets/css/2.styles.6d36d198.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/worktable/element-ui/" class="home-link router-link-active"><!----> <span class="site-name">Worktable</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/worktable/element-ui/" class="nav-link">
+  Home
+</a></div><div class="nav-item"><a href="/worktable/element-ui/guide/install.html" class="nav-link">
+  指南
+</a></div><div class="nav-item"><a href="/worktable/element-ui/feature/0inner-component.html" class="nav-link">
+  特性
+</a></div><div class="nav-item"><a href="/worktable/element-ui/api/0Column.html" class="nav-link">
+  API
+</a></div> <a href="https://github.com/JE-lee/worktable" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/worktable/element-ui/" class="nav-link">
+  Home
+</a></div><div class="nav-item"><a href="/worktable/element-ui/guide/install.html" class="nav-link">
+  指南
+</a></div><div class="nav-item"><a href="/worktable/element-ui/feature/0inner-component.html" class="nav-link">
+  特性
+</a></div><div class="nav-item"><a href="/worktable/element-ui/api/0Column.html" class="nav-link">
+  API
+</a></div> <a href="https://github.com/JE-lee/worktable" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></nav>  <ul class="sidebar-links"><li><a href="/worktable/element-ui/feature/0inner-component.html" class="sidebar-link">内置组件</a></li><li><a href="/worktable/element-ui/feature/1custom-compnent.html" class="sidebar-link">自定义组件</a></li><li><a href="/worktable/element-ui/feature/2dynamic-component.html" class="sidebar-link">动态组件</a></li><li><a href="/worktable/element-ui/feature/3dynamic-component-props.html" class="sidebar-link">动态组件属性</a></li><li><a href="/worktable/element-ui/feature/4deconstruct-valuve.html" aria-current="page" class="active sidebar-link">值解构</a></li><li><a href="/worktable/element-ui/feature/5feedback.html" class="sidebar-link">校验反馈</a></li><li><a href="/worktable/element-ui/feature/6auto-validate.html" class="sidebar-link">自动校验</a></li><li><a href="/worktable/element-ui/feature/7effects.html" class="sidebar-link">Effects</a></li><li><a href="/worktable/element-ui/feature/9pagination.html" class="sidebar-link">分页</a></li><li><a href="/worktable/element-ui/feature/10selectable.html" class="sidebar-link">可选择</a></li><li><a href="/worktable/element-ui/feature/11summary-line.html" class="sidebar-link">合计行</a></li><li><a href="/worktable/element-ui/feature/12cell-state.html" class="sidebar-link">Cell 的状态</a></li></ul> </aside> <main class="page"> <div class="theme-dumi-content content__default"><h1 id="值解构"><a href="#值解构" class="header-anchor">#</a> 值解构</h1> <p>一种比较常见的情况是，我们需要使用 <code>Select</code> 组件选择某个用户或者某个商品，但是接口要求不仅要保存 code, 还需要保存对应的名称。在这种情况下面，我们可以让 <code>Select</code> 组件的<code>value</code>是一个对象，包含<code>Option</code>的所有内容。此时对应 <code>field</code> 的 <code>value</code> 类型是 <code>object</code>。对于值类型 是<code>object</code> 或者 <code>array</code> 字段，声明 <code>field</code> 的时候可以用 ESMAScript 的结构语法来描述最后真正的字段。</p> <p><strong>非解构的写法</strong></p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token keyword">import</span> <span class="token punctuation">{</span> defineComponent <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'vue-demi'</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> useWorktable<span class="token punctuation">,</span> Worktable <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@edsheet/element-ui'</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token function">defineComponent</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  <span class="token literal-property property">components</span><span class="token operator">:</span> <span class="token punctuation">{</span> Worktable <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> columns <span class="token operator">=</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span>
+        <span class="token literal-property property">title</span><span class="token operator">:</span> <span class="token string">'用户'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">field</span><span class="token operator">:</span> <span class="token string">'user'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'object'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">width</span><span class="token operator">:</span> <span class="token number">180</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">component</span><span class="token operator">:</span> <span class="token string">'Select'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">componentProps</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token literal-property property">optionInValue</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span> <span class="token comment">// 将 option 作为 value</span>
+          <span class="token literal-property property">valueProp</span><span class="token operator">:</span> <span class="token string">'code'</span><span class="token punctuation">,</span>
+          <span class="token literal-property property">labelProp</span><span class="token operator">:</span> <span class="token string">'name'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token keyword">enum</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+          <span class="token punctuation">{</span> <span class="token literal-property property">code</span><span class="token operator">:</span> <span class="token string">'zhangsan'</span><span class="token punctuation">,</span> <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'章三'</span><span class="token punctuation">,</span> <span class="token literal-property property">id</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token punctuation">{</span> <span class="token literal-property property">code</span><span class="token operator">:</span> <span class="token string">'lisi'</span><span class="token punctuation">,</span> <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'莉丝'</span><span class="token punctuation">,</span> <span class="token literal-property property">id</span><span class="token operator">:</span> <span class="token number">2</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span>
+    <span class="token function">useWorktable</span><span class="token punctuation">(</span><span class="token punctuation">{</span> columns <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre></div><p>此时我们的值是这样的</p> <div class="language-json extra-class"><pre class="language-json"><code><span class="token punctuation">[</span>
+  <span class="token punctuation">{</span> <span class="token property">&quot;user&quot;</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">&quot;name&quot;</span><span class="token operator">:</span> <span class="token string">&quot;章三&quot;</span><span class="token punctuation">,</span> <span class="token property">&quot;code&quot;</span><span class="token operator">:</span> <span class="token string">&quot;zhangsan&quot;</span><span class="token punctuation">,</span> <span class="token property">&quot;id&quot;</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">}</span> <span class="token punctuation">}</span>
+<span class="token punctuation">]</span>
+</code></pre></div><p>但是接口要求的可能往往是一个展开的值，如<code>[{ userName: '', userCode: '' }]</code>，
+此时我们可以对<code>field</code>字段使用<code>解构语法</code>来声明我们真实的字段名。</p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token keyword">const</span> columns <span class="token operator">=</span> <span class="token punctuation">[</span>
+  <span class="token punctuation">{</span>
+    <span class="token literal-property property">title</span><span class="token operator">:</span> <span class="token string">'用户'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">field</span><span class="token operator">:</span> <span class="token string">'{ code: userCode, name: userName }'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'object'</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span>
+</code></pre></div><p>完整的例子参考如下：
+<!----></p> <p><strong>此外，我们还可以解构 type 为 array 的值</strong></p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token keyword">const</span> columns <span class="token operator">=</span> <span class="token punctuation">[</span>
+  <span class="token punctuation">{</span>
+    <span class="token literal-property property">title</span><span class="token operator">:</span> <span class="token string">'期间'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">field</span><span class="token operator">:</span> <span class="token string">'[startDate, endDate]'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'array'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">component</span><span class="token operator">:</span> <span class="token string">'DatePicker'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">componnetProps</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'daterange'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">valueFormat</span><span class="token operator">:</span> <span class="token string">'yyyy-MM-dd'</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span>
+</code></pre></div></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/worktable/element-ui/feature/3dynamic-component-props.html" class="prev">
+        动态组件属性
+      </a></span> <span class="next"><a href="/worktable/element-ui/feature/5feedback.html">
+        校验反馈
+      </a>
+      →
+    </span></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/worktable/element-ui/assets/js/app.281b86ef.js" defer></script><script src="/worktable/element-ui/assets/js/15.aacd6d33.js" defer></script><script src="/worktable/element-ui/assets/js/34.f9de2c9f.js" defer></script><script src="/worktable/element-ui/assets/js/16.0d078d0d.js" defer></script>
+  </body>
+</html>
