@@ -1,5 +1,11 @@
 # @edsheet/core
 
+## 1.7.4
+
+### Patch Changes
+
+- 453cc30: find the row through 'rowsMap' instead of traversing the all of rows
+
 ## 1.7.3
 
 ### Patch Changes
