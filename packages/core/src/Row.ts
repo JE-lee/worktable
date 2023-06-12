@@ -132,7 +132,7 @@ export class Row {
     if (index > -1) {
       const [removed] = workRows.splice(index, 1)
       this.wt?.updateRowsMap()
-      removed.stopWatchValidation()
+      removed.teardown()
       // reset row.rIndex
       workRows.forEach((row, index) => (row.rIndex = index))
     }
@@ -151,9 +151,13 @@ export class Row {
     this.children.sort((arow, brow) => comparator(makeRowProxy(arow), makeRowProxy(brow)))
   }
 
-  stopWatchValidation() {
+  teardown() {
     this.disposers.forEach((disposer) => disposer())
     this.disposers = []
+    // dispose cells in this row
+    Object.values(this.data).forEach((cell) => cell.teardown())
+    // dispose children
+    this.children.forEach((child) => child.teardown())
   }
 
   validate() {

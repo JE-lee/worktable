@@ -1,7 +1,7 @@
 import { Context, RowData, UIColumn, useWorkTableOpt } from '@element-ui/types'
 import { computed as mcomputed } from 'mobx'
 import { Column, makeRowProxy, Row, RowProxy, Worktable } from '@edsheet/core'
-import { provide, shallowRef } from 'vue-demi'
+import { provide, shallowRef, onUnmounted } from 'vue-demi'
 import { bindWorktable, getWorktableInjectKey, mergePosKey, ROWID, walk } from '@element-ui/shared'
 import { InnerRender } from '@element-ui/components/InnerComponent'
 import { usePagination, PAGE_SIZE } from '@element-ui/components/InnerPagination'
@@ -27,6 +27,11 @@ export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
 
     targets.forEach((row) => tableRef.value?.toggleRowExpansion(row, expanded))
   }
+
+  // teardown when unmount
+  onUnmounted(() => {
+    worktable.teardown()
+  })
 
   // pagination
   const paginationCtx = usePagination()

@@ -100,7 +100,7 @@ export class Worktable extends BaseWorktable {
     if (index > -1) {
       const [removed] = workRows.splice(index, 1)
       this.updateRowsMap()
-      removed.stopWatchValidation()
+      removed.teardown()
       // reset row.rIndex
       workRows.forEach((row, index) => (row.rIndex = index))
     }
@@ -119,10 +119,11 @@ export class Worktable extends BaseWorktable {
     rows.forEach((row) => this.removeRow(row))
   }
 
+  // 删除所有行数据
   removeAll() {
     this.rows = []
     this.updateRowsMap()
-    this.stopWatchValidation()
+    this.teardownAllReactions()
   }
 
   sort(comparator: (a: RowProxy, b: RowProxy) => number) {
@@ -242,6 +243,11 @@ export class Worktable extends BaseWorktable {
     this.columns = columns
   }
 
+  teardown() {
+    this.removeAll()
+    this.offAll() // clear all event listeners
+  }
+
   private findAllRows(filter: Filter = () => true) {
     const rows: Row[] = []
     walk(this.rows, (row) => {
@@ -277,9 +283,11 @@ export class Worktable extends BaseWorktable {
       }
       // init effect event listener of every field
       if (isObject(colDef.effects)) {
-        Object.entries(colDef.effects).forEach(([eventName, listener]) =>
-          this.on(colDef.field, eventName, listener)
-        )
+        Object.entries(colDef.effects).forEach(([eventName, listener]) => {
+          if (isFunction(listener)) {
+            this.on(colDef.field, eventName, listener)
+          }
+        })
       }
     })
   }
@@ -302,7 +310,9 @@ export class Worktable extends BaseWorktable {
     this.columns.forEach((colDef) => {
       if (isObject(colDef.effects)) {
         Object.entries(colDef.effects).forEach(([eventName, listener]) => {
-          this.off(colDef.field, eventName, listener)
+          if (isFunction(listener)) {
+            this.off(colDef.field, eventName, listener)
+          }
         })
       }
     })

@@ -89,7 +89,7 @@ export const InnerAsyncSelect: VueComponent = defineComponent({
           loading: state.loading,
           remoteMethod,
           remote: !!props.search,
-          filterable: !!props.search,
+          filterable: attrs.filterable || !!props.search,
         }),
         on,
       })

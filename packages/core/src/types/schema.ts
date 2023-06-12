@@ -68,6 +68,7 @@ export type Rule = Omit<RuleItem, 'transform' | 'asyncValidator' | 'validator'> 
 
 export type FieldEffectListener = (val: CellValue, row: RowProxy, errors?: CellErrors) => void
 export type OnFieldReactEffectListener = (row: RowProxy) => void
+export type FieldReactEffectListener<T> = [(row: RowProxy) => T, (val: T) => void] // [tracker, effect]
 export type TableEffectListener = (errors?: TableErrors) => void
 export interface Column {
   title?: string
@@ -89,7 +90,7 @@ export interface Column {
   virtual?: boolean
   effects?: {
     [k in FIELD_EVENT_NAME]?: k extends FIELD_EVENT_NAME.ON_FIELD_REACT
-      ? OnFieldReactEffectListener
+      ? OnFieldReactEffectListener | FieldReactEffectListener<unknown>
       : FieldEffectListener
   }
   width?: number

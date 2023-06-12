@@ -29,6 +29,8 @@ export class Cell {
   staticComponentProps: StaticComponentProps
   deconstructedType = ''
   deconstructedCells: Record<string, Cell> = {} // deconstructed fields
+  disposers: (() => void)[] = [] // reaction disposers of 'onFieldReact'
+  private trackCount = 0
 
   get cellValue() {
     if (this.colDef.type === 'number') {
@@ -88,7 +90,8 @@ export class Cell {
 
   trackDynamicValue() {
     if (isFunction(this.colDef.value)) {
-      this.track((row: RowProxy) => this.setState('value', this.colDef.value!(row)), true)
+      const reactor = (row: RowProxy) => this.setState('value', this.colDef.value!(row))
+      this.track(reactor, reactor, true)
     }
   }
 
@@ -145,14 +148,28 @@ export class Cell {
     }
   }
 
-  private track(reactor: (row: RowProxy) => void, rowImmutable = false) {
+  teardown() {
+    this.deconstructedCells = {}
+    this.disposers.forEach((disposer) => disposer())
+  }
+
+  private track(
+    reactor: (row: RowProxy) => void,
+    tracker?: (row: RowProxy) => unknown,
+    rowImmutable = false
+  ) {
+    if (!tracker) {
+      tracker = reactor
+    }
+
     const row = this.parent
     const colDef = this.colDef
-    const reactionName = `${row.rid}-${colDef.field}-value-tracker`
+    const reactionName = `${row.rid}-${colDef.field}-tracker-${++this.trackCount}`
     const rowProxy = makeRowProxy(row, rowImmutable)
     const reaction: Reaction = new Reaction(reactionName, () =>
       reaction.track(() => reactor(rowProxy))
     )
     reaction.track(() => reactor(rowProxy))
+    this.disposers.push(() => reaction.dispose())
   }
 }

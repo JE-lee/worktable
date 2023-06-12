@@ -23,8 +23,8 @@ export class Validator extends EventEmitter {
     }
   }
 
-  stopWatchValidation() {
-    flatten(this.rows).forEach((row) => row.stopWatchValidation())
+  teardownAllReactions() {
+    flatten(this.rows).forEach((row) => row.teardown())
   }
 
   getValidateErrors(): TableErrors {

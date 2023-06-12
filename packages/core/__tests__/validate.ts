@@ -180,7 +180,7 @@ describe('validate', () => {
     await delay(20)
     expect(mockValidator.mock.calls.length).toBe(2)
 
-    worktable.stopWatchValidation()
+    worktable.teardownAllReactions()
     worktable.inputValue({ rid: row.rid, field: 'code' }, 9)
     await delay(20)
     expect(mockValidator.mock.calls.length).toBe(2)
