@@ -231,6 +231,75 @@ describe('effects', () => {
     expect(onFieldReact).toBeCalledTimes(2)
   })
 
+  it('onFieldReact#3', () => {
+    const onFieldReact = jest.fn((row: RowProxy) => {
+      row.data.b = (row.data.a as number) * 2
+    })
+    const columns: Column[] = [
+      { field: 'a', type: 'number' },
+      {
+        field: 'b',
+        title: 'double a',
+        type: 'number',
+        effects: {
+          [FIELD_EVENT_NAME.ON_FIELD_REACT]: [(row) => row.data.a, onFieldReact],
+        },
+      },
+    ]
+
+    const wt = new Worktable(columns)
+    const row = wt.add({ a: 10 })
+    expect(onFieldReact).toBeCalledTimes(0)
+
+    wt.inputValue({ field: 'a', rid: row.rid }, 20)
+    expect(onFieldReact).toBeCalledTimes(1)
+
+    wt.inputValue({ field: 'a', rid: row.rid }, 20)
+    expect(onFieldReact).toBeCalledTimes(1)
+  })
+
+  it('onFieldReact#4', () => {
+    const onFieldReact = jest.fn((row: RowProxy) => {
+      row.data.c = (((row.data.a as number) < 10 ? row.data.a : row.data.b) as number) * 2
+    })
+    const columns: Column[] = [
+      { field: 'a', type: 'number' },
+      { field: 'b', type: 'number' },
+      {
+        field: 'c',
+        title: 'double a or b',
+        type: 'number',
+        effects: {
+          [FIELD_EVENT_NAME.ON_FIELD_REACT]: [
+            (row) => ((row.data.a as number) < 10 ? row.data.a : row.data.b),
+            onFieldReact,
+          ],
+        },
+      },
+    ]
+
+    const wt = new Worktable(columns)
+    const row = wt.add({ a: 1 })
+    expect(onFieldReact).toBeCalledTimes(0)
+
+    // did not access b
+    wt.inputValue({ field: 'a', rid: row.rid }, 2)
+    expect(onFieldReact).toBeCalledTimes(1)
+
+    wt.inputValue({ field: 'b', rid: row.rid }, 12)
+    expect(onFieldReact).toBeCalledTimes(1)
+
+    // accessed b
+    wt.inputValue({ field: 'a', rid: row.rid }, 10)
+    expect(onFieldReact).toBeCalledTimes(2)
+
+    wt.inputValue({ field: 'b', rid: row.rid }, 12)
+    expect(onFieldReact).toBeCalledTimes(2)
+
+    wt.inputValue({ field: 'b', rid: row.rid }, 13)
+    expect(onFieldReact).toBeCalledTimes(3)
+  })
+
   it('re-set columns', () => {
     const onFieldValueChange1 = jest.fn()
     const onFieldValueChange2 = jest.fn()

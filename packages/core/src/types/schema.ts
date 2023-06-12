@@ -68,7 +68,7 @@ export type Rule = Omit<RuleItem, 'transform' | 'asyncValidator' | 'validator'> 
 
 export type FieldEffectListener = (val: CellValue, row: RowProxy, errors?: CellErrors) => void
 export type OnFieldReactEffectListener = (row: RowProxy) => void
-export type FieldReactEffectListener<T> = [(row: RowProxy) => T, (val: T) => void] // [tracker, effect]
+export type FieldReactEffectListener<T> = [(row: RowProxy) => T, (row: RowProxy) => void] // [tracker, effect]
 export type TableEffectListener = (errors?: TableErrors) => void
 export interface Column {
   title?: string
