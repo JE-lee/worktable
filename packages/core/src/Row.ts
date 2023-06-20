@@ -63,6 +63,7 @@ export class Row {
     })
 
     // notify value initialization event
+    // FIXME: 这里是否需要延迟一下，否则在 onFieldInit 里面调用 worktable.getData 无法拿到全部的数据
     this.notifyCellInitializationEvent()
     this.trackRowValidateHandle()
   }

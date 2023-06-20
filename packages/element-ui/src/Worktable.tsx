@@ -117,6 +117,7 @@ const InnerWorktable = defineComponent({
             }
           }
           return h(ElTableColumn, {
+            key: col.field || col.type || colIndex,
             props: {
               type: col.type,
               prop: col.field,
