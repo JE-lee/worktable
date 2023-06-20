@@ -1,5 +1,19 @@
 # @edsheet/element-ui
 
+## 1.8.0
+
+### Minor Changes
+
+- f0d0d5f: custom tracker in onFieldReact
+
+### Patch Changes
+
+- 837ac65: teardown when unmount
+- 8913a69: fix some problem of fixed column of element-ui
+- Updated dependencies [f0d0d5f]
+- Updated dependencies [837ac65]
+  - @edsheet/core@1.8.0
+
 ## 1.7.2
 
 ### Patch Changes

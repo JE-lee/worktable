@@ -1,5 +1,15 @@
 # @edsheet/core
 
+## 1.8.0
+
+### Minor Changes
+
+- f0d0d5f: custom tracker in onFieldReact
+
+### Patch Changes
+
+- 837ac65: teardown when unmount
+
 ## 1.7.4
 
 ### Patch Changes
