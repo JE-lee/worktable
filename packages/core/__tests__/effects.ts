@@ -321,4 +321,27 @@ describe('effects', () => {
     expect(onFieldValueChange1).toBeCalledTimes(1)
     expect(onFieldValueChange2).toBeCalledTimes(1)
   })
+
+  it('removeFieldEffect', () => {
+    const onFieldValueChange = jest.fn()
+    const columns: Column[] = [{ field: 'code', type: 'number' }]
+    const wt = new Worktable({ columns, initialData: [{ code: 1 }] })
+    const row = wt.findAll()[0]
+    wt.addFieldEffect('code', FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE, onFieldValueChange)
+
+    row.data.code = 2
+    expect(onFieldValueChange).toBeCalledTimes(1)
+
+    wt.removeFieldEffect('code', FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE, onFieldValueChange)
+    row.data.code = 3
+    expect(onFieldValueChange).toBeCalledTimes(1)
+
+    wt.addFieldEffect('code', FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE, onFieldValueChange)
+    row.data.code = 4
+    expect(onFieldValueChange).toBeCalledTimes(2)
+
+    wt.removeFieldEffect('code')
+    row.data.code = 5
+    expect(onFieldValueChange).toBeCalledTimes(2)
+  })
 })

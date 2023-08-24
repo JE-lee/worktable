@@ -211,6 +211,18 @@ export class Worktable extends BaseWorktable {
     return this.on(feild, eventName, listener)
   }
 
+  removeFieldEffect(field: string, eventName?: FIELD_EVENT_NAME, listener?: FieldEffectListener) {
+    const eventNames: FIELD_EVENT_NAME[] = []
+    if (!eventName) {
+      eventNames.push(...Object.values(FIELD_EVENT_NAME))
+    } else {
+      eventNames.push(eventName)
+    }
+    eventNames.forEach((eventName) => {
+      this.off(field, eventName, listener)
+    })
+  }
+
   removeEffect(eventName: TABLE_EVENT_NAME, listener?: FieldEffectListener) {
     return this.off(TABLE_EFFECT_NAMESPACE, eventName, listener)
   }

@@ -22,6 +22,7 @@ export function bindWorktable(worktable: Worktable) {
     resumeEffects: worktable.resume.bind(worktable),
     addEffect: worktable.addEffect.bind(worktable),
     addFieldEffect: worktable.addFieldEffect.bind(worktable),
+    removeFieldEffect: worktable.removeFieldEffect.bind(worktable),
     removeEffect: worktable.removeEffect.bind(worktable),
     setComponentProps: worktable.setComponentProps.bind(worktable),
     validate: worktable.validate.bind(worktable),
