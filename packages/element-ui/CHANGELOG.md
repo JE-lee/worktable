@@ -1,5 +1,13 @@
 # @edsheet/element-ui
 
+## 1.8.1
+
+### Patch Changes
+
+- a4cf694: expose worktable.removeFieldEffect
+- Updated dependencies [a4cf694]
+  - @edsheet/core@1.8.1
+
 ## 1.8.0
 
 ### Minor Changes

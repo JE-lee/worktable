@@ -1,5 +1,11 @@
 # @edsheet/core
 
+## 1.8.1
+
+### Patch Changes
+
+- a4cf694: expose worktable.removeFieldEffect
+
 ## 1.8.0
 
 ### Minor Changes
