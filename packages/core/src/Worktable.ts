@@ -204,11 +204,13 @@ export class Worktable extends BaseWorktable {
     eventName: T,
     listener: T extends TableEventForCell ? FieldEffectListener : TableEffectListener
   ) {
-    return this.on(TABLE_EFFECT_NAMESPACE, eventName, listener)
+    this.on(TABLE_EFFECT_NAMESPACE, eventName, listener)
+    return () => this.off(TABLE_EFFECT_NAMESPACE, eventName, listener)
   }
 
-  addFieldEffect(feild: string, eventName: FIELD_EVENT_NAME, listener: FieldEffectListener) {
-    return this.on(feild, eventName, listener)
+  addFieldEffect(field: string, eventName: FIELD_EVENT_NAME, listener: FieldEffectListener) {
+    this.on(field, eventName, listener)
+    return () => this.off(field, eventName, listener)
   }
 
   removeFieldEffect(field: string, eventName?: FIELD_EVENT_NAME, listener?: FieldEffectListener) {
