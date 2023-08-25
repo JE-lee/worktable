@@ -1,5 +1,11 @@
 # @edsheet/core
 
+## 1.8.2
+
+### Patch Changes
+
+- 2b13903: return disposer of Worktable.add(Field)Effect
+
 ## 1.8.1
 
 ### Patch Changes
