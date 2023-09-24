@@ -142,7 +142,7 @@ const InnerWorktable = defineComponent({
 
     const onSelectionChange = listeners['selection-change']
     function onTableSelectionChange(rows: RowData[]) {
-      const rowProxys = rows.map((row) => row._row).map((row) => makeRowProxy(row!, true))
+      const rowProxys = rows.map((row) => row._row).map((row) => makeRowProxy(row!, false))
       ctx.selectionCtx.selections = rowProxys
       isFunction(onSelectionChange) && onSelectionChange([...rowProxys])
     }

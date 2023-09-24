@@ -1,4 +1,4 @@
-import { isBoolean, isFunction, isUndefined, mapValues, omit } from 'lodash-es'
+import { cloneDeep, isBoolean, isFunction, isUndefined, mapValues, omit } from 'lodash-es'
 import { observable, makeObservable, action, Reaction } from 'mobx'
 import {
   Column,
@@ -53,7 +53,7 @@ export class Row {
     this.columns = columns
     this.parent = parent
     this.rIndex = rIndex
-    this.initialData = raw
+    this.initialData = cloneDeep(raw)
     this.generate(raw)
     Object.values(this.data).forEach((cell) => {
       // track dynamic value
@@ -376,7 +376,7 @@ export class Row {
       descriptor[colDef.field].push({
         type: colDef.type,
         required: true,
-        message: colDef.requiredMessage || '',
+        message: colDef.requiredMessage || 'This field is required',
       })
     }
     const rules = this.getRules(colDef)
