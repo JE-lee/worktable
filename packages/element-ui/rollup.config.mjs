@@ -23,7 +23,15 @@ const config = {
       targets: [{ src: 'src/style', dest: `${outDir}/theme` }],
     }),
   ],
-  external: ['vue', 'vue-demi', 'element-ui', '@edsheet/core'],
+  external: [
+    'vue',
+    'vue-demi',
+    'element-ui',
+    '@edsheet/core',
+    'ag-grid-community',
+    'ag-grid-vue',
+    'vue-property-decorator',
+  ],
 }
 
 export default config

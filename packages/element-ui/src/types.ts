@@ -42,18 +42,21 @@ export type InnerComponent =
 
 export type Options = Array<{ label: string; value: any }>
 
-export type Context = {
+export type BaseContext = {
   worktable: Worktable
   layout: TableLayout
   rowDatas: IComputedValue<RowData[]>
   tableRef: ShallowRef<any>
-  toggleRowExpansion: (filter: (row: RowProxy) => boolean, expanded: boolean) => void
   opt: useWorkTableOpt
   selectionCtx: {
     selections: RowProxy[]
   }
-  paginationCtx: ReturnType<typeof usePagination>
   componentCache: CompositionCache<VueComponent>
+}
+
+export type Context = BaseContext & {
+  toggleRowExpansion: (filter: (row: RowProxy) => boolean, expanded: boolean) => void
+  paginationCtx: ReturnType<typeof usePagination>
 }
 
 export type RenderRowProxy = RowProxy & {
@@ -67,7 +70,7 @@ export type UIColumn = Column & {
   render?: DynamicRender
   renderHeader?: (ctx: {
     field: string
-    colIndex: number
+    colIndex?: number
     add: Worktable['addRow']
     worktable: ReturnType<typeof bindWorktable>
   }) => void

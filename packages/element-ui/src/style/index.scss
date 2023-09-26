@@ -12,3 +12,31 @@
     }
   }
 }
+
+$agCellPaddingLeft: 4px;
+$agCellPaddingRight: 4px;
+
+.#{$CLASS-PREFIX}.ag-grid-worktable {
+  .ag-header-cell {
+    padding-left: $agCellPaddingLeft;
+    padding-right: $agCellPaddingRight;
+  }
+  .ag-cell {
+    display: flex;
+    align-items: center;
+    padding-left: $agCellPaddingLeft;
+    padding-right: $agCellPaddingRight;
+
+    .#{$CLASS-PREFIX}-feedback {
+      width: 100%;
+
+      .el-select {
+        width: 100%;
+      }
+    }
+  }
+
+  .el-form-item__content {
+    line-height: 1.1;
+  }
+}

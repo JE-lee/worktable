@@ -49,6 +49,7 @@ module.exports = {
         '@element-ui': path.resolve(__dirname, '../../src'),
         // fix: 统一 vue-demi 和 vue-press 的 vue 依赖位置
         'vue': path.resolve(__dirname, '../../node_modules/vue/dist/vue.runtime.esm.js'),
+        'async-validator': path.resolve(__dirname, '../../../core/node_modules/async-validator/dist-web/index.js')
       },
     },
     module: {

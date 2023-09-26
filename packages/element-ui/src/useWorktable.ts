@@ -1,4 +1,4 @@
-import { Context, RowData, UIColumn, useWorkTableOpt } from '@element-ui/types'
+import { BaseContext, Context, RowData, UIColumn, useWorkTableOpt } from '@element-ui/types'
 import { computed as mcomputed } from 'mobx'
 import { Column, makeRowProxy, Row, RowProxy, Worktable } from '@edsheet/core'
 import { provide, shallowRef, onUnmounted } from 'vue-demi'
@@ -7,15 +7,19 @@ import { InnerRender } from '@element-ui/components/InnerComponent'
 import { usePagination, PAGE_SIZE } from '@element-ui/components/InnerPagination'
 import { CompositionCache } from './shared/composition-cache'
 
+// Element-ui Table
 export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
-  const _opt = { ...opt }
-  const columns = [...opt.columns]
-  const selectionCtx: Context['selectionCtx'] = { selections: [] }
-  _opt.columns = formatColumns(columns)
-  const worktable = new Worktable(_opt)
-  const injectKey = getWorktableInjectKey(opt.key)
-  const rowDatas = mcomputed(() => generatePosData(worktable.rows, worktable.columns))
-  const tableRef = shallowRef(null as any)
+  const {
+    injectKey,
+    opt: _opt,
+    removeSelectedRows,
+    rowDatas,
+    selectionCtx,
+    setColumns,
+    tableRef,
+    worktable,
+  } = useBaseWorktable(opt)
+
   const toggleRowExpansion = (filter: (row: RowProxy) => boolean, expanded: boolean) => {
     const targets: RowData[] = []
     const datas = rowDatas.get()
@@ -27,11 +31,6 @@ export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
 
     targets.forEach((row) => tableRef.value?.toggleRowExpansion(row, expanded))
   }
-
-  // teardown when unmount
-  onUnmounted(() => {
-    worktable.teardown()
-  })
 
   // pagination
   const paginationCtx = usePagination()
@@ -48,13 +47,6 @@ export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
     componentCache: new CompositionCache(),
   }
   provide(injectKey, ctx)
-
-  function removeSelectedRows() {
-    selectionCtx.selections.forEach((row) => {
-      worktable.remove(row.rid)
-    })
-    selectionCtx.selections = []
-  }
 
   function gotoPage(index: number) {
     paginationCtx.refresh(index)
@@ -74,13 +66,80 @@ export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
     toggleRowExpansion,
     removeSelectedRows,
     ...bindWorktable(worktable),
-    setColumns: (cols: UIColumn[]) => {
-      const columns = formatColumns(cols)
-      return worktable.setColumns(columns)
-    },
+    setColumns,
     gotoFirstPage,
     gotoLastPage,
     gotoPage,
+  }
+}
+
+// AgGrid
+export function useBigWorktable(opt: useWorkTableOpt = { columns: [] }) {
+  const {
+    injectKey,
+    opt: _opt,
+    removeSelectedRows,
+    rowDatas,
+    selectionCtx,
+    setColumns,
+    tableRef,
+    worktable,
+  } = useBaseWorktable(opt)
+
+  const ctx: BaseContext = {
+    worktable,
+    layout: Object.assign({ pagination: false, size: 'mini', feedback: 'terse' }, opt.layout),
+    rowDatas,
+    tableRef,
+    opt: _opt,
+    selectionCtx,
+    componentCache: new CompositionCache(),
+  }
+  provide(injectKey, ctx)
+
+  return {
+    ...bindWorktable(worktable),
+    ...worktable,
+    removeSelectedRows,
+    setColumns,
+  }
+}
+
+function useBaseWorktable(opt: useWorkTableOpt = { columns: [] }) {
+  const _opt = { ...opt }
+  _opt.columns = formatColumns(opt.columns)
+  const selectionCtx: Context['selectionCtx'] = { selections: [] }
+  const worktable = new Worktable(_opt)
+  const injectKey = getWorktableInjectKey(opt.key)
+  const rowDatas = mcomputed(() => generatePosData(worktable.rows, worktable.columns))
+  const tableRef = shallowRef(null as any)
+
+  // teardown when unmount
+  onUnmounted(() => {
+    worktable.teardown()
+  })
+
+  function removeSelectedRows() {
+    selectionCtx.selections.forEach((row) => {
+      worktable.remove(row.rid)
+    })
+    selectionCtx.selections = []
+  }
+
+  function setColumns(cols: UIColumn[]) {
+    const columns = formatColumns(cols)
+    return worktable.setColumns(columns)
+  }
+
+  return {
+    injectKey,
+    rowDatas,
+    removeSelectedRows,
+    tableRef,
+    worktable,
+    selectionCtx,
+    opt: _opt,
+    setColumns,
   }
 }
 
