@@ -1,6 +1,6 @@
 {
   "name": "@edsheet/core",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "description": "",
   "main": "esm",
   "module": "esm",

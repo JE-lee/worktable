@@ -1,5 +1,13 @@
 # @edsheet/element-ui
 
+## 1.8.3
+
+### Patch Changes
+
+- 3a542d7: fix some bug
+- Updated dependencies [3a542d7]
+  - @edsheet/core@1.8.3
+
 ## 1.8.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @edsheet/core
 
+## 1.8.3
+
+### Patch Changes
+
+- 3a542d7: fix some bug
+
 ## 1.8.2
 
 ### Patch Changes
