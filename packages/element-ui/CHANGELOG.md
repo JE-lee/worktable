@@ -1,5 +1,17 @@
 # @edsheet/element-ui
 
+## 1.9.0
+
+### Minor Changes
+
+- 79ab998: Using ag-grid to take on large data-volume tables
+
+### Patch Changes
+
+- 3a542d7: fix some bug
+- Updated dependencies [3a542d7]
+  - @edsheet/core@1.9.0
+
 ## 1.9.0-alpha.1
 
 ### Minor Changes
