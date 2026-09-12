@@ -7,15 +7,15 @@ import {
   getCurrentInstance,
   shallowRef,
   onUnmounted,
+  computed,
+  watch,
 } from 'vue-demi'
 import { AgGridVue } from 'ag-grid-vue'
 import type { GridReadyEvent, GridApi, IRowNode } from 'ag-grid-community'
 import type { VueComponent, BaseContext, UIColumn } from './types'
-import { observer } from 'mobx-vue'
 import { CLASS_PREFIX, getWorktableInjectKey, innerDefaultKey, ROWID } from '@element-ui/shared'
 import { AgWrapper } from './components/AgWrapper'
 import { AgHeader } from './components/AgHeader'
-import { computed as mcomputed, reaction } from 'mobx'
 import { CellPosition, RowProxy, TABLE_EVENT_NAME } from '@edsheet/core'
 
 const InnerAgGridTable = defineComponent({
@@ -37,7 +37,7 @@ const InnerAgGridTable = defineComponent({
     const key = getWorktableInjectKey(props.name)
     const ctx = inject(key) as BaseContext
     const worktable = ctx.worktable
-    const columnDefs = mcomputed(() => {
+    const columnDefs = computed(() => {
       const colDefs = covert2ColumnDefs(worktable.columns.filter((col) => !col.hidden))
       // add extra render params
       colDefs.forEach((colDef) => {
@@ -48,7 +48,7 @@ const InnerAgGridTable = defineComponent({
       })
       return colDefs
     })
-    const rowData = useMobxData(() => ctx.rowDatas.get())
+    const rowData = useVueData(() => ctx.rowDatas.value)
     // https://www.ag-grid.com/vue-data-grid/grid-options/#reference-rowModels-getRowId
     // 提升单行新增的性能
     const getRowId = (params: any) => params.data[ROWID]
@@ -97,7 +97,7 @@ const InnerAgGridTable = defineComponent({
         staticClass: CLASS_PREFIX,
         attrs: {
           ...attrs,
-          columnDefs: columnDefs.get(),
+          columnDefs: columnDefs.value,
           rowData: rowData.value,
           getRowId,
           debounceVerticalScrollbar: true,
@@ -116,7 +116,7 @@ const InnerAgGridTable = defineComponent({
   },
 })
 
-export default observer(InnerAgGridTable as any) as VueComponent
+export default InnerAgGridTable as VueComponent
 
 function covert2ColumnDefs(columns: UIColumn[]): Record<string, any>[] {
   const colDefs = columns.map((col) => {
@@ -140,11 +140,11 @@ function covert2ColumnDefs(columns: UIColumn[]): Record<string, any>[] {
   return colDefs
 }
 
-function useMobxData<T>(tracker: () => T) {
+function useVueData<T>(tracker: () => T) {
   const data = shallowRef<T>(tracker())
-  const disposer = reaction(tracker, (value) => (data.value = value))
+  const stop = watch(tracker, (value: T) => (data.value = value))
 
-  onUnmounted(() => disposer())
+  onUnmounted(() => stop())
 
   return data
 }

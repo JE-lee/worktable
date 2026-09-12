@@ -30,9 +30,7 @@
   "dependencies": {
     "@edsheet/core": "workspace:^1.9.0-alpha.1",
     "dayjs": "^1.11.7",
-    "lodash-es": "^4.17.21",
-    "mobx": "^6.7.0",
-    "mobx-vue": "^2.2.0"
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",

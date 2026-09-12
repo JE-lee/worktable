@@ -1,5 +1,5 @@
 import { cloneDeep, isBoolean, isFunction, isUndefined, mapValues, omit } from 'lodash-es'
-import { observable, makeObservable, action, Reaction } from 'mobx'
+import { shallowRef, watch, watchEffect, markRaw, type ShallowRef, type WatchStopHandle } from 'vue'
 import {
   Column,
   RowRaw,
@@ -12,7 +12,7 @@ import {
   RowErrors,
 } from './types'
 import { Cell } from './Cell'
-import { Worktable } from './Worktable'
+import type { Worktable } from './Worktable'
 import { makeRowProxy, noThrow, walk, getDefaultValue } from './share'
 import type { RuleItem } from 'async-validator'
 import ValidateSchema from 'async-validator'
@@ -24,13 +24,29 @@ export class Row {
   static rid = 1
   rid: number
   data: Record<string, Cell> = {}
-  children: Row[] = []
   parent?: Row
-  rIndex = 0
   columns: Column[]
   disposers: Array<() => void> = []
   initialData: Record<string, any> = {}
   private wt?: Worktable
+
+  // 响应式字段
+  private _children: ShallowRef<Row[]>
+  private _rIndex: ShallowRef<number>
+
+  get children(): Row[] {
+    return this._children.value
+  }
+  set children(val: Row[]) {
+    this._children.value = val
+  }
+
+  get rIndex(): number {
+    return this._rIndex.value
+  }
+  set rIndex(val: number) {
+    this._rIndex.value = val
+  }
 
   static generateRows(columns: Column[], raws: RowRaws, parent?: Row, wt?: Worktable) {
     return raws.map((raw, index) => {
@@ -40,19 +56,13 @@ export class Row {
   }
 
   constructor(columns: Column[], raw: RowRaw = {}, parent?: Row, rIndex = 0, wt?: Worktable) {
-    makeObservable(this, {
-      rIndex: observable.ref,
-      children: observable.shallow,
-      addRow: action,
-      addRows: action,
-      sort: action,
-    })
+    this._children = shallowRef([])
+    this._rIndex = shallowRef(rIndex)
 
     this.wt = wt
     this.rid = Row.rid++
     this.columns = columns
     this.parent = parent
-    this.rIndex = rIndex
     this.initialData = cloneDeep(raw)
     this.generate(raw)
     Object.values(this.data).forEach((cell) => {
@@ -63,9 +73,11 @@ export class Row {
     })
 
     // notify value initialization event
-    // FIXME: 这里是否需要延迟一下，否则在 onFieldInit 里面调用 worktable.getData 无法拿到全部的数据
     this.notifyCellInitializationEvent()
     this.trackRowValidateHandle()
+
+    // 与 Cell 同理，标记 raw 阻止 vue 对 Row 二次 reactive 代理（保护 children/rIndex 的 shallowRef）。
+    return markRaw(this)
   }
 
   getShallowRaw() {
@@ -104,17 +116,21 @@ export class Row {
   addRow(raw?: RowRaw): RowProxy {
     const row = new Row(this.columns, raw, this, 0, this.wt)
     row.rIndex = this.children.length
-    this.children.push(row)
+    this.children = [...this.children, row]
     this.wt?.updateRowsMap()
     return makeRowProxy(row)
   }
 
   addRows(raws: RowRaw[] = []): RowProxy[] {
-    const rows: RowProxy[] = []
-    raws.forEach((raw) => {
-      rows.push(this.addRow(raw))
-    })
-    return rows
+    // 批量构建后一次性赋值 children，保证只触发一次响应式通知
+    const newRows = raws.map((raw) => new Row(this.columns, raw, this, 0, this.wt))
+    if (newRows.length > 0) {
+      const startIndex = this.children.length
+      newRows.forEach((row, i) => (row.rIndex = startIndex + i))
+      this.children = [...this.children, ...newRows]
+      this.wt?.updateRowsMap()
+    }
+    return newRows.map((row) => makeRowProxy(row))
   }
 
   remove(rid: number): void
@@ -131,11 +147,13 @@ export class Row {
     const workRows = this.children
     const index = workRows.findIndex((r) => r === row)
     if (index > -1) {
-      const [removed] = workRows.splice(index, 1)
+      const next = workRows.slice()
+      const [removed] = next.splice(index, 1)
+      // 先重置 rIndex，再赋值触发响应式通知
+      next.forEach((row, index) => (row.rIndex = index))
+      this.children = next
       this.wt?.updateRowsMap()
       removed.teardown()
-      // reset row.rIndex
-      workRows.forEach((row, index) => (row.rIndex = index))
     }
   }
 
@@ -149,7 +167,9 @@ export class Row {
   }
 
   sort(comparator: (a: RowProxy, b: RowProxy) => number) {
-    this.children.sort((arow, brow) => comparator(makeRowProxy(arow), makeRowProxy(brow)))
+    this.children = this.children
+      .slice()
+      .sort((arow, brow) => comparator(makeRowProxy(arow), makeRowProxy(brow)))
   }
 
   teardown() {
@@ -198,13 +218,6 @@ export class Row {
     return mapValues(this.data, (cell) => cell.errors)
   }
 
-  // private notifyCellValueEvent() {
-  //   Object.values(this.data).forEach((cell) => {
-  //     cell.notifyValueFieldEvent(FIELD_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
-  //     cell.notifyValueTableEvent(TABLE_EVENT_NAME.ON_FIELD_VALUE_CHANGE)
-  //   })
-  // }
-
   private setBoolState(field: string | string[], state: CellBoolState, val: boolean) {
     if (field) {
       const fields = Array.isArray(field) ? field : [field]
@@ -238,14 +251,24 @@ export class Row {
     }
   }
 
+  /**
+   * 监听 cell 校验依赖，变化即重新校验（对齐 mobx 的 Reaction 模型）。
+   *
+   * 用单个 watchEffect 承载 validateCell：effect 每次重跑时既做真校验、又顺带
+   * 重新收集依赖——validateCell 同步段会读取 cellValue（本 cell 依赖），其内部
+   * asyncValidator 同步调用用户 validator 时会读取跨字段值（如 row.data.isGroup，
+   * 跨字段依赖）。任一依赖变化即触发 effect 重跑校验。这与 mobx 版本
+   * `reaction.track(() => validator())` 完全同构（一次执行 = 校验 + 依赖收集），
+   * 避免「source 探测 + callback 校验」双次执行导致 validator 被重复调用。
+   *
+   * flush 用 'pre' 而非 'sync'：校验常因 onFieldReact 等计算值 effect 写入而间接
+   * 触发。'pre' 将其推迟到外层同步代码跑完后的独立时机执行，避免嵌套调度下校验
+   * 内的依赖读取被外层 effect 误收集（core 测试均有 await delay 等待校验完成）。
+   */
   private trackCellValidateHandle(cell: Cell) {
     const validator = noThrow(() => this.validateCell(cell))
-    const reaction: Reaction = new Reaction(`${this.rid}-${cell.colDef.field}-validator`, () =>
-      reaction.track(() => validator())
-    )
-    reaction.track(() => this.trackCellValidatorDep(cell))
-    const disposer = () => reaction.dispose()
-    return disposer
+    const stop: WatchStopHandle = watchEffect(() => validator(), { flush: 'pre' })
+    return stop
   }
 
   private validateCell(cell: Cell, force = false) {
@@ -258,6 +281,8 @@ export class Row {
 
     const needEmitError = cell.modified || force
     const descriptor = this.makeCellVaidateDescriptor(colDef)
+    // target 读取响应式 cellValue，使 watchEffect 能收集到本 cell 值的依赖；
+    // 其余场景（notify、errors）用 peek 读取，避免校验过程对 errors 等产生多余依赖。
     const target = { [colDef.field]: cell.cellValue }
     cell.setState('validating', true)
     const validator = new ValidateSchema(descriptor)
@@ -265,21 +290,21 @@ export class Row {
       this.wt?.notifyFieldEvent(
         colDef.field,
         FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_START,
-        cell.cellValue,
+        cell.peekCellValue(),
         makeRowProxy(this)
       )
     }
     return validator
       .validate(target)
       .then(() => {
-        if (cell.errors.length > 0) {
+        if (cell.peekErrors().length > 0) {
           cell.setState('errors', [])
         }
         if (needEmitError) {
           this.wt?.notifyFieldEvent(
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_SUCCESS,
-            cell.cellValue,
+            cell.peekCellValue(),
             makeRowProxy(this)
           )
         }
@@ -292,7 +317,7 @@ export class Row {
           this.wt?.notifyFieldEvent(
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FAIL,
-            cell.cellValue,
+            cell.peekCellValue(),
             makeRowProxy(this),
             errors
           )
@@ -305,36 +330,11 @@ export class Row {
           this.wt?.notifyFieldEvent(
             colDef.field,
             FIELD_EVENT_NAME.ON_FIELD_VALUE_VALIDATE_FINISH,
-            cell.cellValue,
+            cell.peekCellValue(),
             makeRowProxy(this)
           )
         }
       })
-  }
-
-  private trackCellValidatorDep(cell: Cell) {
-    const rules = this.getRules(cell.colDef).filter((rule) => isFunction(rule.asyncValidator))
-    if (rules.length > 0) {
-      const exec = async () => {
-        try {
-          await Promise.all(
-            rules.map((rule) => {
-              return rule.asyncValidator!(
-                null as any,
-                cell.cellValue,
-                () => [],
-                null as any,
-                null as any
-              )
-            })
-          )
-        } catch {
-          /* empty */
-        }
-      }
-      return [exec()]
-    }
-    return [cell.cellValue]
   }
 
   private generate(raw: RowRaw) {

@@ -1,7 +1,6 @@
 import { Cell, Column, Row, Worktable } from '@edsheet/core'
 import type { RowProxy, RowRaw, RowRaws } from '@edsheet/core'
-import { Component, ShallowRef } from 'vue-demi'
-import { IComputedValue } from 'mobx'
+import { Component, ShallowRef, ComputedRef } from 'vue-demi'
 import { bindWorktable } from './shared'
 import type { usePagination } from '@element-ui/components/InnerPagination'
 import { CompositionCache } from './shared/composition-cache'
@@ -45,7 +44,7 @@ export type Options = Array<{ label: string; value: any }>
 export type BaseContext = {
   worktable: Worktable
   layout: TableLayout
-  rowDatas: IComputedValue<RowData[]>
+  rowDatas: ComputedRef<RowData[]>
   tableRef: ShallowRef<any>
   opt: useWorkTableOpt
   selectionCtx: {

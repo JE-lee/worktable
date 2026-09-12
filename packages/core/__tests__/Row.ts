@@ -1,6 +1,6 @@
 import { Column, Worktable } from '../src'
 import { Row } from '../src/Row'
-import { reaction } from 'mobx'
+import { watch } from 'vue'
 
 describe('Row', () => {
   test('rIndex', () => {
@@ -143,7 +143,7 @@ describe('Row', () => {
     const row1 = wt.add()
     const row2 = wt.add()
     const consumer = jest.fn(() => row2.index)
-    reaction(() => wt.rows.slice(0), consumer)
+    watch(() => wt.rows.slice(0), consumer, { flush: 'sync' })
 
     wt.add()
     expect(consumer.mock.results[0].value).toBe(1)

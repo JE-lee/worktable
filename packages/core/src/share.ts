@@ -52,8 +52,24 @@ export function noThrow<T>(fn: (...args: any[]) => Promise<T>) {
   }
 }
 
-// TODO: correct type delaretion
-export function makeRowProxy(row: Row, immutable = false) {
+// RowProxy 上与列 field 同名的保留属性，列 field 撞名时会被 proxy 拦截。
+// 这些 key 始终映射到行自身的能力，而非某个 cell。
+const ROW_PROXY_RESERVED_KEYS = ['parent', 'children', 'index', 'rid', 'data', 'errors']
+
+export function isReservedField(field: string) {
+  return ROW_PROXY_RESERVED_KEYS.indexOf(field) > -1
+}
+
+// 缓存 RowProxy，避免 sort/filter/notify 等热路径上重复 new Proxy。
+// WeakMap 以原始 Row 为 key，Row 被回收时缓存自动失效。
+const mutableProxyCache = new WeakMap<Row, RowProxy>()
+const immutableProxyCache = new WeakMap<Row, RowProxy>()
+
+export function makeRowProxy(row: Row, immutable = false): RowProxy {
+  const cache = immutable ? immutableProxyCache : mutableProxyCache
+  const cached = cache.get(row)
+  if (cached) return cached
+
   const rowDataProxy = makeRowDataProxy(row, immutable)
   const rowAction = makeRowAction(row)
   const handler: ProxyHandler<Row> = {
@@ -79,7 +95,9 @@ export function makeRowProxy(row: Row, immutable = false) {
       }
     },
   }
-  return new Proxy(row, handler) as unknown as RowProxy
+  const proxy = new Proxy(row, handler) as unknown as RowProxy
+  cache.set(row, proxy)
+  return proxy
 }
 
 export function makeRowAction(row: Row): RowAction {
@@ -92,7 +110,6 @@ export function makeRowAction(row: Row): RowAction {
   const reset = row.reset.bind(row)
   const setValues = row.setValues.bind(row)
   const getValues = row.getRaw.bind(row)
-  const getValue = row.getRaw.bind(row)
   const setLoading = row.setLoading.bind(row)
   return {
     reset,
@@ -104,7 +121,6 @@ export function makeRowAction(row: Row): RowAction {
     setComponentProps,
     setValues,
     getValues,
-    getValue,
     setLoading,
   }
 }

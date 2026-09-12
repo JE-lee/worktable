@@ -21,8 +21,6 @@ import {
 import { makeRowProxy, TABLE_EVENT_NAME } from '@edsheet/core'
 import { TableCell } from '@element-ui/components/TableCell'
 import { splitPosKey } from '@element-ui/shared/pos-key'
-import { computed as mcomputed } from 'mobx'
-import { observer } from 'mobx-vue'
 import type { Context, RowData, UIColumn, VueComponent } from './types'
 import { InnerPagination, PAGE_SIZE } from '@element-ui/components/InnerPagination'
 import { isFunction } from 'lodash-es'
@@ -43,12 +41,12 @@ const InnerWorktable = defineComponent({
 
     const datas = ctx.rowDatas
     const { attr: paginationAttrs, on: paginationListeners, pagination } = ctx.paginationCtx
-    const visibleDatas = mcomputed(() => {
+    const visibleDatas = computed(() => {
       if (ctx.layout.pagination) {
-        const { current, size } = pagination.get()
-        return datas.get().slice((current - 1) * size, current * size)
+        const { current, size } = pagination.value
+        return datas.value.slice((current - 1) * size, current * size)
       } else {
-        return datas.get()
+        return datas.value
       }
     })
 
@@ -153,7 +151,7 @@ const InnerWorktable = defineComponent({
         {
           ref: 'tableRef',
           attrs: Object.assign({}, attrs, {
-            data: visibleDatas.get(),
+            data: visibleDatas.value,
             'row-key': ROWID,
             showSummary: props.showSummary,
             summaryMethod: summaryMethod.value,
@@ -166,7 +164,7 @@ const InnerWorktable = defineComponent({
       )
     }
     return () => {
-      const paginationVisible = ctx.layout.pagination && datas.get().length > PAGE_SIZE
+      const paginationVisible = ctx.layout.pagination && datas.value.length > PAGE_SIZE
       return h('div', { staticClass: CLASS_PREFIX }, [
         renderTable(),
         paginationVisible && renderPagination(),
@@ -175,4 +173,4 @@ const InnerWorktable = defineComponent({
   },
 })
 
-export default observer(InnerWorktable as any) as VueComponent
+export default InnerWorktable as VueComponent

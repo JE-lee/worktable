@@ -9,8 +9,6 @@ export enum FIELD_EVENT_NAME {
   ON_FIELD_REACT = 'onFieldReact',
 }
 
-export const TABLE_EFFECT_NAMESPACE = '__table_effects__'
-
 export enum TABLE_EVENT_NAME {
   ON_FIELD_VALUE_CHANGE = 'onFieldValueChange',
   ON_FIELD_INPUT_VALUE_CHANGE = 'onFieldInputValueChange',

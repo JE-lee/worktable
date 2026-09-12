@@ -1,7 +1,6 @@
 import { BaseContext, Context, RowData, UIColumn, useWorkTableOpt } from '@element-ui/types'
-import { computed as mcomputed } from 'mobx'
 import { Column, makeRowProxy, Row, RowProxy, Worktable } from '@edsheet/core'
-import { provide, shallowRef, onUnmounted } from 'vue-demi'
+import { provide, shallowRef, onUnmounted, computed } from 'vue-demi'
 import { bindWorktable, getWorktableInjectKey, mergePosKey, ROWID, walk } from '@element-ui/shared'
 import { InnerRender } from '@element-ui/components/InnerComponent'
 import { usePagination, PAGE_SIZE } from '@element-ui/components/InnerPagination'
@@ -22,7 +21,7 @@ export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
 
   const toggleRowExpansion = (filter: (row: RowProxy) => boolean, expanded: boolean) => {
     const targets: RowData[] = []
-    const datas = rowDatas.get()
+    const datas = rowDatas.value
     walk(datas, (item) => {
       if (item._row && filter(makeRowProxy(item._row, true))) {
         targets.push(item)
@@ -53,7 +52,7 @@ export function useWorktable(opt: useWorkTableOpt = { columns: [] }) {
   }
 
   function gotoLastPage() {
-    const length = rowDatas.get().length
+    const length = rowDatas.value.length
     gotoPage(Math.ceil(length / PAGE_SIZE))
   }
 
@@ -111,7 +110,7 @@ function useBaseWorktable(opt: useWorkTableOpt = { columns: [] }) {
   const selectionCtx: Context['selectionCtx'] = { selections: [] }
   const worktable = new Worktable(_opt)
   const injectKey = getWorktableInjectKey(opt.key)
-  const rowDatas = mcomputed(() => generatePosData(worktable.rows, worktable.columns))
+  const rowDatas = computed(() => generatePosData(worktable.rows, worktable.columns))
   const tableRef = shallowRef(null as any)
 
   // teardown when unmount

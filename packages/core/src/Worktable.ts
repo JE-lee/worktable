@@ -13,10 +13,9 @@ import {
 } from './types'
 import { cloneDeep, isObject, isFunction, isEmpty } from 'lodash-es'
 import { BaseWorktable } from './BaseWorktable'
-import { runInAction, makeObservable, observable, action } from 'mobx'
 import { Row } from './Row'
-import { flatten, makeRowProxy, walk } from './share'
-import { FIELD_EVENT_NAME, TABLE_EFFECT_NAMESPACE, TABLE_EVENT_NAME } from './event'
+import { flatten, makeRowProxy, walk, isReservedField } from './share'
+import { FIELD_EVENT_NAME, TABLE_EVENT_NAME } from './event'
 import { deconstruct } from './field-parser'
 
 type TableEventForCell =
@@ -26,16 +25,15 @@ type TableEventForCell =
 export class Worktable extends BaseWorktable {
   constructor(opt: WorktableConstructorOpt)
   constructor(columns: Column[])
-  constructor(opt: any) {
+  constructor(opt: WorktableConstructorOpt | Column[]) {
     super()
-    this.makeObservable()
 
     let columns: Column[] = []
     let initialData: WorktableConstructorOpt['initialData']
     if (Array.isArray(opt)) {
       columns = opt
     } else if (isObject(opt)) {
-      columns = (opt as WorktableConstructorOpt).columns
+      columns = (opt as WorktableConstructorOpt).columns || []
       initialData = (opt as WorktableConstructorOpt).initialData
     }
     this._setColumns(columns)
@@ -47,23 +45,20 @@ export class Worktable extends BaseWorktable {
   setColumns(columns: Column[]) {
     const raws = this.getRaws()
 
-    this.removeAll()
-    this._setColumns(columns)
-    // re-generate row data
-    this.addRows(raws)
+    // 拆解旧行但不立即清空 this.rows（避免中间的空数组态额外触发一次响应式通知），
+    // 待新行构建完成后一次性替换（对齐 mobx 版本 setColumns 作为单个 action 的批处理语义）。
+    const oldRows = this.rows
+    this.removeAllColFieldEffects()
+    const cols = this.buildColumns(columns)
+
+    oldRows.forEach((row) => row.teardown())
+
+    const newRows = raws.map((raw, i) => new Row(cols, raw, undefined, i, this))
+    this.columns = cols
+    this.rows = newRows
+    this.updateRowsMap()
+    this.bindColumnEffects(cols)
   }
-
-  // updateColumn(field: string, newCol: Column | ((oldCol: Column) => Column)) {
-  //   const colIndex = this.columns.findIndex((col) => col.field === field)
-
-  //   if (colIndex > -1) {
-  //     if (isFunction(newCol)) {
-  //       newCol = newCol(this.columns[colIndex])
-  //     }
-  //     const columns = [...this.columns]
-  //     columns.splice(colIndex, 1, newCol)
-  //   }
-  // }
 
   getData() {
     return this.getRaws()
@@ -98,11 +93,18 @@ export class Worktable extends BaseWorktable {
 
     const index = workRows.findIndex((r) => r === row)
     if (index > -1) {
-      const [removed] = workRows.splice(index, 1)
+      const next = workRows.slice()
+      const [removed] = next.splice(index, 1)
+      // 先重置 rIndex，再赋值触发响应式通知，
+      // 保证 watcher 回调里读到的 rIndex 已是最新值（对齐 mobx action 的批处理边界）。
+      next.forEach((row, index) => (row.rIndex = index))
+      if (row.parent) {
+        row.parent.children = next
+      } else {
+        this.rows = next
+      }
       this.updateRowsMap()
       removed.teardown()
-      // reset row.rIndex
-      workRows.forEach((row, index) => (row.rIndex = index))
     }
   }
 
@@ -121,13 +123,16 @@ export class Worktable extends BaseWorktable {
 
   // 删除所有行数据
   removeAll() {
+    const removed = this.rows
     this.rows = []
     this.updateRowsMap()
-    this.teardownAllReactions()
+    removed.forEach((row) => row.teardown())
   }
 
   sort(comparator: (a: RowProxy, b: RowProxy) => number) {
-    this.rows.sort((arow, brow) => comparator(makeRowProxy(arow, true), makeRowProxy(brow, true)))
+    this.rows = this.rows
+      .slice()
+      .sort((arow, brow) => comparator(makeRowProxy(arow, true), makeRowProxy(brow, true)))
   }
 
   sortChildInEach(comparator: (a: RowProxy, b: RowProxy) => number, filter: Filter) {
@@ -161,17 +166,23 @@ export class Worktable extends BaseWorktable {
 
   addRow(raw: RowRaw = {}): RowProxy {
     const row = new Row(this.columns, raw, undefined, this.rows.length, this)
-    this.rows.push(row)
+    this.rows = [...this.rows, row]
     this.updateRowsMap()
     return makeRowProxy(row)
   }
 
   addRows(raws: RowRaws): RowProxy[] {
-    const rows: RowProxy[] = []
-    raws.forEach((raw) => {
-      rows.push(this.addRow(raw))
-    })
-    return rows
+    // 批量构建后一次性赋值 rows，保证只触发一次响应式通知
+    // （对齐 mobx 版本 addRows 作为单个 action 的批处理语义）。
+    const startIndex = this.rows.length
+    const newRows = raws.map(
+      (raw, i) => new Row(this.columns, raw, undefined, startIndex + i, this)
+    )
+    if (newRows.length > 0) {
+      this.rows = [...this.rows, ...newRows]
+      this.updateRowsMap()
+    }
+    return newRows.map((row) => makeRowProxy(row))
   }
 
   findAll(filter?: Filter) {
@@ -184,6 +195,15 @@ export class Worktable extends BaseWorktable {
 
   find(filter: Filter): RowProxy | null {
     return this.findAll(filter)[0] || null
+  }
+
+  /**
+   * 按 rid 获取行的代理对象（RowProxy）。
+   * 与内部使用的 getRowByRid（返回 Row 实例）不同，这是面向使用者的便捷入口。
+   */
+  getRow(rid: number): RowProxy | null {
+    const row = this.getRowByRid(rid)
+    return row ? makeRowProxy(row) : null
   }
 
   forEach(processor: (row: RowProxy) => void) {
@@ -204,13 +224,13 @@ export class Worktable extends BaseWorktable {
     eventName: T,
     listener: T extends TableEventForCell ? FieldEffectListener : TableEffectListener
   ) {
-    this.on(TABLE_EFFECT_NAMESPACE, eventName, listener)
-    return () => this.off(TABLE_EFFECT_NAMESPACE, eventName, listener)
+    this.emitter.onTable(eventName, listener)
+    return () => this.emitter.offTable(eventName, listener)
   }
 
   addFieldEffect(field: string, eventName: FIELD_EVENT_NAME, listener: FieldEffectListener) {
-    this.on(field, eventName, listener)
-    return () => this.off(field, eventName, listener)
+    this.emitter.onField(field, eventName, listener)
+    return () => this.emitter.offField(field, eventName, listener)
   }
 
   removeFieldEffect(field: string, eventName?: FIELD_EVENT_NAME, listener?: FieldEffectListener) {
@@ -221,12 +241,12 @@ export class Worktable extends BaseWorktable {
       eventNames.push(eventName)
     }
     eventNames.forEach((eventName) => {
-      this.off(field, eventName, listener)
+      this.emitter.offField(field, eventName, listener)
     })
   }
 
-  removeEffect(eventName: TABLE_EVENT_NAME, listener?: FieldEffectListener) {
-    return this.off(TABLE_EFFECT_NAMESPACE, eventName, listener)
+  removeEffect(eventName: TABLE_EVENT_NAME, listener?: FieldEffectListener | TableEffectListener) {
+    return this.emitter.offTable(eventName, listener)
   }
 
   setComponentProps(field: string, externalProps: StaticComponentProps) {
@@ -248,18 +268,19 @@ export class Worktable extends BaseWorktable {
 
   toggleColumnVisibility(fields: string | string[], visible = false) {
     fields = Array.isArray(fields) ? fields : [fields]
-    const columns = [...this.columns]
-    columns.forEach((colDef) => {
+    // 原地修改 colDef.hidden，保持与 cell.colDef 的引用一致（cell 读取的是同一对象），
+    // 再以新数组重新赋值触发 columns 的浅响应更新。
+    this.columns.forEach((colDef) => {
       if ((fields as string[]).some((field) => field === colDef.field)) {
         colDef.hidden = !visible
       }
     })
-    this.columns = columns
+    this.columns = this.columns.slice()
   }
 
   teardown() {
     this.removeAll()
-    this.offAll() // clear all event listeners
+    this.emitter.offAll() // clear all event listeners
   }
 
   private findAllRows(filter: Filter = () => true) {
@@ -273,6 +294,14 @@ export class Worktable extends BaseWorktable {
   }
 
   private _setColumns(columns: Column[]) {
+    const cols = this.buildColumns(columns)
+    this.removeAllColFieldEffects()
+    this.columns = cols
+    this.bindColumnEffects(cols)
+  }
+
+  /** 构建列定义：过滤、字段解构展开、保留字撞名告警（纯数据加工，不触碰响应式状态） */
+  private buildColumns(columns: Column[]): Column[] {
     const cols = cloneDeep(columns.filter((col) => isObject(col) && !isEmpty(col)))
     // deconstruct column field
     const appendCols: Column[] = []
@@ -286,10 +315,20 @@ export class Worktable extends BaseWorktable {
       cols.push(appended)
     })
 
-    // remove all effect event listeners of field
-    this.removeAllColFieldEffects()
-    runInAction(() => (this.columns = cols))
+    // 列 field 与 RowProxy 保留字撞名时给出告警（该列在 row.data 上会被保留字遮蔽）
+    cols.forEach((col) => {
+      if (col.field && isReservedField(col.field)) {
+        console.warn(
+          `[worktable] column field "${col.field}" conflicts with RowProxy reserved keys, ` +
+            `it will be shadowed when accessed via rowProxy.${col.field}`
+        )
+      }
+    })
+    return cols
+  }
 
+  /** 绑定列上声明的 effects 到字段事件 */
+  private bindColumnEffects(cols: Column[]) {
     cols.forEach((colDef) => {
       // format enum
       if (!Array.isArray(colDef.enum)) {
@@ -299,7 +338,11 @@ export class Worktable extends BaseWorktable {
       if (isObject(colDef.effects)) {
         Object.entries(colDef.effects).forEach(([eventName, listener]) => {
           if (isFunction(listener)) {
-            this.on(colDef.field, eventName, listener)
+            this.emitter.onField(
+              colDef.field,
+              eventName as FIELD_EVENT_NAME,
+              listener as FieldEffectListener
+            )
           }
         })
       }
@@ -312,7 +355,7 @@ export class Worktable extends BaseWorktable {
       colDef.virtual = true
       const cols: Column[] = []
 
-      meta.keyMaps.forEach(([from, to]) => {
+      meta.keyMaps.forEach(([, to]) => {
         cols.push({ field: to, hidden: true })
       })
       return cols
@@ -325,28 +368,14 @@ export class Worktable extends BaseWorktable {
       if (isObject(colDef.effects)) {
         Object.entries(colDef.effects).forEach(([eventName, listener]) => {
           if (isFunction(listener)) {
-            this.off(colDef.field, eventName, listener)
+            this.emitter.offField(
+              colDef.field,
+              eventName as FIELD_EVENT_NAME,
+              listener as FieldEffectListener
+            )
           }
         })
       }
-    })
-  }
-
-  private makeObservable() {
-    makeObservable(this, {
-      columns: observable.shallow,
-      rows: observable.shallow,
-      setColumns: action,
-      addRow: action,
-      addRows: action,
-      // add: action,
-      removeAll: action,
-      removeRow: action,
-      // updateColumn: action,
-      inputValue: action,
-      setComponentProps: action,
-      sort: action,
-      toggleColumnVisibility: action,
     })
   }
 }

@@ -65,5 +65,17 @@
   },
   "engines": {
     "node": ">17.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "vue-demi",
+      "cypress",
+      "esbuild",
+      "core-js",
+      "@parcel/watcher",
+      "ejs",
+      "highlight.js",
+      "vuepress"
+    ]
   }
 }

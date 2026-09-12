@@ -37,7 +37,6 @@ export type RowAction = Pick<
 > & {
   removeRow: Row['remove']
   removeAllRow: Row['removeAll']
-  getValue: Row['getRaw']
   getValues: Row['getRaw']
   setLoading: Row['setLoading']
 }
@@ -52,8 +51,6 @@ export type RowProxy = {
 } & RowAction
 
 export type RowRaws = Array<RowRaw>
-
-export type EventContext = [CellValue, RowProxy]
 
 type BaseColumnComponent = string | (() => any) | object
 type ColumnComponent = BaseColumnComponent | ((row: RowProxy) => BaseColumnComponent)

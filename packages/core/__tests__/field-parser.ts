@@ -48,12 +48,12 @@ describe('field parser', () => {
 
     const row = wt.addRow({ productCode: 's1' })
 
-    expect(row.getValue()[field]).toBeUndefined()
-    expect(row.getValue().productCode).toBe('s1')
+    expect(row.getValues()[field]).toBeUndefined()
+    expect(row.getValues().productCode).toBe('s1')
 
     wt.inputValue({ rid: row.rid, field }, { code: 's2' })
-    expect(row.getValue()[field]).toBeUndefined()
-    expect(row.getValue().productCode).toBe('s2')
+    expect(row.getValues()[field]).toBeUndefined()
+    expect(row.getValues().productCode).toBe('s2')
   })
 
   test('value of deconstructed array field #1', () => {
@@ -63,14 +63,14 @@ describe('field parser', () => {
 
     const row = wt.addRow({ productCode: 's1', price: 12 })
 
-    let raw = row.getValue()
+    let raw = row.getValues()
     expect(raw[field]).toBeUndefined()
     expect(raw.productCode).toBe('s1')
     expect(raw.price).toBe(12)
 
     wt.inputValue({ rid: row.rid, field }, [{ code: 's2' }, 100])
 
-    raw = row.getValue()
+    raw = row.getValues()
     expect(raw[field]).toBeUndefined()
     expect(raw.productCode).toBe('s2')
     expect(raw.price).toBe(100)
@@ -83,7 +83,7 @@ describe('field parser', () => {
 
     const row = wt.addRow({ productCode: 's1', price: 12 })
 
-    let raw = row.getValue()
+    let raw = row.getValues()
     expect(raw[field]).toBeUndefined()
     expect(raw.productCode).toBe('s1')
     expect(raw.price).toBe(12)
@@ -94,7 +94,7 @@ describe('field parser', () => {
       { code: 's4', name: '86 inch tv' },
     ])
 
-    raw = row.getValue()
+    raw = row.getValues()
     expect(raw[field]).toBeUndefined()
     expect(raw.productCode).toBe('s2')
     expect(raw.productName).toBe('65 inch tv')

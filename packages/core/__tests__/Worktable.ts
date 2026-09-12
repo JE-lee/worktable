@@ -1,6 +1,6 @@
 import { Worktable } from '../src'
 import { Column } from '../src/types'
-import { reaction } from 'mobx'
+import { watch } from 'vue'
 
 function generateWorktable() {
   const columns: Column[] = [{ field: 'code' }]
@@ -76,7 +76,7 @@ describe('Worktable', () => {
   test('should react when add new row', () => {
     const worktable = generateWorktable()
     const consumer = jest.fn(() => worktable.rows.length)
-    reaction(() => worktable.rows.slice(0), consumer)
+    watch(() => worktable.rows.slice(0), consumer, { flush: 'sync' })
 
     worktable.addRow()
     expect(consumer.mock.calls.length).toBe(1)
@@ -92,7 +92,7 @@ describe('Worktable', () => {
     const head = worktable.rows[0]
 
     const consumer = jest.fn(() => head.children.length)
-    reaction(() => head.children.slice(0), consumer)
+    watch(() => head.children.slice(0), consumer, { flush: 'sync' })
 
     head.addRow()
 
@@ -106,8 +106,8 @@ describe('Worktable', () => {
     const worktable = new Worktable({ columns, initialData: raws as any })
     const consumer1 = jest.fn()
     const consumer2 = jest.fn()
-    reaction(() => worktable.columns.length, consumer1)
-    reaction(() => worktable.rows[0], consumer2)
+    watch(() => worktable.columns.length, consumer1, { flush: 'sync' })
+    watch(() => worktable.rows[0], consumer2, { flush: 'sync' })
 
     worktable.setColumns([{ field: 'code' }, { field: 'name' }])
 
@@ -119,7 +119,7 @@ describe('Worktable', () => {
     const worktable = generateWorktable()
     const target = worktable.rows[0]
     const consumer = jest.fn(() => target.data['code'].value)
-    reaction(() => target.data['code'].value, consumer)
+    watch(() => target.data['code'].value, consumer, { flush: 'sync' })
     consumer()
     expect(consumer.mock.results[0].value).toBe('A')
     worktable.inputValue({ rid: target.rid, field: 'code' }, 'B')

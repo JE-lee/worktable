@@ -14,7 +14,7 @@ const config = {
     }),
     nodeResolve(),
   ],
-  external: ['mobx'],
+  external: ['vue'],
 }
 
 export default config
